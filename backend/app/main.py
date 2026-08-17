@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import settings
 from app.database import engine
+from app.routers.heatwave import router as heatwave_router
 from app.routers.schedules import router as schedules_router
 from app.routers.visit_targets import router as visit_targets_router
 from app.routers.weather import router as weather_router
@@ -28,6 +29,7 @@ app.include_router(visit_targets_router)
 app.include_router(schedules_router)
 app.include_router(work_sessions_router)
 app.include_router(weather_router)
+app.include_router(heatwave_router)
 
 
 @app.get("/health", tags=["system"])

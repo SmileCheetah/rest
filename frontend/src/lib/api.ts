@@ -1,6 +1,8 @@
 import type {
   CreateScheduleRequest,
   CurrentWeather,
+  HeatwaveImpact,
+  LivingWeatherIndex,
   NextScheduleResult,
   Schedule,
   VisitTarget,
@@ -97,4 +99,15 @@ export function getCurrentWeather(
     longitude: String(longitude),
   });
   return apiRequest(`/weather/current?${params}`);
+}
+
+export function getCurrentHeatwave(): Promise<HeatwaveImpact> {
+  return apiRequest("/heatwave/current");
+}
+
+export function getLivingWeatherIndex(
+  areaNo = "1100000000",
+): Promise<LivingWeatherIndex> {
+  const params = new URLSearchParams({ areaNo });
+  return apiRequest(`/weather/living-index?${params}`);
 }

@@ -8,6 +8,12 @@ from app.schemas.weather import (
     ForecastWeatherResponse,
     HourlyWeatherResponse,
 )
+from app.schemas.living_index import LivingIndexResponse
+from app.services.living_index import (
+    LivingIndexConfigurationError,
+    LivingIndexProviderError,
+    get_living_weather_index,
+)
 from app.services.weather import (
     WeatherConfigurationError,
     WeatherForecastNotFoundError,
@@ -22,6 +28,28 @@ router = APIRouter(prefix="/weather", tags=["weather"])
 Latitude = Annotated[float, Query(ge=33.0, le=39.0)]
 Longitude = Annotated[float, Query(ge=124.0, le=132.0)]
 ResponseT = TypeVar("ResponseT")
+
+
+@router.get(
+    "/living-index",
+    response_model=LivingIndexResponse,
+    summary="생활기상지수 조회",
+)
+async def living_index(
+    area_no: Annotated[str, Query(alias="areaNo", pattern=r"^\d{10}$")] = "1100000000",
+) -> LivingIndexResponse:
+    try:
+        return await get_living_weather_index(area_no)
+    except LivingIndexConfigurationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+    except LivingIndexProviderError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
 
 
 @router.get(

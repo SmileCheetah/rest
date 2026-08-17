@@ -59,3 +59,36 @@ export interface CurrentWeather {
   apparentTemperature: number;
   source: "KMA";
 }
+
+export type HeatwaveLevel = "NONE" | "INTEREST" | "CAUTION" | "WARNING" | "DANGER";
+
+export interface HeatwaveImpact {
+  regionId: string;
+  regionName: string;
+  announcedAt: string;
+  effectiveDate: string | null;
+  level: HeatwaveLevel;
+  label: string;
+  hasAnnouncement: boolean;
+  forecasts: Array<{
+    category: string;
+    level: HeatwaveLevel;
+    label: string;
+    effectiveDate: string;
+  }>;
+  source: "KMA";
+}
+
+export interface LivingIndexValue {
+  value: number;
+  label: string;
+  forecastAt: string;
+}
+
+export interface LivingWeatherIndex {
+  areaNo: string;
+  publishedAt: string;
+  ultraviolet: LivingIndexValue;
+  airDiffusion: LivingIndexValue;
+  source: "KMA";
+}

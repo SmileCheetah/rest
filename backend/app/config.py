@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     kma_api_base_url: str = (
         "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
     )
+    kma_impact_api_base_url: str = (
+        "https://apis.data.go.kr/1360000/ImpactInfoServiceV2"
+    )
+    kma_living_index_api_base_url: str = (
+        "https://apis.data.go.kr/1360000/LivingWthrIdxServiceV5"
+    )
     database_url: str
 
     model_config = SettingsConfigDict(

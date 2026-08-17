@@ -9,13 +9,22 @@ import {
   createSchedule,
   deleteSchedule,
   getCurrentWeather,
+  getCurrentHeatwave,
+  getLivingWeatherIndex,
   getCurrentWorkSession,
   getNextSchedule,
   getTodaySchedules,
   getVisitTargets,
   startWorkSession,
 } from "@/lib/api";
-import type { CurrentWeather, Schedule, VisitTarget, WorkSession } from "@/types/api";
+import type {
+  CurrentWeather,
+  HeatwaveImpact,
+  LivingWeatherIndex,
+  Schedule,
+  VisitTarget,
+  WorkSession,
+} from "@/types/api";
 
 type Screen = "schedule" | "route" | "guidance" | "complete";
 type Modal = "add" | "menu" | "ai" | "warning" | "spot" | "skip" | null;
@@ -68,6 +77,18 @@ function getHeatLevel(apparentTemperature: number | undefined) {
   if (apparentTemperature >= 35) return { label: "위험", tone: "danger" };
   if (apparentTemperature >= 31) return { label: "주의", tone: "caution" };
   return { label: "보통", tone: "safe" };
+}
+
+function getHeatwaveTone(level: HeatwaveImpact["level"] | undefined) {
+  if (level === "DANGER" || level === "WARNING") return "danger";
+  if (level === "CAUTION" || level === "INTEREST") return "caution";
+  return "safe";
+}
+
+function getUltravioletTone(label: string | undefined) {
+  if (label === "위험" || label === "매우 높음") return "danger";
+  if (label === "높음" || label === "보통") return "caution";
+  return "safe";
 }
 
 function toVisitCards(schedules: Schedule[]): VisitCard[] {
@@ -132,6 +153,8 @@ export default function Home() {
   const [visitTargets, setVisitTargets] = useState<VisitTarget[]>([]);
   const [workSession, setWorkSession] = useState<WorkSession | null>(null);
   const [currentWeather, setCurrentWeather] = useState<CurrentWeather | null>(null);
+  const [heatwaveImpact, setHeatwaveImpact] = useState<HeatwaveImpact | null>(null);
+  const [livingIndex, setLivingIndex] = useState<LivingWeatherIndex | null>(null);
   const [completed, setCompleted] = useState<number[]>([]);
   const [activeScheduleId, setActiveScheduleId] = useState<number | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
@@ -172,14 +195,18 @@ export default function Home() {
   }, []);
 
   const loadWeather = useCallback(async () => {
-    try {
-      const location = await getBrowserLocation();
-      setCurrentWeather(await getCurrentWeather(location.latitude, location.longitude));
-      setWeatherMessage(null);
-    } catch {
-      setCurrentWeather(null);
-      setWeatherMessage("기상청 정보를 불러오지 못했습니다. 다시 눌러주세요.");
-    }
+    const location = await getBrowserLocation();
+    const [weatherResult, heatwaveResult, livingResult] = await Promise.allSettled([
+      getCurrentWeather(location.latitude, location.longitude),
+      getCurrentHeatwave(),
+      getLivingWeatherIndex(),
+    ]);
+    setCurrentWeather(weatherResult.status === "fulfilled" ? weatherResult.value : null);
+    setHeatwaveImpact(heatwaveResult.status === "fulfilled" ? heatwaveResult.value : null);
+    setLivingIndex(livingResult.status === "fulfilled" ? livingResult.value : null);
+    const hasError = [weatherResult, heatwaveResult, livingResult]
+      .some((result) => result.status === "rejected");
+    setWeatherMessage(hasError ? "일부 기상 정보를 불러오지 못했습니다. 다시 눌러주세요." : null);
   }, []);
 
   useEffect(() => {
@@ -286,6 +313,10 @@ export default function Home() {
     visits[0] ??
     fallbackVisits[0];
   const heatLevel = getHeatLevel(currentWeather?.apparentTemperature);
+  const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
+  const displayedHeatTone = heatwaveImpact
+    ? getHeatwaveTone(heatwaveImpact.level)
+    : heatLevel.tone;
 
   const startRoute = () => selectedRoute === "normal" ? setModal("warning") : setScreen("guidance");
 
@@ -297,7 +328,8 @@ export default function Home() {
         <div className="screen-content">
           <section className="weather-card">
             <div className="weather-metrics"><div className="sun"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg></div><div className="metric"><strong>{currentWeather ? `${Math.round(currentWeather.temperature)}°C` : "--"}</strong><span>현재 기온</span></div><div className="metric"><strong>{currentWeather ? `${Math.round(currentWeather.apparentTemperature)}°C` : "--"}</strong><span>체감 온도</span></div><div className="metric"><strong>{currentWeather ? `${Math.round(currentWeather.humidity)}%` : "--"}</strong><span>습도</span></div></div>
-            <div className="weather-footer"><span>기상청 초단기실황</span><span className={`badge ${heatLevel.tone}`}>{heatLevel.label}</span></div>
+            <div className="weather-footer"><span>{heatwaveImpact ? "폭염 영향예보" : "현재 체감온도 수준"}</span><span className={`badge ${displayedHeatTone}`}>{displayedHeatLevel}</span></div>
+            <div className="weather-footer living-index"><span>자외선 지수</span><span className={`badge ${getUltravioletTone(livingIndex?.ultraviolet.label)}`}>{livingIndex ? `${livingIndex.ultraviolet.value} · ${livingIndex.ultraviolet.label}` : "확인 중"}</span></div>
           </section>
           {weatherMessage && <button type="button" className="api-message" onClick={() => void loadWeather()}>{weatherMessage}</button>}
           {apiMessage && <button type="button" className="api-message" onClick={() => void loadDashboard()}>{apiMessage}</button>}
