@@ -26,6 +26,7 @@ rest/
 ├── docs/
 │   ├── DEVELOPMENT.md    # Git 및 팀 협업 규칙
 │   ├── PROJECT_STRUCTURE.md
+│   ├── WORK_STATUS.md     # 현재 구현 상태와 다음 작업
 │   ├── database-erd.md   # MySQL ERD와 테이블 정의
 │   └── role-responsibilities.md
 ├── docker-compose.yml    # 로컬 MySQL 8.x 실행 환경

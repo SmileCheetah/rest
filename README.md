@@ -14,7 +14,7 @@ rest/
 └── README.md
 ```
 
-상세한 폴더 역할은 [프로젝트 구조 문서](docs/PROJECT_STRUCTURE.md)를 참고하세요.
+상세한 폴더 역할은 [프로젝트 구조 문서](docs/PROJECT_STRUCTURE.md)를 참고하세요. 현재 구현 상태와 다음 작업은 [작업 현황 문서](docs/WORK_STATUS.md)에 정리되어 있습니다.
 
 ## 기술 스택
 
