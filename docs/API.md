@@ -1,0 +1,214 @@
+# 쉼표 MVP API 명세
+
+> 구현된 기본 API의 Frontend 연동 기준이다. 실행 중인 최신 스키마는 FastAPI `/docs`를 우선 확인한다.
+
+## 1. 공통 규칙
+
+- 개발 Base URL: `http://localhost:8000`
+- 요청·응답: JSON
+- JSON 필드명: camelCase
+- 날짜: `YYYY-MM-DD`
+- 시간: `HH:MM:SS`
+- 일시: ISO 8601, API 응답은 `Asia/Seoul` 오프셋 포함
+- `404`: 요청한 데이터 없음
+- `409`: 현재 상태 또는 중복 데이터 때문에 처리 불가
+- `422`: 요청 형식 또는 값이 잘못됨
+
+## 2. 상태 확인
+
+### `GET /health`
+
+```json
+{
+  "status": "ok"
+}
+```
+
+### `GET /health/db`
+
+```json
+{
+  "status": "ok",
+  "database": "connected"
+}
+```
+
+## 3. 방문대상자
+
+### `GET /visit-targets`
+
+방문대상자 전체 목록을 반환한다.
+
+### `GET /visit-targets/{visit_target_id}`
+
+```json
+{
+  "visitTargetId": 1,
+  "name": "김영희",
+  "address": "서울특별시 종로구 창신동 데모 주소 1",
+  "latitude": 37.57471,
+  "longitude": 127.01142
+}
+```
+
+없는 ID는 `404`를 반환한다.
+
+## 4. 방문 일정
+
+### 일정 응답
+
+```json
+{
+  "scheduleId": 1,
+  "workSessionId": 1,
+  "scheduledTime": "09:00:00",
+  "visitOrder": 1,
+  "status": "PENDING",
+  "plannedVisitMinutes": 40,
+  "completedAt": null,
+  "visitTarget": {
+    "visitTargetId": 1,
+    "name": "김영희",
+    "address": "서울특별시 종로구 창신동 데모 주소 1",
+    "latitude": 37.57471,
+    "longitude": 127.01142
+  }
+}
+```
+
+### `GET /schedules/today`
+
+한국 날짜 기준 오늘 일정을 방문 순서대로 반환한다.
+
+### `GET /schedules/next`
+
+```json
+{
+  "workSessionId": 1,
+  "workCompleted": false,
+  "nextSchedule": {
+    "scheduleId": 1,
+    "workSessionId": 1,
+    "scheduledTime": "09:00:00",
+    "visitOrder": 1,
+    "status": "PENDING",
+    "plannedVisitMinutes": 40,
+    "completedAt": null,
+    "visitTarget": {
+      "visitTargetId": 1,
+      "name": "김영희",
+      "address": "서울특별시 종로구 창신동 데모 주소 1",
+      "latitude": 37.57471,
+      "longitude": 127.01142
+    }
+  }
+}
+```
+
+남은 일정이 없으면 `workCompleted`는 `true`, `nextSchedule`은 `null`이다.
+
+### `POST /schedules`
+
+```json
+{
+  "visitTargetId": 5,
+  "scheduleDate": "2026-08-18",
+  "scheduledTime": "16:30:00",
+  "visitOrder": 5,
+  "plannedVisitMinutes": 30
+}
+```
+
+- 성공: `201`, 생성된 일정 반환
+- 방문대상자 없음: `404`
+- 같은 업무의 방문 순서 중복: `409`
+- 완료된 업무에 추가: `409`
+
+### `PATCH /schedules/{schedule_id}`
+
+필요한 필드만 보낸다.
+
+```json
+{
+  "scheduledTime": "17:00:00",
+  "plannedVisitMinutes": 45
+}
+```
+
+수정 가능 필드:
+
+- `scheduledTime`
+- `visitOrder`
+- `plannedVisitMinutes`
+
+빈 요청은 `422`, 중복 방문 순서는 `409`를 반환한다.
+
+### `DELETE /schedules/{schedule_id}`
+
+- 성공: `204 No Content`
+- 완료된 일정 또는 경로 데이터가 있는 일정: `409`
+- 삭제 후 뒤의 방문 순서는 자동으로 1씩 당겨진다.
+
+### `PATCH /schedules/{schedule_id}/complete`
+
+- 업무가 `IN_PROGRESS`일 때만 방문 완료 가능
+- 성공 시 상태가 `COMPLETED`로 변경되고 완료 시각을 반환
+- `VISIT_COMPLETED` 활동 로그 생성
+- 같은 요청을 반복해도 로그는 중복 생성하지 않음
+
+## 5. 업무 세션
+
+### 업무 세션 응답
+
+```json
+{
+  "workSessionId": 1,
+  "workDate": "2026-08-18",
+  "status": "IN_PROGRESS",
+  "startedAt": "2026-08-18T09:00:00+09:00",
+  "completedAt": null,
+  "completedVisitCount": 0,
+  "totalVisitCount": 4,
+  "totalExposureMinutes": 0,
+  "maxContinuousExposureMinutes": 0,
+  "totalRestMinutes": 0,
+  "restCount": 0
+}
+```
+
+### `POST /work-sessions/start`
+
+```json
+{
+  "workDate": "2026-08-18"
+}
+```
+
+상태를 `READY`에서 `IN_PROGRESS`로 변경하고 `WORK_STARTED` 활동 로그를 기록한다.
+
+### `GET /work-sessions/current`
+
+한국 날짜 기준 오늘 업무 상태와 방문 진행률을 반환한다.
+
+### `PATCH /work-sessions/{work_session_id}/complete`
+
+- 모든 일정이 완료되어야 처리 가능
+- 성공 시 상태를 `COMPLETED`로 변경
+- `WORK_COMPLETED` 활동 로그 생성
+- 미완료 일정이 있거나 업무 시작 전이면 `409`
+
+## 6. 기본 사용자 흐름
+
+```text
+GET /schedules/today
+→ POST /work-sessions/start
+→ GET /schedules/next
+→ PATCH /schedules/{id}/complete 반복
+→ GET /schedules/next에서 workCompleted=true 확인
+→ PATCH /work-sessions/{id}/complete
+```
+
+## 7. A/B 분석 계약
+
+위험판단과 쿨링스팟 추천의 입력·출력은 `docs/AB_INTERFACE.md`와 `docs/mocks/`를 확인한다.
+

@@ -1,0 +1,14 @@
+{
+  "routeOptionId": 2,
+  "currentContinuousExposureMinutes": 25,
+  "expectedContinuousExposureMinutes": 43,
+  "riskScore": 82.0,
+  "riskLevel": "REST_REQUIRED",
+  "restRequired": true,
+  "recommendedRestCount": 1,
+  "reasonCodes": [
+    "HIGH_APPARENT_TEMPERATURE",
+    "LONG_CONTINUOUS_EXPOSURE"
+  ],
+  "modelVersion": "mvp-v1"
+}

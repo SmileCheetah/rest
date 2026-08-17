@@ -1,0 +1,34 @@
+{
+  "routeSegmentId": 2,
+  "expectedArrivalTime": "2026-08-18T13:48:00+09:00",
+  "bufferMinutes": 5,
+  "maxDetourDistanceMeters": 500,
+  "maxAdditionalMinutes": 10,
+  "candidates": [
+    {
+      "coolingSpotId": 1,
+      "name": "창신동 공공 무더위쉼터",
+      "type": "PUBLIC",
+      "isOpen": true,
+      "detourDistanceMeters": 180,
+      "additionalMinutes": 4,
+      "minutesToCoolingSpot": 10,
+      "facilities": ["AIR_CONDITIONING", "WATER", "RESTROOM"]
+    },
+    {
+      "coolingSpotId": 3,
+      "name": "쉼표 카페 창신점",
+      "type": "COMPANY",
+      "isOpen": true,
+      "detourDistanceMeters": 240,
+      "additionalMinutes": 5,
+      "minutesToCoolingSpot": 9,
+      "facilities": [
+        "AIR_CONDITIONING",
+        "WATER",
+        "RESTROOM",
+        "CHARGING"
+      ]
+    }
+  ]
+}
