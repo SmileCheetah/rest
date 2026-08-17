@@ -1,10 +1,12 @@
 import type {
   CreateScheduleRequest,
+  CreateRouteSegmentRequest,
   CurrentWeather,
   HeatwaveImpact,
   LivingWeatherIndex,
   NextScheduleResult,
   Schedule,
+  RouteSegment,
   VisitTarget,
   WorkSession,
 } from "@/types/api";
@@ -110,4 +112,13 @@ export function getLivingWeatherIndex(
 ): Promise<LivingWeatherIndex> {
   const params = new URLSearchParams({ areaNo });
   return apiRequest(`/weather/living-index?${params}`);
+}
+
+export function createRouteSegment(
+  request: CreateRouteSegmentRequest,
+): Promise<RouteSegment> {
+  return apiRequest("/route-segments", {
+    method: "POST",
+    body: JSON.stringify(request),
+  });
 }

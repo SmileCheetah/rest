@@ -92,3 +92,46 @@ export interface LivingWeatherIndex {
   airDiffusion: LivingIndexValue;
   source: "KMA";
 }
+
+export interface Coordinate {
+  latitude: number;
+  longitude: number;
+  name?: string;
+}
+
+export interface RoutePathPoint {
+  latitude: number;
+  longitude: number;
+}
+
+export interface CreateRouteSegmentRequest {
+  workSessionId: number;
+  scheduleId: number;
+  origin: Coordinate;
+  destination: Coordinate;
+  departureTime: string;
+}
+
+export interface RouteSegment {
+  routeSegmentId: number;
+  routeOptionId: number;
+  workSessionId: number;
+  scheduleId: number;
+  routeType: "NORMAL" | "SAFE";
+  origin: Coordinate;
+  destination: Coordinate;
+  departureTime: string | null;
+  distanceMeters: number;
+  walkingMinutes: number;
+  estimatedArrivalTime: string | null;
+  path: RoutePathPoint[];
+  weather: {
+    latitude: number;
+    longitude: number;
+    forecastAt: string;
+    temperature: number;
+    humidity: number;
+    apparentTemperature: number;
+    source: "KMA";
+  } | null;
+}
