@@ -14,12 +14,13 @@ rest/
 └── README.md
 ```
 
-상세한 폴더 역할은 [프로젝트 구조 문서](docs/PROJECT_STRUCTURE.md)를 참고하세요.
+상세한 폴더 역할은 [프로젝트 구조 문서](docs/PROJECT_STRUCTURE.md)를 참고하세요. 현재 구현 상태와 다음 작업은 [작업 현황 문서](docs/WORK_STATUS.md), API 형식은 [API 명세](docs/API.md)와 [A/B 분석 인터페이스](docs/AB_INTERFACE.md)에 정리되어 있습니다.
 
 ## 기술 스택
 
 - Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS 4
-- Backend: FastAPI, Python, Uvicorn
+- Backend: FastAPI, Python, Uvicorn, SQLAlchemy, Alembic
+- Database: MySQL 8.x
 - API 문서: FastAPI Swagger UI
 
 ## Frontend 실행 방법
@@ -37,21 +38,36 @@ npm run dev
 
 ## Backend 실행 방법
 
-Python 3.11 이상을 권장합니다.
+Docker Desktop과 Python 3.11 이상을 권장합니다. 프로젝트 루트에서 환경변수를 준비하고 MySQL을 먼저 실행합니다.
+
+```bash
+cp backend/.env.example backend/.env
+docker compose up -d mysql
+```
+
+`backend/.env`의 MySQL 비밀번호와 `DATABASE_URL`을 로컬 환경에 맞게 변경한 뒤 Backend를 준비합니다.
 
 ```bash
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-cp .env.example .env
+alembic upgrade head
+python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
 서버는 <http://localhost:8000>에서 실행됩니다.
 
 - 상태 확인: <http://localhost:8000/health>
+- DB 연결 확인: <http://localhost:8000/health/db>
+- 방문대상자 목록: <http://localhost:8000/visit-targets>
+- 오늘 일정: <http://localhost:8000/schedules/today>
+- 다음 일정: <http://localhost:8000/schedules/next>
+- 현재 업무 상태: <http://localhost:8000/work-sessions/current>
 - Swagger API 문서: <http://localhost:8000/docs>
+
+Docker MySQL은 로컬 `127.0.0.1:3307`에서 실행됩니다. `python -m scripts.seed`는 방문대상자 8명, 쿨링스팟 5곳, 오늘 업무 세션 1개와 방문 일정 4개를 추가하며, 다시 실행해도 중복으로 생성하지 않습니다.
 
 Windows PowerShell에서는 가상환경 활성화 명령으로 `.venv\Scripts\Activate.ps1`을 사용합니다.
 

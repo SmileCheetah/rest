@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>A01 오늘의 방문 일정</title>
+<link rel="stylesheet" href="../tokens.css"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>body{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px}</style>
+</head>
+<body>
+<section class="phone" data-screen="A01">
+  <div class="statusbar"><span>9:41</span><span class="status-icons">● ◔ ▰</span></div>
+  <header class="appbar"><h2>오늘의 방문 일정</h2><button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></button></header>
+  <div class="screen-content">
+
+    <section class="weather-card">
+      <div class="weather-metrics">
+        <div class="weather-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg></div>
+        <div class="metric"><strong>34°C</strong><span>현재 기온</span></div>
+        <div class="metric"><strong>36°C</strong><span>체감 온도</span></div>
+        <div class="metric"><strong>72%</strong><span>습도</span></div>
+      </div>
+      <div class="weather-footer"><span>폭염 영향예보</span><span class="badge badge--caution">주의</span></div>
+    </section>
+    <div class="section-header">
+      <div class="section-title-row"><h3>오늘의 방문</h3><span class="muted">2 / 4 완료</span></div>
+      <button class="button button--small button--ghost">+ 대상자 추가</button>
+    </div>
+    <div class="visit-list">
+
+    <article class="visit-card">
+      <div class="visit-card__head">
+        <div class="visit-index">1</div>
+        <div class="visit-main">
+          <div class="visit-title"><strong>10:00</strong><span>김○○</span></div>
+          <p>종로구 창신동 ○○길 00</p>
+        </div>
+        <button class="check-btn" aria-label="방문 완료"></button>
+        <button class="icon-btn icon-btn--sm" aria-label="더보기"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+      </div>
+      <div class="route-meta"><span>도보 12분</span><span>•</span><span>0.8km</span></div>
+      <div class="visit-foot"><span class="badge badge--safe">이동 가능</span>
+        <div class="ai-rec"><strong>추천 휴식 0회</strong><span class="ai-label">AI 분석</span></div></div>
+    </article>
+
+    <article class="visit-card">
+      <div class="visit-card__head">
+        <div class="visit-index">2</div>
+        <div class="visit-main">
+          <div class="visit-title"><strong>11:30</strong><span>이○○</span></div>
+          <p>종로구 창신동 ○○길 00</p>
+        </div>
+        <button class="check-btn" aria-label="방문 완료"></button>
+        <button class="icon-btn icon-btn--sm" aria-label="더보기"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+      </div>
+      <div class="route-meta"><span>도보 18분</span><span>•</span><span>1.2km</span></div>
+      <div class="visit-foot"><span class="badge badge--caution">휴식 권장</span>
+        <div class="ai-rec"><strong>추천 휴식 1회</strong><span class="ai-label">AI 분석</span></div></div>
+    </article>
+
+    <article class="visit-card">
+      <div class="visit-card__head">
+        <div class="visit-index">3</div>
+        <div class="visit-main">
+          <div class="visit-title"><strong>14:00</strong><span>박○○</span></div>
+          <p>종로구 창신동 ○○길 00</p>
+        </div>
+        <button class="check-btn" aria-label="방문 완료"></button>
+        <button class="icon-btn icon-btn--sm" aria-label="더보기"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+      </div>
+      <div class="route-meta"><span>도보 21분</span><span>•</span><span>1.5km</span></div>
+      <div class="visit-foot"><span class="badge badge--danger">다음 방문 전 휴식 필요</span>
+        <div class="ai-rec"><strong>추천 휴식 2회</strong><span class="ai-label">AI 분석</span></div></div>
+    </article>
+
+    <article class="visit-card">
+      <div class="visit-card__head">
+        <div class="visit-index">4</div>
+        <div class="visit-main">
+          <div class="visit-title"><strong>15:30</strong><span>최○○</span></div>
+          <p>종로구 창신동 ○○길 00</p>
+        </div>
+        <button class="check-btn" aria-label="방문 완료"></button>
+        <button class="icon-btn icon-btn--sm" aria-label="더보기"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></button>
+      </div>
+      <div class="route-meta"><span>도보 15분</span><span>•</span><span>1.0km</span></div>
+
+    </article>
+    </div>
+  </div>
+  <footer class="sticky-footer"><button class="button button--primary button--full">오늘 첫 방문 시작</button></footer>
+</section></body>
+</html>

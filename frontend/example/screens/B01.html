@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>B01 이동 경로 확인</title>
+<link rel="stylesheet" href="../tokens.css"/>
+<link rel="stylesheet" href="../styles.css"/>
+<style>body{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px}</style>
+</head>
+<body>
+<section class="phone" data-screen="B01">
+  <div class="statusbar"><span>9:41</span><span class="status-icons">● ◔ ▰</span></div>
+  <header class="appbar">
+    <button class="icon-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="appbar__center"><h2>김○○님 댁</h2><span>1번째 이동 구간</span></div>
+    <button class="icon-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7h.01"/></svg></button>
+  </header>
+  <div class="map-area map-area--compare">
+
+<svg class="map-svg" viewBox="0 0 375 450">
+  <rect width="375" height="450" fill="#F7F9FB"/>
+  <g class="map-street">
+    <path d="M-10 80 L120 50 L200 120 L390 90"/><path d="M20 180 L100 120 L250 160 L370 140"/>
+    <path d="M0 300 L90 250 L190 320 L375 250"/><path d="M60 0 L70 450M180 0 L160 450M300 0 L320 450"/>
+  </g>
+  <path d="M70 355 L105 330 L110 265 L160 250 L165 190 L235 175 L235 120 L310 105" class="route-line route-normal"/>
+  <path d="M70 355 L125 318 L165 285 L205 270 L235 220 L260 185 L310 105" class="route-line route-safe"/>
+  <circle cx="70" cy="355" r="10" class="current-dot"/>
+  <circle cx="310" cy="105" r="10" class="destination-dot"/>
+  <circle cx="235" cy="220" r="9" class="shelter-dot"/>
+  <circle cx="115" cy="140" r="7" class="shelter-dot shelter-dot--muted"/>
+  <circle cx="300" cy="250" r="7" class="shelter-dot shelter-dot--muted"/>
+</svg>
+    <div class="map-legend">
+      <span><i class="line-swatch line-swatch--normal"></i>일반 경로 18분 (1.2km)</span>
+      <span><i class="line-swatch line-swatch--safe"></i>안전 경로 22분 (1.4km)</span>
+    </div>
+    <span class="map-tag">추천 쉼터</span>
+  </div>
+  <div class="route-panel">
+    <div class="route-panel__summary">
+      <span class="badge badge--caution">휴식 권장</span>
+      <div class="ai-rec"><strong>추천 휴식 1회</strong><span class="ai-label">AI 분석</span></div>
+    </div>
+    <p class="route-panel__reason">체감온도가 높고 야외 활동이 길어지고 있어 휴식이 필요한 구간이에요.</p>
+    <div class="route-options">
+      <button class="route-card"><span>일반 경로</span><strong>18분</strong><small>1.2km</small><em>휴식 없음</em></button>
+      <button class="route-card route-card--selected">
+        <div class="route-card__top"><span>안전 경로</span><span class="badge badge--outline">추천</span></div>
+        <strong>22분</strong><small>1.4km</small><em>휴식 1회</em><span class="route-card__shelter">추천 쉼터: 창신동 주민센터</span>
+      </button>
+    </div>
+    <p class="route-delta">일반 경로보다 <strong>4분 더 걸리지만</strong> 이동 중 1회 쉴 수 있어요.</p>
+    <button class="button button--primary button--full">안전 경로로 안내 시작</button>
+  </div>
+</section></body>
+</html>
