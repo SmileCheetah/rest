@@ -1,7 +1,9 @@
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.config import settings
 from app.database import engine
 from app.routers.schedules import router as schedules_router
 from app.routers.visit_targets import router as visit_targets_router
@@ -11,6 +13,14 @@ app = FastAPI(
     title="폭염 이동 안전 지원 API",
     description="생활지원사의 안전한 이동을 지원하는 서비스의 백엔드 API",
     version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.frontend_origin],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(visit_targets_router)
