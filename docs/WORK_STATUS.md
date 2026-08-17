@@ -8,9 +8,9 @@
 - 저장소: `https://github.com/SmileCheetah/rest`
 - 로컬 경로: `/Users/m3air/Desktop/Code/Project/rest`
 - 현재 브랜치: `feat/backend-route`
-- 현재 브랜치는 로컬 전용이며 아직 원격에 push하지 않았다.
+- 현재 브랜치는 원격에 push했고 Pull Request를 생성했다.
 - `feat/core-integration`에서 분기한 stacked branch다.
-- 열린 PR: [#4 업무 세션 API 및 폭염 안전 이동 화면 구현](https://github.com/SmileCheetah/rest/pull/4)
+- 열린 PR: [#5 기상·지도·일반경로 MVP 통합](https://github.com/SmileCheetah/rest/pull/5)
 - PR 대상: `dev`
 - `dev`에 병합된 기준 커밋: `05a4aa7`
 - 현재 브랜치의 주요 커밋:
@@ -28,6 +28,7 @@
   - `98e6ac9 feat: 영향예보 및 생활기상지수 연동`
   - `42537fc feat: 일반 보행 경로와 이동구간 API 추가`
   - `ab84a41 feat: 프론트엔드에 실제 일반경로 연결`
+  - `daf0876 docs: 일반경로와 이동구간 사용법 추가`
 - `main`에는 아직 최신 Backend 기능이 병합되지 않았다.
 
 ## 2. 프로젝트 목표
@@ -309,7 +310,7 @@ READY → IN_PROGRESS → COMPLETED
 - Backend 단위 테스트 11개 통과
 - TMAP GeoJSON에서 거리·시간·경로 좌표 변환 확인
 - 외부 API를 mock 처리한 이동구간·일반경로 MySQL 생성과 rollback 확인
-- TMAP 실제 호출은 현재 `403 Forbidden`이며 AppKey의 보행자 경로안내 권한 확인 필요
+- TMAP 실제 보행경로 호출 성공 및 `/routes/normal` `200 OK` 확인
 - Frontend ESLint 통과
 - Frontend production build 통과
 - 통합 테스트 후 migration과 seed로 DB 초기 상태 복구 확인
@@ -320,7 +321,6 @@ READY → IN_PROGRESS → COMPLETED
 ### 우선순위가 높은 기본 기능
 
 - 일정 추가 시간 입력 UI 연결
-- TMAP 콘솔에서 보행자 경로안내 API 권한 활성화 후 실제 호출 재검증
 - 이동구간 생성 결과를 B 위험판단 API에 연결
 
 ### 이후 기능
