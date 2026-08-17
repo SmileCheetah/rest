@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     kma_living_index_api_base_url: str = (
         "https://apis.data.go.kr/1360000/LivingWthrIdxServiceV5"
     )
+    map_api_key: str | None = None
+    tmap_api_base_url: str = "https://apis.openapi.sk.com/tmap"
     database_url: str
 
     model_config = SettingsConfigDict(
