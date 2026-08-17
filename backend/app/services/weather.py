@@ -256,12 +256,24 @@ async def _request_kma(
         "ny": grid_y,
     }
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(
-                f"{settings.kma_api_base_url}/{operation}",
-                params=params,
-            )
-            response.raise_for_status()
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response: httpx.Response | None = None
+            for attempt in range(2):
+                try:
+                    response = await client.get(
+                        f"{settings.kma_api_base_url}/{operation}",
+                        params=params,
+                    )
+                    response.raise_for_status()
+                    break
+                except httpx.TransportError:
+                    if attempt == 1:
+                        raise
+                except httpx.HTTPStatusError as exc:
+                    if attempt == 1 or exc.response.status_code < 500:
+                        raise
+            if response is None:
+                raise WeatherProviderError("KMA API returned no response")
             payload = response.json()
     except (httpx.HTTPError, ValueError) as exc:
         raise WeatherProviderError("KMA API request failed") from exc
