@@ -10,6 +10,20 @@ class Settings(BaseSettings):
 
     app_env: str = "development"
     frontend_origin: str = "http://localhost:3000"
+    kma_api_key: str | None = None
+    kma_impact_api_key: str | None = None
+    kma_living_index_api_key: str | None = None
+    kma_api_base_url: str = (
+        "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
+    )
+    kma_impact_api_base_url: str = (
+        "https://apis.data.go.kr/1360000/ImpactInfoServiceV2"
+    )
+    kma_living_index_api_base_url: str = (
+        "https://apis.data.go.kr/1360000/LivingWthrIdxServiceV5"
+    )
+    map_api_key: str | None = None
+    tmap_api_base_url: str = "https://apis.openapi.sk.com/tmap"
     database_url: str
 
     model_config = SettingsConfigDict(

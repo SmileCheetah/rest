@@ -25,7 +25,11 @@ rest/
 │   └── requirements.txt  # Python 의존성
 ├── docs/
 │   ├── DEVELOPMENT.md    # Git 및 팀 협업 규칙
+│   ├── API.md            # 구현된 API 요청·응답 명세
+│   ├── AB_INTERFACE.md   # A/B 분석 데이터 계약
 │   ├── PROJECT_STRUCTURE.md
+│   ├── WORK_STATUS.md     # 현재 구현 상태와 다음 작업
+│   ├── mocks/            # A/B 병렬 개발용 JSON 예시
 │   ├── database-erd.md   # MySQL ERD와 테이블 정의
 │   └── role-responsibilities.md
 ├── docker-compose.yml    # 로컬 MySQL 8.x 실행 환경

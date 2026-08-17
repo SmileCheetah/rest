@@ -1,0 +1,15 @@
+{
+  "workSessionId": 1,
+  "scheduleId": 2,
+  "routeSegmentId": 2,
+  "routeOptionId": 2,
+  "distanceMeters": 1200,
+  "walkingMinutes": 18,
+  "departureTime": "2026-08-18T13:30:00+09:00",
+  "estimatedArrivalTime": "2026-08-18T13:48:00+09:00",
+  "temperature": 34.5,
+  "humidity": 68.0,
+  "apparentTemperature": 38.2,
+  "currentContinuousExposureMinutes": 25,
+  "plannedVisitMinutes": 40
+}

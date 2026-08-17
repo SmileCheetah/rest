@@ -16,3 +16,10 @@ def utc_naive_to_seoul(value: datetime | None) -> datetime | None:
     if value.tzinfo is None:
         value = value.replace(tzinfo=UTC)
     return value.astimezone(SEOUL_TIMEZONE)
+
+
+def to_utc_naive(value: datetime) -> datetime:
+    """서울 기준 datetime을 DB 저장용 UTC naive datetime으로 변환합니다."""
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=SEOUL_TIMEZONE)
+    return value.astimezone(UTC).replace(tzinfo=None)
