@@ -1,15 +1,15 @@
 """로컬 개발용 MVP mock 데이터를 생성합니다."""
 
 import asyncio
-from datetime import time
+from datetime import date, time
 from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import select
 
 from app.database import AsyncSessionLocal, engine
-from app.models import CoolingSpot, VisitTarget
-from app.models.enums import CoolingSpotType
+from app.models import CoolingSpot, Schedule, VisitTarget, WorkSession
+from app.models.enums import CoolingSpotType, WorkSessionStatus
 
 VISIT_TARGETS: tuple[dict[str, Any], ...] = (
     {
@@ -150,6 +150,33 @@ COOLING_SPOTS: tuple[dict[str, Any], ...] = (
     },
 )
 
+TODAY_SCHEDULES: tuple[dict[str, Any], ...] = (
+    {
+        "visit_target_name": "김영희",
+        "scheduled_time": time(9, 0),
+        "visit_order": 1,
+        "planned_visit_minutes": 40,
+    },
+    {
+        "visit_target_name": "이정수",
+        "scheduled_time": time(10, 30),
+        "visit_order": 2,
+        "planned_visit_minutes": 40,
+    },
+    {
+        "visit_target_name": "박순자",
+        "scheduled_time": time(13, 0),
+        "visit_order": 3,
+        "planned_visit_minutes": 40,
+    },
+    {
+        "visit_target_name": "최동호",
+        "scheduled_time": time(15, 0),
+        "visit_order": 4,
+        "planned_visit_minutes": 40,
+    },
+)
+
 
 async def seed_visit_targets() -> tuple[int, int]:
     async with AsyncSessionLocal() as session, session.begin():
@@ -189,10 +216,86 @@ async def seed_cooling_spots() -> tuple[int, int]:
         return len(new_items), len(COOLING_SPOTS) - len(new_items)
 
 
+async def seed_today_schedules() -> tuple[int, int, int, int, int]:
+    """오늘 업무 세션 1개와 방문 일정 4개를 중복 없이 생성합니다."""
+    work_date = date.today()
+
+    async with AsyncSessionLocal() as session, session.begin():
+        work_session = (
+            await session.execute(
+                select(WorkSession)
+                .where(WorkSession.work_date == work_date)
+                .order_by(WorkSession.id)
+                .limit(1)
+            )
+        ).scalar_one_or_none()
+
+        work_session_inserted = 0
+        if work_session is None:
+            work_session = WorkSession(
+                work_date=work_date,
+                status=WorkSessionStatus.READY,
+            )
+            session.add(work_session)
+            await session.flush()
+            work_session_inserted = 1
+
+        target_names = [item["visit_target_name"] for item in TODAY_SCHEDULES]
+        targets = (
+            await session.execute(
+                select(VisitTarget).where(VisitTarget.name.in_(target_names))
+            )
+        ).scalars()
+        target_ids_by_name = {target.name: target.id for target in targets}
+        missing_target_names = set(target_names) - target_ids_by_name.keys()
+        if missing_target_names:
+            missing = ", ".join(sorted(missing_target_names))
+            raise RuntimeError(f"visit targets must be seeded first: {missing}")
+
+        existing_orders = set(
+            (
+                await session.execute(
+                    select(Schedule.visit_order).where(
+                        Schedule.work_session_id == work_session.id
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+        new_schedules = [
+            Schedule(
+                work_session_id=work_session.id,
+                visit_target_id=target_ids_by_name[item["visit_target_name"]],
+                scheduled_time=item["scheduled_time"],
+                visit_order=item["visit_order"],
+                planned_visit_minutes=item["planned_visit_minutes"],
+            )
+            for item in TODAY_SCHEDULES
+            if item["visit_order"] not in existing_orders
+        ]
+        session.add_all(new_schedules)
+
+        return (
+            work_session.id,
+            work_session_inserted,
+            1 - work_session_inserted,
+            len(new_schedules),
+            len(TODAY_SCHEDULES) - len(new_schedules),
+        )
+
+
 async def main() -> None:
     try:
         target_inserted, target_skipped = await seed_visit_targets()
         spot_inserted, spot_skipped = await seed_cooling_spots()
+        (
+            work_session_id,
+            work_session_inserted,
+            work_session_skipped,
+            schedule_inserted,
+            schedule_skipped,
+        ) = await seed_today_schedules()
         print(
             "visit_targets: "
             f"inserted={target_inserted}, skipped={target_skipped}"
@@ -200,6 +303,15 @@ async def main() -> None:
         print(
             "cooling_spots: "
             f"inserted={spot_inserted}, skipped={spot_skipped}"
+        )
+        print(
+            "work_sessions: "
+            f"inserted={work_session_inserted}, skipped={work_session_skipped}, "
+            f"id={work_session_id}, work_date={date.today().isoformat()}"
+        )
+        print(
+            "schedules: "
+            f"inserted={schedule_inserted}, skipped={schedule_skipped}"
         )
     finally:
         await engine.dispose()
