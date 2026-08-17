@@ -37,21 +37,32 @@ npm run dev
 
 ## Backend 실행 방법
 
-Python 3.11 이상을 권장합니다.
+Docker Desktop과 Python 3.11 이상을 권장합니다. 프로젝트 루트에서 환경변수를 준비하고 MySQL을 먼저 실행합니다.
+
+```bash
+cp backend/.env.example backend/.env
+docker compose up -d mysql
+```
+
+`backend/.env`의 MySQL 비밀번호와 `DATABASE_URL`을 로컬 환경에 맞게 변경한 뒤 Backend를 준비합니다.
 
 ```bash
 cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-cp .env.example .env
+alembic upgrade head
+python -m scripts.seed
 uvicorn app.main:app --reload
 ```
 
 서버는 <http://localhost:8000>에서 실행됩니다.
 
 - 상태 확인: <http://localhost:8000/health>
+- DB 연결 확인: <http://localhost:8000/health/db>
 - Swagger API 문서: <http://localhost:8000/docs>
+
+Docker MySQL은 로컬 `127.0.0.1:3307`에서 실행됩니다. `python -m scripts.seed`는 방문대상자 8명과 쿨링스팟 mock 데이터를 추가하며, 다시 실행해도 중복으로 생성하지 않습니다.
 
 Windows PowerShell에서는 가상환경 활성화 명령으로 `.venv\Scripts\Activate.ps1`을 사용합니다.
 
