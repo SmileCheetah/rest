@@ -15,7 +15,7 @@ NAMING_CONVENTION = {
 
 def utc_now() -> datetime:
     """MySQL DATETIME에 저장할 UTC naive datetime을 반환합니다."""
-    return datetime.now(UTC).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None, microsecond=0)
 
 
 class Base(DeclarativeBase):

@@ -63,6 +63,7 @@ uvicorn app.main:app --reload
 - DB 연결 확인: <http://localhost:8000/health/db>
 - 방문대상자 목록: <http://localhost:8000/visit-targets>
 - 오늘 일정: <http://localhost:8000/schedules/today>
+- 현재 업무 상태: <http://localhost:8000/work-sessions/current>
 - Swagger API 문서: <http://localhost:8000/docs>
 
 Docker MySQL은 로컬 `127.0.0.1:3307`에서 실행됩니다. `python -m scripts.seed`는 방문대상자 8명, 쿨링스팟 5곳, 오늘 업무 세션 1개와 방문 일정 4개를 추가하며, 다시 실행해도 중복으로 생성하지 않습니다.
