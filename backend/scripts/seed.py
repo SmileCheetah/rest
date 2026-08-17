@@ -1,7 +1,7 @@
 """로컬 개발용 MVP mock 데이터를 생성합니다."""
 
 import asyncio
-from datetime import date, time
+from datetime import time
 from decimal import Decimal
 from typing import Any
 
@@ -10,6 +10,7 @@ from sqlalchemy import select
 from app.database import AsyncSessionLocal, engine
 from app.models import CoolingSpot, Schedule, VisitTarget, WorkSession
 from app.models.enums import CoolingSpotType, WorkSessionStatus
+from app.time_utils import seoul_today
 
 VISIT_TARGETS: tuple[dict[str, Any], ...] = (
     {
@@ -218,7 +219,7 @@ async def seed_cooling_spots() -> tuple[int, int]:
 
 async def seed_today_schedules() -> tuple[int, int, int, int, int]:
     """오늘 업무 세션 1개와 방문 일정 4개를 중복 없이 생성합니다."""
-    work_date = date.today()
+    work_date = seoul_today()
 
     async with AsyncSessionLocal() as session, session.begin():
         work_session = (
@@ -307,7 +308,7 @@ async def main() -> None:
         print(
             "work_sessions: "
             f"inserted={work_session_inserted}, skipped={work_session_skipped}, "
-            f"id={work_session_id}, work_date={date.today().isoformat()}"
+            f"id={work_session_id}, work_date={seoul_today().isoformat()}"
         )
         print(
             "schedules: "

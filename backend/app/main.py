@@ -3,6 +3,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import engine
+from app.routers.schedules import router as schedules_router
 from app.routers.visit_targets import router as visit_targets_router
 
 app = FastAPI(
@@ -12,6 +13,7 @@ app = FastAPI(
 )
 
 app.include_router(visit_targets_router)
+app.include_router(schedules_router)
 
 
 @app.get("/health", tags=["system"])
