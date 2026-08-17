@@ -7,7 +7,7 @@
 
 - 저장소: `https://github.com/SmileCheetah/rest`
 - 로컬 경로: `/Users/m3air/Desktop/Code/Project/rest`
-- 현재 브랜치: `feat/backend-weather`
+- 현재 브랜치: `feat/backend-route`
 - 현재 브랜치는 로컬 전용이며 아직 원격에 push하지 않았다.
 - `feat/core-integration`에서 분기한 stacked branch다.
 - 열린 PR: [#4 업무 세션 API 및 폭염 안전 이동 화면 구현](https://github.com/SmileCheetah/rest/pull/4)
@@ -26,6 +26,8 @@
   - `05e8cf5 fix: 기상청 환경변수와 재시도 보완`
   - `06f0506 docs: 기상청 API 연동 결과 기록`
   - `98e6ac9 feat: 영향예보 및 생활기상지수 연동`
+  - `42537fc feat: 일반 보행 경로와 이동구간 API 추가`
+  - `ab84a41 feat: 프론트엔드에 실제 일반경로 연결`
 - `main`에는 아직 최신 Backend 기능이 병합되지 않았다.
 
 ## 2. 프로젝트 목표
@@ -79,6 +81,7 @@ MySQL이 기본 포트 `3306`이 아닌 `3307`을 사용하는 이유는 로컬�
 
 비밀번호와 API Key는 `backend/.env`에만 작성한다. 실제 `.env`는 Git에서 제외되어 있다.
 기상청 키는 단기예보 `KMA_API_KEY`, 영향예보 `KMA_IMPACT_API_KEY`, 생활기상지수 `KMA_LIVING_INDEX_API_KEY`로 구분한다.
+TMAP AppKey는 `MAP_API_KEY`에 작성하며 보행자 경로안내 API 사용 권한이 필요하다.
 
 ## 5. 주요 폴더
 
@@ -181,6 +184,9 @@ ERD의 FK, Unique, Check Constraint, 기본값, Nullable, 문자열 길이와 �
 | `GET` | `/weather/forecast` | 완료 | 방문 예정 시각의 단기예보 조회 |
 | `GET` | `/heatwave/current` | 완료 | 서울 지역 공식 폭염 영향예보 조회 |
 | `GET` | `/weather/living-index` | 완료 | 자외선·대기정체지수 조회 |
+| `POST` | `/routes/normal` | 구현 완료 | TMAP 일반 보행 경로 계산 |
+| `POST` | `/route-segments` | 구현 완료 | 일반경로와 기상정보를 결합해 이동구간 저장 |
+| `GET` | `/route-segments/{route_segment_id}` | 구현 완료 | 저장된 이동구간과 일반경로 조회 |
 
 Swagger: `http://localhost:8000/docs`
 
@@ -260,11 +266,14 @@ READY → IN_PROGRESS → COMPLETED
 - 업무 시작과 다음 방문지 조회
 - 방문 완료와 모든 방문 완료 후 업무 완료
 - Backend 연결 실패 시 mock 화면 표시와 재시도 안내
+- 업무 시작 시 현재 위치와 다음 방문지를 기준으로 이동구간 생성
+- TMAP 응답의 거리·도보시간·경로 좌표를 화면에 표시
 
 아직 mock인 기능:
 
 - 지도는 실제 지도 API가 아닌 SVG mock이다.
-- 경로 거리·시간, AI 위험도, 쿨링스팟 추천은 mock 값이다.
+- 일반경로는 실제 API 연결 코드가 구현됐지만 TMAP 권한 활성화 확인이 남아 있다.
+- 안전경로 거리·시간, AI 위험도, 쿨링스팟 추천은 mock 값이다.
 - 노출 감소량과 이용한 쿨링스팟은 mock 값이다.
 - 일정 추가 시간은 현재 `14:30` 고정이며 시간 입력 UI 연결이 필요하다.
 
@@ -297,7 +306,10 @@ READY → IN_PROGRESS → COMPLETED
 - 기상청 통신 오류 시 1회 자동 재시도 적용
 - 영향예보 인증 성공 및 `NO_DATA`를 정상적인 `발표 없음`으로 처리하는 것 확인
 - 생활기상지수 자외선·대기정체 실제 응답 확인
-- 기상 관련 Backend 단위 테스트 9개 통과
+- Backend 단위 테스트 11개 통과
+- TMAP GeoJSON에서 거리·시간·경로 좌표 변환 확인
+- 외부 API를 mock 처리한 이동구간·일반경로 MySQL 생성과 rollback 확인
+- TMAP 실제 호출은 현재 `403 Forbidden`이며 AppKey의 보행자 경로안내 권한 확인 필요
 - Frontend ESLint 통과
 - Frontend production build 통과
 - 통합 테스트 후 migration과 seed로 DB 초기 상태 복구 확인
@@ -308,8 +320,8 @@ READY → IN_PROGRESS → COMPLETED
 ### 우선순위가 높은 기본 기능
 
 - 일정 추가 시간 입력 UI 연결
-- 지도 API와 일반경로 생성
-- 이동구간 생성 후 B 위험판단 API 연결
+- TMAP 콘솔에서 보행자 경로안내 API 권한 활성화 후 실제 호출 재검증
+- 이동구간 생성 결과를 B 위험판단 API에 연결
 
 ### 이후 기능
 
@@ -320,20 +332,18 @@ READY → IN_PROGRESS → COMPLETED
 
 ## 11. 다음 작업 권장 순서
 
-1. GitHub 점검이 끝나면 `feat/backend-work-session`의 문서 커밋을 push한다.
-2. PR #4의 변경사항을 확인하고 `dev`에 병합한다.
-3. 현재 `feat/backend-schedule` 브랜치를 최신 `dev` 기준으로 정리한다.
-4. 일정 API 변경사항을 push하고 별도 `dev` PR을 만든다.
-5. `feat/core-integration` 변경사항을 push하고 `dev` PR을 만든다.
-6. 지도 API로 일반경로와 이동구간을 생성한다.
-7. B가 `docs/AB_INTERFACE.md`와 `docs/mocks/`를 기준으로 위험판단을 구현한다.
-8. 위험판단 결과와 쿨링스팟 추천을 연결해 안전경로를 생성한다.
-9. 방문·휴식 기록과 하루 집계를 연결한다.
+1. TMAP 콘솔에서 현재 앱에 보행자 경로안내 API가 연결됐는지 확인한다.
+2. `POST /routes/normal`과 `POST /route-segments`를 실제 키로 다시 검증한다.
+3. B가 `docs/AB_INTERFACE.md`와 `docs/mocks/`를 기준으로 위험판단을 구현한다.
+4. 이동구간 결과를 위험판단 API에 연결한다.
+5. 쿨링스팟 추천 결과로 안전경로를 생성한다.
+6. 방문·휴식 기록과 하루 집계를 연결한다.
+7. GitHub 점검이 끝나면 로컬 stacked branch들을 순서대로 push하고 `dev` PR을 만든다.
 
 현재 로컬 작업 브랜치:
 
 ```text
-feat/backend-weather
+feat/backend-route
 ```
 
 ## 12. 실행 방법

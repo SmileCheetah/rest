@@ -291,17 +291,96 @@
 
 환경변수는 `KMA_LIVING_INDEX_API_KEY`다.
 
-## 7. 기본 사용자 흐름
+## 7. 지도와 이동구간
+
+TMAP 보행자 경로안내 API를 사용한다. 환경변수는 `MAP_API_KEY`다.
+
+### `POST /routes/normal`
+
+DB에 저장하지 않고 일반 보행 경로만 계산한다.
+
+```json
+{
+  "origin": {
+    "latitude": 37.5739,
+    "longitude": 127.0105,
+    "name": "현재 위치"
+  },
+  "destination": {
+    "latitude": 37.57471,
+    "longitude": 127.01142,
+    "name": "김영희"
+  },
+  "departureTime": "2026-08-18T10:00:00+09:00"
+}
+```
+
+응답에는 `distanceMeters`, `walkingMinutes`, `estimatedArrivalTime`, 지도 표시용 `path`가 포함된다.
+
+### `POST /route-segments`
+
+업무가 `IN_PROGRESS`이고 일정이 `PENDING`일 때 일반경로와 방문 예정 시각의 날씨를 결합해 DB에 저장한다.
+
+```json
+{
+  "workSessionId": 1,
+  "scheduleId": 1,
+  "origin": {
+    "latitude": 37.5739,
+    "longitude": 127.0105,
+    "name": "현재 위치"
+  },
+  "destination": {
+    "latitude": 37.57471,
+    "longitude": 127.01142,
+    "name": "김영희"
+  },
+  "departureTime": "2026-08-18T10:00:00+09:00"
+}
+```
+
+```json
+{
+  "routeSegmentId": 1,
+  "routeOptionId": 1,
+  "workSessionId": 1,
+  "scheduleId": 1,
+  "routeType": "NORMAL",
+  "distanceMeters": 615,
+  "walkingMinutes": 9,
+  "estimatedArrivalTime": "2026-08-18T10:09:00+09:00",
+  "path": [
+    { "latitude": 37.5739, "longitude": 127.0105 },
+    { "latitude": 37.57471, "longitude": 127.01142 }
+  ],
+  "weather": {
+    "forecastAt": "2026-08-18T10:00:00+09:00",
+    "temperature": 33.0,
+    "humidity": 60.0,
+    "apparentTemperature": 34.5,
+    "source": "KMA"
+  }
+}
+```
+
+실제 응답에는 `origin`, `destination`, 날씨 좌표도 포함된다. 업무·일정 관계가 맞지 않으면 `409`, TMAP 권한 또는 호출 오류는 `502`를 반환한다.
+
+### `GET /route-segments/{route_segment_id}`
+
+저장된 이동구간과 일반경로를 조회한다. 날씨는 현재 별도 컬럼에 저장하지 않으므로 조회 응답의 `weather`는 `null`이다.
+
+## 8. 기본 사용자 흐름
 
 ```text
 GET /schedules/today
 → POST /work-sessions/start
 → GET /schedules/next
+→ POST /route-segments
 → PATCH /schedules/{id}/complete 반복
 → GET /schedules/next에서 workCompleted=true 확인
 → PATCH /work-sessions/{id}/complete
 ```
 
-## 8. A/B 분석 계약
+## 9. A/B 분석 계약
 
 위험판단과 쿨링스팟 추천의 입력·출력은 `docs/AB_INTERFACE.md`와 `docs/mocks/`를 확인한다.
