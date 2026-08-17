@@ -7,14 +7,17 @@
 
 - 저장소: `https://github.com/SmileCheetah/rest`
 - 로컬 경로: `/Users/m3air/Desktop/Code/Project/rest`
-- 현재 브랜치: `feat/backend-work-session`
-- 원격 브랜치: `origin/feat/backend-work-session`
+- 현재 브랜치: `feat/backend-schedule`
+- 현재 브랜치는 로컬 전용이며 아직 원격에 push하지 않았다.
+- `feat/backend-work-session`에서 분기한 stacked branch다.
 - 열린 PR: [#4 업무 세션 API 및 폭염 안전 이동 화면 구현](https://github.com/SmileCheetah/rest/pull/4)
 - PR 대상: `dev`
 - `dev`에 병합된 기준 커밋: `05a4aa7`
 - 현재 브랜치의 주요 커밋:
   - `b191134 feat: 업무 세션 API 추가`
   - `81c5789 feat: 폭염 안전 이동 프론트 화면 구현`
+  - `a0338f2 docs: 현재 작업 현황 및 다음 계획 정리`
+  - `bba62bd feat: 일정 관리 및 방문 완료 API 추가`
 - `main`에는 아직 최신 Backend 기능이 병합되지 않았다.
 
 ## 2. 프로젝트 목표
@@ -156,6 +159,11 @@ ERD의 FK, Unique, Check Constraint, 기본값, Nullable, 문자열 길이와 �
 | `GET` | `/visit-targets` | 완료 | 방문대상자 전체 조회 |
 | `GET` | `/visit-targets/{visit_target_id}` | 완료 | 방문대상자 상세 조회 |
 | `GET` | `/schedules/today` | 완료 | 한국 날짜 기준 오늘 일정 조회 |
+| `GET` | `/schedules/next` | 완료 | 다음 미완료 방문지와 전체 완료 여부 조회 |
+| `POST` | `/schedules` | 완료 | 방문 일정 생성 |
+| `PATCH` | `/schedules/{schedule_id}` | 완료 | 방문 시간·순서·체류시간 수정 |
+| `DELETE` | `/schedules/{schedule_id}` | 완료 | 미완료 방문 일정 삭제 |
+| `PATCH` | `/schedules/{schedule_id}/complete` | 완료 | 방문 완료와 활동 로그 기록 |
 | `POST` | `/work-sessions/start` | 완료 | 업무 시작 |
 | `GET` | `/work-sessions/current` | 완료 | 오늘 업무 상태와 방문 진행률 조회 |
 | `PATCH` | `/work-sessions/{work_session_id}/complete` | 완료 | 하루 업무 완료 |
@@ -186,7 +194,16 @@ READY → IN_PROGRESS → COMPLETED
 - 존재하지 않는 업무는 `404`, 잘못된 상태 전환은 `409`를 반환한다.
 - DB에는 UTC로 저장하고 시간 응답은 `Asia/Seoul`로 반환한다.
 
-중요: 일정 완료 API가 아직 없기 때문에 현재 공개 API만 사용해서 업무 완료 조건을 만족시키는 전체 흐름은 아직 완성되지 않았다.
+### 일정 핵심 규칙
+
+- 방문 순서는 같은 업무 세션 안에서 중복될 수 없다.
+- 빈 수정 요청은 `422`, 중복 순서는 `409`를 반환한다.
+- 완료된 일정과 완료된 업무의 일정은 수정·삭제할 수 없다.
+- 일정 삭제 시 뒤의 방문 순서를 1씩 당긴다.
+- 방문 완료는 업무가 `IN_PROGRESS`일 때만 가능하다.
+- 방문 완료 시 `VISIT_COMPLETED` 활동 로그를 기록한다.
+- 완료 요청을 반복해도 완료 로그는 중복 생성하지 않는다.
+- 남은 일정이 없으면 `/schedules/next`가 `workCompleted: true`를 반환한다.
 
 ## 8. Frontend 현재 상태
 
@@ -233,6 +250,11 @@ READY → IN_PROGRESS → COMPLETED
 - 미완료 일정이 있을 때 업무 완료 `409` 확인
 - 없는 업무 세션 `404` 확인
 - 시작·완료 활동 로그가 각각 1개만 생성되는 것 확인
+- 일정 생성·수정·삭제와 순서 재정렬 확인
+- 잘못된 일정 요청의 `404`, `409`, `422` 응답 확인
+- 다음 일정이 방문 완료 순서에 맞게 변경되는 것 확인
+- 방문 완료 로그 4개가 중복 없이 생성되는 것 확인
+- 업무 시작 → 방문 4건 완료 → 업무 완료 전체 흐름 확인
 - Frontend ESLint 통과
 - Frontend production build 통과
 - 실제 `.env`가 Git에 포함되지 않는 것 확인
@@ -241,14 +263,9 @@ READY → IN_PROGRESS → COMPLETED
 
 ### 우선순위가 높은 기본 기능
 
-- `GET /schedules/next`
-- `POST /schedules`
-- `PATCH /schedules/{schedule_id}`
-- `DELETE /schedules/{schedule_id}`
-- `PATCH /schedules/{schedule_id}/complete`
 - Frontend와 Backend 간 CORS 설정
 - Frontend mock 데이터를 실제 API로 교체
-- 업무 시작부터 전체 방문 완료까지 API 통합 테스트
+- API 요청·응답 명세와 A/B mock JSON 작성
 
 ### 이후 기능
 
@@ -264,11 +281,13 @@ READY → IN_PROGRESS → COMPLETED
 
 ## 11. 다음 작업 권장 순서
 
-1. PR #4의 변경사항을 확인하고 `dev`에 병합한다.
-2. 최신 `dev`에서 일정 기능 브랜치를 만든다.
-3. 일정 생성·수정·삭제·다음 일정·방문 완료 API를 구현한다.
-4. CORS를 설정한다.
-5. 아래 전체 흐름을 Swagger에서 검증한다.
+1. GitHub 점검이 끝나면 `feat/backend-work-session`의 문서 커밋을 push한다.
+2. PR #4의 변경사항을 확인하고 `dev`에 병합한다.
+3. 현재 `feat/backend-schedule` 브랜치를 최신 `dev` 기준으로 정리한다.
+4. 일정 API 변경사항을 push하고 별도 `dev` PR을 만든다.
+5. CORS를 설정하고 API 요청·응답 명세를 작성한다.
+6. Frontend의 일정·업무 상태부터 실제 API와 연결한다.
+7. 다음 전체 흐름을 Frontend와 Backend에서 검증한다.
 
 ```text
 오늘 일정 조회
@@ -279,14 +298,13 @@ READY → IN_PROGRESS → COMPLETED
 → 업무 완료
 ```
 
-6. A/B 위험판단 요청·응답 형식과 mock JSON을 확정한다.
-7. Frontend의 일정·업무 상태부터 실제 API와 연결한다.
-8. 기상, 지도, 위험판단 기능을 A/B가 병렬로 개발한다.
+8. A/B 위험판단 요청·응답 형식과 mock JSON을 확정한다.
+9. 기상, 지도, 위험판단 기능을 A/B가 병렬로 개발한다.
 
-추천 다음 브랜치:
+추천 다음 로컬 브랜치:
 
 ```text
-feat/backend-schedule
+feat/core-integration
 ```
 
 ## 12. 실행 방법
@@ -367,4 +385,3 @@ AI가 작업을 시작하기 전에 반드시 확인할 항목:
 - Docker MySQL 상태
 - Alembic 현재 revision
 - 해당 날짜의 seed 데이터 존재 여부
-

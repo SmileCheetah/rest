@@ -63,6 +63,7 @@ uvicorn app.main:app --reload
 - DB 연결 확인: <http://localhost:8000/health/db>
 - 방문대상자 목록: <http://localhost:8000/visit-targets>
 - 오늘 일정: <http://localhost:8000/schedules/today>
+- 다음 일정: <http://localhost:8000/schedules/next>
 - 현재 업무 상태: <http://localhost:8000/work-sessions/current>
 - Swagger API 문서: <http://localhost:8000/docs>
 
