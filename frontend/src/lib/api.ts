@@ -1,5 +1,6 @@
 import type {
   CreateScheduleRequest,
+  CurrentWeather,
   NextScheduleResult,
   Schedule,
   VisitTarget,
@@ -87,3 +88,13 @@ export function completeSchedule(scheduleId: number): Promise<Schedule> {
   return apiRequest(`/schedules/${scheduleId}/complete`, { method: "PATCH" });
 }
 
+export function getCurrentWeather(
+  latitude: number,
+  longitude: number,
+): Promise<CurrentWeather> {
+  const params = new URLSearchParams({
+    latitude: String(latitude),
+    longitude: String(longitude),
+  });
+  return apiRequest(`/weather/current?${params}`);
+}

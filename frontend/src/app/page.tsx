@@ -8,13 +8,14 @@ import {
   completeWorkSession,
   createSchedule,
   deleteSchedule,
+  getCurrentWeather,
   getCurrentWorkSession,
   getNextSchedule,
   getTodaySchedules,
   getVisitTargets,
   startWorkSession,
 } from "@/lib/api";
-import type { Schedule, VisitTarget, WorkSession } from "@/types/api";
+import type { CurrentWeather, Schedule, VisitTarget, WorkSession } from "@/types/api";
 
 type Screen = "schedule" | "route" | "guidance" | "complete";
 type Modal = "add" | "menu" | "ai" | "warning" | "spot" | "skip" | null;
@@ -45,6 +46,29 @@ const fallbackVisits: VisitCard[] = [
   { scheduleId: -3, visitOrder: 3, time: "14:00", name: "박○○", address: "종로구 창신동 ○○길 00", ...routeMocks[2] },
   { scheduleId: -4, visitOrder: 4, time: "15:30", name: "최○○", address: "종로구 창신동 ○○길 00", ...routeMocks[3] },
 ];
+
+const DEFAULT_LOCATION = { latitude: 37.57471, longitude: 127.01142 };
+
+function getBrowserLocation(): Promise<{ latitude: number; longitude: number }> {
+  if (!navigator.geolocation) return Promise.resolve(DEFAULT_LOCATION);
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      }),
+      () => resolve(DEFAULT_LOCATION),
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 },
+    );
+  });
+}
+
+function getHeatLevel(apparentTemperature: number | undefined) {
+  if (apparentTemperature === undefined) return { label: "확인 중", tone: "safe" };
+  if (apparentTemperature >= 35) return { label: "위험", tone: "danger" };
+  if (apparentTemperature >= 31) return { label: "주의", tone: "caution" };
+  return { label: "보통", tone: "safe" };
+}
 
 function toVisitCards(schedules: Schedule[]): VisitCard[] {
   return schedules.map((schedule, index) => ({
@@ -107,11 +131,13 @@ export default function Home() {
   const [visits, setVisits] = useState<VisitCard[]>(fallbackVisits);
   const [visitTargets, setVisitTargets] = useState<VisitTarget[]>([]);
   const [workSession, setWorkSession] = useState<WorkSession | null>(null);
+  const [currentWeather, setCurrentWeather] = useState<CurrentWeather | null>(null);
   const [completed, setCompleted] = useState<number[]>([]);
   const [activeScheduleId, setActiveScheduleId] = useState<number | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<number | null>(null);
   const [apiMessage, setApiMessage] = useState<string | null>(null);
+  const [weatherMessage, setWeatherMessage] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
 
   const loadDashboard = useCallback(async () => {
@@ -145,12 +171,24 @@ export default function Home() {
     }
   }, []);
 
+  const loadWeather = useCallback(async () => {
+    try {
+      const location = await getBrowserLocation();
+      setCurrentWeather(await getCurrentWeather(location.latitude, location.longitude));
+      setWeatherMessage(null);
+    } catch {
+      setCurrentWeather(null);
+      setWeatherMessage("기상청 정보를 불러오지 못했습니다. 다시 눌러주세요.");
+    }
+  }, []);
+
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       void loadDashboard();
+      void loadWeather();
     }, 0);
     return () => window.clearTimeout(timeoutId);
-  }, [loadDashboard]);
+  }, [loadDashboard, loadWeather]);
 
   const handleVisitComplete = async (scheduleId: number) => {
     if (scheduleId < 0) {
@@ -247,6 +285,7 @@ export default function Home() {
     visits.find((visit) => !completed.includes(visit.scheduleId)) ??
     visits[0] ??
     fallbackVisits[0];
+  const heatLevel = getHeatLevel(currentWeather?.apparentTemperature);
 
   const startRoute = () => selectedRoute === "normal" ? setModal("warning") : setScreen("guidance");
 
@@ -257,9 +296,10 @@ export default function Home() {
         <header className="appbar"><h1>오늘의 방문 일정</h1><button className="icon-btn" aria-label="알림"><Icon name="bell"/></button></header>
         <div className="screen-content">
           <section className="weather-card">
-            <div className="weather-metrics"><div className="sun"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg></div><div className="metric"><strong>34°C</strong><span>현재 기온</span></div><div className="metric"><strong>36°C</strong><span>체감 온도</span></div><div className="metric"><strong>72%</strong><span>습도</span></div></div>
-            <div className="weather-footer"><span>폭염 영향예보</span><span className="badge caution">주의</span></div>
+            <div className="weather-metrics"><div className="sun"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg></div><div className="metric"><strong>{currentWeather ? `${Math.round(currentWeather.temperature)}°C` : "--"}</strong><span>현재 기온</span></div><div className="metric"><strong>{currentWeather ? `${Math.round(currentWeather.apparentTemperature)}°C` : "--"}</strong><span>체감 온도</span></div><div className="metric"><strong>{currentWeather ? `${Math.round(currentWeather.humidity)}%` : "--"}</strong><span>습도</span></div></div>
+            <div className="weather-footer"><span>기상청 초단기실황</span><span className={`badge ${heatLevel.tone}`}>{heatLevel.label}</span></div>
           </section>
+          {weatherMessage && <button type="button" className="api-message" onClick={() => void loadWeather()}>{weatherMessage}</button>}
           {apiMessage && <button type="button" className="api-message" onClick={() => void loadDashboard()}>{apiMessage}</button>}
           <div className="section-header"><div><h2>오늘의 방문</h2><span>{completed.length} / {visits.length} 완료</span></div><button className="small-button" disabled={isBusy} onClick={() => setModal("add")}>+ 대상자 추가</button></div>
           <div className="visit-list">{visits.map((visit) => <article className={`visit-card ${completed.includes(visit.scheduleId) ? "done" : ""}`} key={visit.scheduleId}>

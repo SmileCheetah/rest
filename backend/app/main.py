@@ -7,6 +7,7 @@ from app.config import settings
 from app.database import engine
 from app.routers.schedules import router as schedules_router
 from app.routers.visit_targets import router as visit_targets_router
+from app.routers.weather import router as weather_router
 from app.routers.work_sessions import router as work_sessions_router
 
 app = FastAPI(
@@ -26,6 +27,7 @@ app.add_middleware(
 app.include_router(visit_targets_router)
 app.include_router(schedules_router)
 app.include_router(work_sessions_router)
+app.include_router(weather_router)
 
 
 @app.get("/health", tags=["system"])

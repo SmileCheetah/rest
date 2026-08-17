@@ -13,6 +13,8 @@
 - `404`: 요청한 데이터 없음
 - `409`: 현재 상태 또는 중복 데이터 때문에 처리 불가
 - `422`: 요청 형식 또는 값이 잘못됨
+- `502`: 외부 API 호출 또는 응답 오류
+- `503`: 필요한 환경변수 또는 서비스 연결 없음
 
 ## 2. 상태 확인
 
@@ -197,7 +199,51 @@
 - `WORK_COMPLETED` 활동 로그 생성
 - 미완료 일정이 있거나 업무 시작 전이면 `409`
 
-## 6. 기본 사용자 흐름
+## 6. 기상
+
+기상청 단기예보 조회서비스를 사용한다. 위·경도는 Backend에서 기상청 격자로 변환한다.
+
+### `GET /weather/current`
+
+```text
+/weather/current?latitude=37.57471&longitude=127.01142
+```
+
+기상청 초단기실황의 기온과 습도를 반환한다. 체감온도는 기상청 공식 계절별 산식으로 계산한다.
+
+```json
+{
+  "latitude": 37.57471,
+  "longitude": 127.01142,
+  "gridX": 60,
+  "gridY": 127,
+  "observedAt": "2026-08-18T14:00:00+09:00",
+  "temperature": 34.0,
+  "humidity": 72.0,
+  "apparentTemperature": 36.8,
+  "source": "KMA"
+}
+```
+
+### `GET /weather/hourly`
+
+```text
+/weather/hourly?latitude=37.57471&longitude=127.01142&date=2026-08-18
+```
+
+해당 날짜에 제공되는 시간대별 기온, 습도, 체감온도를 반환한다.
+
+### `GET /weather/forecast`
+
+```text
+/weather/forecast?latitude=37.57471&longitude=127.01142&datetime=2026-08-18T15:00:00%2B09:00
+```
+
+방문 예정 시각에서 가장 가까운 1시간 단위 단기예보를 반환한다.
+
+환경변수 `KMA_API_KEY`가 없으면 `503`, 기상청 호출에 실패하면 `502`, 제공 범위 밖의 예보는 `404`를 반환한다.
+
+## 7. 기본 사용자 흐름
 
 ```text
 GET /schedules/today
@@ -208,7 +254,6 @@ GET /schedules/today
 → PATCH /work-sessions/{id}/complete
 ```
 
-## 7. A/B 분석 계약
+## 8. A/B 분석 계약
 
 위험판단과 쿨링스팟 추천의 입력·출력은 `docs/AB_INTERFACE.md`와 `docs/mocks/`를 확인한다.
-

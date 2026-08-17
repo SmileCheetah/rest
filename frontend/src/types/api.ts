@@ -48,3 +48,14 @@ export interface CreateScheduleRequest {
   plannedVisitMinutes?: number;
 }
 
+export interface CurrentWeather {
+  latitude: number;
+  longitude: number;
+  gridX: number;
+  gridY: number;
+  observedAt: string;
+  temperature: number;
+  humidity: number;
+  apparentTemperature: number;
+  source: "KMA";
+}
