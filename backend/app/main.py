@@ -3,12 +3,15 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import engine
+from app.routers.visit_targets import router as visit_targets_router
 
 app = FastAPI(
     title="폭염 이동 안전 지원 API",
     description="생활지원사의 안전한 이동을 지원하는 서비스의 백엔드 API",
     version="0.1.0",
 )
+
+app.include_router(visit_targets_router)
 
 
 @app.get("/health", tags=["system"])
