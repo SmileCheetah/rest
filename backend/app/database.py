@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
+from app.models.base import Base
 
 engine = create_async_engine(
     settings.database_url,
@@ -19,11 +19,6 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
-
-
-class Base(DeclarativeBase):
-    """모든 SQLAlchemy 모델이 상속할 기본 클래스입니다."""
-
 
 async def get_db_session() -> AsyncGenerator[AsyncSession]:
     """요청 단위 비동기 DB 세션을 제공합니다."""
