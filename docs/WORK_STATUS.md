@@ -7,9 +7,9 @@
 
 - 저장소: `https://github.com/SmileCheetah/rest`
 - 로컬 경로: `/Users/m3air/Desktop/Code/Project/rest`
-- 현재 브랜치: `feat/core-integration`
+- 현재 브랜치: `feat/backend-weather`
 - 현재 브랜치는 로컬 전용이며 아직 원격에 push하지 않았다.
-- `feat/backend-schedule`에서 분기한 stacked branch다.
+- `feat/core-integration`에서 분기한 stacked branch다.
 - 열린 PR: [#4 업무 세션 API 및 폭염 안전 이동 화면 구현](https://github.com/SmileCheetah/rest/pull/4)
 - PR 대상: `dev`
 - `dev`에 병합된 기준 커밋: `05a4aa7`
@@ -22,6 +22,8 @@
   - `71687f4 chore: Frontend CORS 설정 추가`
   - `76ddd33 docs: API 및 A/B 분석 인터페이스 정의`
   - `44ee162 feat: 일정 및 업무 API 프론트 연결`
+  - `8adc15a feat: 기상청 날씨 API 연동`
+  - `05e8cf5 fix: 기상청 환경변수와 재시도 보완`
 - `main`에는 아직 최신 Backend 기능이 병합되지 않았다.
 
 ## 2. 프로젝트 목표
@@ -74,6 +76,7 @@
 MySQL이 기본 포트 `3306`이 아닌 `3307`을 사용하는 이유는 로컬에 설치된 MySQL과 충돌을 피하기 위해서다.
 
 비밀번호와 API Key는 `backend/.env`에만 작성한다. 실제 `.env`는 Git에서 제외되어 있다.
+기상청 키는 단기예보 `KMA_API_KEY`, 영향예보 `KMA_IMPACT_API_KEY`, 생활기상지수 `KMA_LIVING_INDEX_API_KEY`로 구분한다.
 
 ## 5. 주요 폴더
 
@@ -171,6 +174,9 @@ ERD의 FK, Unique, Check Constraint, 기본값, Nullable, 문자열 길이와 �
 | `POST` | `/work-sessions/start` | 완료 | 업무 시작 |
 | `GET` | `/work-sessions/current` | 완료 | 오늘 업무 상태와 방문 진행률 조회 |
 | `PATCH` | `/work-sessions/{work_session_id}/complete` | 완료 | 하루 업무 완료 |
+| `GET` | `/weather/current` | 완료 | 기상청 초단기실황과 체감온도 조회 |
+| `GET` | `/weather/hourly` | 완료 | 날짜별 시간대 단기예보 조회 |
+| `GET` | `/weather/forecast` | 완료 | 방문 예정 시각의 단기예보 조회 |
 
 Swagger: `http://localhost:8000/docs`
 
@@ -244,6 +250,7 @@ READY → IN_PROGRESS → COMPLETED
 
 - 오늘 일정과 방문대상자 조회
 - 오늘 업무 상태와 방문 완료 수 조회
+- 현재 위치 기반 기온·습도·체감온도 조회
 - 일정 추가와 삭제
 - 업무 시작과 다음 방문지 조회
 - 방문 완료와 모든 방문 완료 후 업무 완료
@@ -252,7 +259,7 @@ READY → IN_PROGRESS → COMPLETED
 아직 mock인 기능:
 
 - 지도는 실제 지도 API가 아닌 SVG mock이다.
-- 날씨, 경로 거리·시간, 위험도, 쿨링스팟 추천은 mock 값이다.
+- 공식 폭염 영향예보, 경로 거리·시간, 위험도, 쿨링스팟 추천은 mock 값이다.
 - 노출 감소량과 이용한 쿨링스팟은 mock 값이다.
 - 일정 추가 시간은 현재 `14:30` 고정이며 시간 입력 UI 연결이 필요하다.
 
@@ -279,6 +286,10 @@ READY → IN_PROGRESS → COMPLETED
 - Frontend 서버 `200 OK` 확인
 - `localhost:3000` CORS preflight 성공 확인
 - Frontend가 사용하는 일정 추가·삭제 → 업무 시작 → 방문 4건 완료 → 업무 완료 API 흐름 확인
+- 기상청 단기예보 인증키 실제 호출 성공
+- 창신동 좌표의 초단기실황 `200 OK` 확인
+- 시간대별 단기예보 24건과 특정 방문 시각 예보 확인
+- 기상청 통신 오류 시 1회 자동 재시도 적용
 - Frontend ESLint 통과
 - Frontend production build 통과
 - 통합 테스트 후 migration과 seed로 DB 초기 상태 복구 확인
@@ -289,7 +300,7 @@ READY → IN_PROGRESS → COMPLETED
 ### 우선순위가 높은 기본 기능
 
 - 일정 추가 시간 입력 UI 연결
-- 기상 API를 연결하고 날씨 mock 교체
+- 기상청 영향예보를 연결하고 폭염 상태 mock 교체
 - 지도 API와 일반경로 생성
 - 이동구간 생성 후 B 위험판단 API 연결
 
@@ -307,7 +318,7 @@ READY → IN_PROGRESS → COMPLETED
 3. 현재 `feat/backend-schedule` 브랜치를 최신 `dev` 기준으로 정리한다.
 4. 일정 API 변경사항을 push하고 별도 `dev` PR을 만든다.
 5. `feat/core-integration` 변경사항을 push하고 `dev` PR을 만든다.
-6. 기상 API를 연결해 현재 날씨와 시간대별 예보를 실제 데이터로 교체한다.
+6. 기상청 영향예보를 연결해 공식 폭염 상태를 실제 데이터로 교체한다.
 7. 지도 API로 일반경로와 이동구간을 생성한다.
 8. B가 `docs/AB_INTERFACE.md`와 `docs/mocks/`를 기준으로 위험판단을 구현한다.
 9. 위험판단 결과와 쿨링스팟 추천을 연결해 안전경로를 생성한다.
@@ -316,7 +327,7 @@ READY → IN_PROGRESS → COMPLETED
 현재 로컬 작업 브랜치:
 
 ```text
-feat/core-integration
+feat/backend-weather
 ```
 
 ## 12. 실행 방법
