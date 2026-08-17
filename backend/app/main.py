@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.database import engine
 from app.routers.schedules import router as schedules_router
 from app.routers.visit_targets import router as visit_targets_router
+from app.routers.work_sessions import router as work_sessions_router
 
 app = FastAPI(
     title="폭염 이동 안전 지원 API",
@@ -14,6 +15,7 @@ app = FastAPI(
 
 app.include_router(visit_targets_router)
 app.include_router(schedules_router)
+app.include_router(work_sessions_router)
 
 
 @app.get("/health", tags=["system"])
