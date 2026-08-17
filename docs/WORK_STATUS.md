@@ -7,9 +7,9 @@
 
 - 저장소: `https://github.com/SmileCheetah/rest`
 - 로컬 경로: `/Users/m3air/Desktop/Code/Project/rest`
-- 현재 브랜치: `feat/backend-schedule`
+- 현재 브랜치: `feat/core-integration`
 - 현재 브랜치는 로컬 전용이며 아직 원격에 push하지 않았다.
-- `feat/backend-work-session`에서 분기한 stacked branch다.
+- `feat/backend-schedule`에서 분기한 stacked branch다.
 - 열린 PR: [#4 업무 세션 API 및 폭염 안전 이동 화면 구현](https://github.com/SmileCheetah/rest/pull/4)
 - PR 대상: `dev`
 - `dev`에 병합된 기준 커밋: `05a4aa7`
@@ -18,6 +18,10 @@
   - `81c5789 feat: 폭염 안전 이동 프론트 화면 구현`
   - `a0338f2 docs: 현재 작업 현황 및 다음 계획 정리`
   - `bba62bd feat: 일정 관리 및 방문 완료 API 추가`
+  - `3accab7 docs: 일정 API 작업 현황 갱신`
+  - `71687f4 chore: Frontend CORS 설정 추가`
+  - `76ddd33 docs: API 및 A/B 분석 인터페이스 정의`
+  - `44ee162 feat: 일정 및 업무 API 프론트 연결`
 - `main`에는 아직 최신 Backend 기능이 병합되지 않았다.
 
 ## 2. 프로젝트 목표
@@ -172,6 +176,12 @@ Swagger: `http://localhost:8000/docs`
 
 API JSON은 Frontend에서 사용하기 쉽도록 `workSessionId`, `scheduleId`, `visitTargetId` 같은 camelCase를 사용한다.
 
+연동 기준 문서:
+
+- `docs/API.md`: 구현된 공통·일정·업무 API 명세
+- `docs/AB_INTERFACE.md`: A가 B에게 전달할 위험분석·쿨링스팟 데이터 계약
+- `docs/mocks/`: A/B 요청·응답 예시 JSON
+
 ### 업무 시작 요청
 
 ```json
@@ -207,7 +217,7 @@ READY → IN_PROGRESS → COMPLETED
 
 ## 8. Frontend 현재 상태
 
-현재 브랜치에 폭염 안전 이동 화면 프로토타입이 구현되어 있다.
+현재 브랜치에 폭염 안전 이동 화면과 Backend 기본 API 연동이 구현되어 있다.
 
 화면:
 
@@ -224,16 +234,27 @@ READY → IN_PROGRESS → COMPLETED
 
 주요 파일:
 
-- `frontend/src/app/page.tsx`: Next.js 동작형 화면 프로토타입
+- `frontend/src/app/page.tsx`: 화면 상태와 API 호출을 연결한 메인 화면
 - `frontend/src/app/globals.css`: 화면 스타일
+- `frontend/src/lib/api.ts`: Backend API 요청 함수
+- `frontend/src/types/api.ts`: API 요청·응답 TypeScript 타입
 - `frontend/example/`: Figma import용 HTML, CSS, 개별 화면
 
-현재 한계:
+실제 API와 연결된 기능:
 
-- 화면 데이터는 `page.tsx` 내부의 mock 데이터다.
-- Backend API와 아직 연결되지 않았다.
+- 오늘 일정과 방문대상자 조회
+- 오늘 업무 상태와 방문 완료 수 조회
+- 일정 추가와 삭제
+- 업무 시작과 다음 방문지 조회
+- 방문 완료와 모든 방문 완료 후 업무 완료
+- Backend 연결 실패 시 mock 화면 표시와 재시도 안내
+
+아직 mock인 기능:
+
 - 지도는 실제 지도 API가 아닌 SVG mock이다.
-- 날씨, 위험도, 쿨링스팟, 집계 결과도 mock 값이다.
+- 날씨, 경로 거리·시간, 위험도, 쿨링스팟 추천은 mock 값이다.
+- 노출 감소량과 이용한 쿨링스팟은 mock 값이다.
+- 일정 추가 시간은 현재 `14:30` 고정이며 시간 입력 UI 연결이 필요하다.
 
 ## 9. 검증 완료 항목
 
@@ -255,25 +276,25 @@ READY → IN_PROGRESS → COMPLETED
 - 다음 일정이 방문 완료 순서에 맞게 변경되는 것 확인
 - 방문 완료 로그 4개가 중복 없이 생성되는 것 확인
 - 업무 시작 → 방문 4건 완료 → 업무 완료 전체 흐름 확인
+- Frontend 서버 `200 OK` 확인
+- `localhost:3000` CORS preflight 성공 확인
+- Frontend가 사용하는 일정 추가·삭제 → 업무 시작 → 방문 4건 완료 → 업무 완료 API 흐름 확인
 - Frontend ESLint 통과
 - Frontend production build 통과
+- 통합 테스트 후 migration과 seed로 DB 초기 상태 복구 확인
 - 실제 `.env`가 Git에 포함되지 않는 것 확인
 
 ## 10. 아직 구현하지 않은 기능
 
 ### 우선순위가 높은 기본 기능
 
-- Frontend와 Backend 간 CORS 설정
-- Frontend mock 데이터를 실제 API로 교체
-- API 요청·응답 명세와 A/B mock JSON 작성
+- 일정 추가 시간 입력 UI 연결
+- 기상 API를 연결하고 날씨 mock 교체
+- 지도 API와 일반경로 생성
+- 이동구간 생성 후 B 위험판단 API 연결
 
 ### 이후 기능
 
-- 기상청·기상 API
-- 폭염 영향예보
-- 지도 API와 일반경로
-- 이동구간 생성
-- B의 노출시간·위험판단 API
 - 쿨링스팟 필터링과 최적 추천
 - 쿨링스팟 경유 안전경로
 - 방문·휴식 기록과 일일 집계
@@ -285,23 +306,14 @@ READY → IN_PROGRESS → COMPLETED
 2. PR #4의 변경사항을 확인하고 `dev`에 병합한다.
 3. 현재 `feat/backend-schedule` 브랜치를 최신 `dev` 기준으로 정리한다.
 4. 일정 API 변경사항을 push하고 별도 `dev` PR을 만든다.
-5. CORS를 설정하고 API 요청·응답 명세를 작성한다.
-6. Frontend의 일정·업무 상태부터 실제 API와 연결한다.
-7. 다음 전체 흐름을 Frontend와 Backend에서 검증한다.
+5. `feat/core-integration` 변경사항을 push하고 `dev` PR을 만든다.
+6. 기상 API를 연결해 현재 날씨와 시간대별 예보를 실제 데이터로 교체한다.
+7. 지도 API로 일반경로와 이동구간을 생성한다.
+8. B가 `docs/AB_INTERFACE.md`와 `docs/mocks/`를 기준으로 위험판단을 구현한다.
+9. 위험판단 결과와 쿨링스팟 추천을 연결해 안전경로를 생성한다.
+10. 방문·휴식 기록과 하루 집계를 연결한다.
 
-```text
-오늘 일정 조회
-→ 업무 시작
-→ 다음 방문지 조회
-→ 방문 완료
-→ 모든 방문 완료
-→ 업무 완료
-```
-
-8. A/B 위험판단 요청·응답 형식과 mock JSON을 확정한다.
-9. 기상, 지도, 위험판단 기능을 A/B가 병렬로 개발한다.
-
-추천 다음 로컬 브랜치:
+현재 로컬 작업 브랜치:
 
 ```text
 feat/core-integration
