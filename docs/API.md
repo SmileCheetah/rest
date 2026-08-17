@@ -243,6 +243,54 @@
 
 환경변수 `KMA_API_KEY`가 없으면 `503`, 기상청 호출에 실패하면 `502`, 제공 범위 밖의 예보는 `404`를 반환한다.
 
+### `GET /heatwave/current`
+
+서울 지역의 기상청 공식 폭염 영향예보를 반환한다. 영향예보는 관심 단계 이상이 예상될 때만 발표되므로 자료가 없는 경우도 정상 응답이다.
+
+```json
+{
+  "regionId": "11B10101",
+  "regionName": "서울",
+  "announcedAt": "2026-08-17T11:30:00+09:00",
+  "effectiveDate": null,
+  "level": "NONE",
+  "label": "발표 없음",
+  "hasAnnouncement": false,
+  "forecasts": [],
+  "source": "KMA"
+}
+```
+
+위험 단계는 `NONE`, `INTEREST`, `CAUTION`, `WARNING`, `DANGER`를 사용한다. 환경변수는 `KMA_IMPACT_API_KEY`다.
+
+### `GET /weather/living-index`
+
+```text
+/weather/living-index?areaNo=1100000000
+```
+
+기상청 생활기상지수의 현재 시각과 가장 가까운 자외선지수와 대기정체지수를 반환한다. `areaNo` 기본값은 서울 `1100000000`이다.
+
+```json
+{
+  "areaNo": "1100000000",
+  "publishedAt": "2026-08-17T18:00:00+09:00",
+  "ultraviolet": {
+    "value": 0.0,
+    "label": "낮음",
+    "forecastAt": "2026-08-18T00:00:00+09:00"
+  },
+  "airDiffusion": {
+    "value": 75.0,
+    "label": "높음",
+    "forecastAt": "2026-08-18T00:00:00+09:00"
+  },
+  "source": "KMA"
+}
+```
+
+환경변수는 `KMA_LIVING_INDEX_API_KEY`다.
+
 ## 7. 기본 사용자 흐름
 
 ```text
