@@ -11,12 +11,24 @@ rest/
 │   └── package.json      # 스크립트 및 JavaScript 의존성
 ├── backend/
 │   ├── app/
-│   │   └── main.py       # FastAPI 앱 생성 및 현재 API 엔드포인트
+│   │   ├── models/       # SQLAlchemy 테이블 모델
+│   │   ├── routers/      # 기능별 FastAPI 엔드포인트
+│   │   ├── schemas/      # API 요청 및 응답 모델
+│   │   ├── services/     # 조회 및 업무 로직
+│   │   ├── config.py     # 환경변수 설정
+│   │   ├── database.py   # DB 엔진과 요청 단위 세션
+│   │   └── main.py       # FastAPI 앱 생성 및 라우터 등록
+│   ├── migrations/       # Alembic DB migration
+│   ├── scripts/          # 로컬 mock 데이터 seed
 │   ├── .env.example      # Backend 환경변수 예시
+│   ├── alembic.ini       # Alembic 설정
 │   └── requirements.txt  # Python 의존성
 ├── docs/
 │   ├── DEVELOPMENT.md    # Git 및 팀 협업 규칙
-│   └── PROJECT_STRUCTURE.md
+│   ├── PROJECT_STRUCTURE.md
+│   ├── database-erd.md   # MySQL ERD와 테이블 정의
+│   └── role-responsibilities.md
+├── docker-compose.yml    # 로컬 MySQL 8.x 실행 환경
 ├── .env.example          # 저장소 공통 외부 API 변수 목록
 ├── .gitignore
 └── README.md
@@ -39,6 +51,9 @@ rest/
 - 기능별 API 라우터: `backend/app/routers/` (예: `schedules.py`, `routes.py`)
 - 외부 API 연동 및 업무 로직: `backend/app/services/`
 - 요청/응답 Pydantic 모델: `backend/app/schemas/`
+- DB 테이블 모델: `backend/app/models/`
+- DB 구조 변경: 모델 수정 후 `backend/migrations/`에 Alembic migration 추가
+- 로컬 mock 데이터: `backend/scripts/seed.py`
 - 공통 설정: `backend/app/config.py`
 
 라우터가 생기면 `backend/app/main.py`에서 등록합니다. 초기에는 데이터 접근 계층이나 복잡한 의존성 주입 구조를 미리 만들지 않고, 코드가 반복되거나 저장소가 실제로 필요해질 때 분리합니다.

@@ -1,4 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.database import engine
+from app.routers.schedules import router as schedules_router
+from app.routers.visit_targets import router as visit_targets_router
 
 app = FastAPI(
     title="폭염 이동 안전 지원 API",
@@ -6,9 +12,26 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.include_router(visit_targets_router)
+app.include_router(schedules_router)
+
 
 @app.get("/health", tags=["system"])
 def health_check() -> dict[str, str]:
     """서버의 실행 상태를 확인합니다."""
     return {"status": "ok"}
 
+
+@app.get("/health/db", tags=["system"])
+async def database_health_check() -> dict[str, str]:
+    """MySQL 연결 상태를 확인합니다."""
+    try:
+        async with engine.connect() as connection:
+            await connection.execute(text("SELECT 1"))
+    except SQLAlchemyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="database unavailable",
+        ) from exc
+
+    return {"status": "ok", "database": "connected"}
