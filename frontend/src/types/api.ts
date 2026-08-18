@@ -180,3 +180,32 @@ export interface RouteRecommendation {
   safeRoute: SafeRoute | null;
   shelterRecommendationMessage: string | null;
 }
+
+export type RestStatus = "MOVABLE" | "REST_RECOMMENDED" | "REST_BEFORE_NEXT_VISIT";
+
+export interface RestDecisionRequest {
+  continuousWalkingMinutes: number;
+  totalWalkingMinutes: number;
+  minutesSinceLastRest: number;
+  recentRestMinutes: number;
+  observedAt: string;
+  nextTravelMinutes: number;
+  coolingSpotNearby: boolean;
+  distanceToCoolingSpotMeters: number | null;
+}
+
+export interface RestDecisionResponse {
+  decision: {
+    shouldRest: boolean;
+    restTiming: "NOW" | "AFTER_NEXT_VISIT" | "SOON" | "NOT_NEEDED";
+    recommendation: string;
+    reason: string;
+    recommendedRestMinutes: number;
+  };
+  restStatusPrediction: {
+    probabilities: Record<RestStatus, number>;
+    decision: RestStatus;
+  } | null;
+  decisionSource: "AI" | "MODEL" | "FALLBACK";
+  weatherSource: "KMA_ASOS" | "REQUEST_FALLBACK";
+}

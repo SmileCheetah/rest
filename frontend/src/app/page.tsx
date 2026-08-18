@@ -11,6 +11,7 @@ import {
   recommendRoute,
   createSchedule,
   deleteSchedule,
+  evaluateRestDecision,
   getCurrentWeather,
   getCurrentHeatwave,
   getLivingWeatherIndex,
@@ -28,6 +29,7 @@ import type {
   RoutePathPoint,
   RouteSegment,
   RouteRecommendation,
+  RestDecisionResponse,
   CoolingSpot,
   Schedule,
   VisitTarget,
@@ -123,6 +125,54 @@ function toVisitCards(schedules: Schedule[]): VisitCard[] {
     longitude: schedule.visitTarget.longitude,
     ...routeMocks[index % routeMocks.length],
   }));
+}
+
+function nearestCoolingSpotDistance(visit: VisitCard, spots: CoolingSpot[]): number | null {
+  if (!spots.length) return null;
+  const latitudeScale = 111_000;
+  const longitudeScale = 111_000 * Math.cos((visit.latitude * Math.PI) / 180);
+  return Math.round(Math.min(...spots.map((spot) => Math.hypot(
+    (spot.latitude - visit.latitude) * latitudeScale,
+    (spot.longitude - visit.longitude) * longitudeScale,
+  ))));
+}
+
+function aiRiskDisplay(result: RestDecisionResponse): Pick<VisitCard, "riskStatus" | "tone" | "rests"> {
+  const status = result.restStatusPrediction?.decision;
+  if (status === "REST_BEFORE_NEXT_VISIT" || result.decision.restTiming === "NOW") {
+    return { riskStatus: "다음 방문 전 휴식 필요", tone: "danger", rests: 1 };
+  }
+  if (status === "REST_RECOMMENDED" || result.decision.shouldRest) {
+    return { riskStatus: "휴식 권장", tone: "caution", rests: 1 };
+  }
+  return { riskStatus: "이동 가능", tone: "safe", rests: 0 };
+}
+
+async function applyAiRiskToVisits(visits: VisitCard[], spots: CoolingSpot[]): Promise<VisitCard[]> {
+  let accumulatedMinutes = 0;
+  const requests = visits.map((visit) => {
+    const nextTravelMinutes = walkingMinutes(visit.walk);
+    const distanceToCoolingSpotMeters = nearestCoolingSpotDistance(visit, spots);
+    const request = evaluateRestDecision({
+      continuousWalkingMinutes: accumulatedMinutes,
+      totalWalkingMinutes: accumulatedMinutes + nextTravelMinutes,
+      minutesSinceLastRest: accumulatedMinutes,
+      recentRestMinutes: 0,
+      observedAt: new Date().toISOString(),
+      nextTravelMinutes,
+      coolingSpotNearby: distanceToCoolingSpotMeters !== null && distanceToCoolingSpotMeters <= 500,
+      distanceToCoolingSpotMeters,
+    });
+    accumulatedMinutes += nextTravelMinutes;
+    return request;
+  });
+  const results = await Promise.allSettled(requests);
+  return visits.map((visit, index) => {
+    const result = results[index];
+    return result.status === "fulfilled"
+      ? { ...visit, ...aiRiskDisplay(result.value) }
+      : visit;
+  });
 }
 
 function seoulDateString(): string {
@@ -252,7 +302,13 @@ export default function Home() {
         // 지도에는 현재 위치 기준 반경 2km 이내 쉼터만 표시한다.
         getCoolingSpots(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude, 2_000),
       ]);
-      setVisits(toVisitCards(schedules));
+      const cards = toVisitCards(schedules);
+      setVisits(cards);
+      // 일정 카드는 먼저 표시하고, XGBoost 휴식 판단 결과가 도착하면
+      // 실제 AI 상태 배지(이동 가능/휴식 권장/다음 방문 전 휴식 필요)로 교체한다.
+      void applyAiRiskToVisits(cards, spots)
+        .then(setVisits)
+        .catch(() => undefined);
       setCompleted(
         schedules
           .filter((schedule) => schedule.status === "COMPLETED")
