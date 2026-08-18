@@ -285,7 +285,7 @@ async def create_safe_route(
     # 공공 쉼터와 기업 쿨링스팟을 구분하지 않는다. 직선거리상 가까운
     # 후보만 먼저 추린 뒤 실제 도보시간을 비교해 가장 가까운 경유지를 선택한다.
     # 모든 후보에 TMAP을 순차 호출하면 응답이 지나치게 느려질 수 있다.
-    for spot in candidates[:10]:
+    for spot in candidates[:5]:
         waypoint = Coordinate(latitude=float(spot.latitude), longitude=float(spot.longitude), name=spot.name)
         to_spot = await get_pedestrian_route(origin, waypoint)
         from_spot = await get_pedestrian_route(waypoint, destination)

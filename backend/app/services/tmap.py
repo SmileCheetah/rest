@@ -65,6 +65,10 @@ async def get_pedestrian_route(
                         raise TmapProviderError(
                             "TMAP AppKey 또는 보행자 경로안내 API 권한을 확인해주세요"
                         ) from exc
+                    if exc.response.status_code == 429:
+                        raise TmapProviderError(
+                            "TMAP 요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요"
+                        ) from exc
                     if attempt == 1 or exc.response.status_code < 500:
                         raise
             if response is None:
@@ -72,6 +76,10 @@ async def get_pedestrian_route(
             response_payload = response.json()
     except TmapProviderError:
         raise
+    except httpx.HTTPStatusError as exc:
+        raise TmapProviderError(
+            f"TMAP API 오류({exc.response.status_code})"
+        ) from exc
     except (httpx.HTTPError, ValueError) as exc:
         raise TmapProviderError("TMAP API request failed") from exc
 
