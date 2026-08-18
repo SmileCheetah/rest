@@ -1,7 +1,9 @@
+import ssl
 from typing import Any
 from urllib.parse import unquote
 
 import httpx
+import truststore
 
 
 class ExternalApiError(Exception):
@@ -18,7 +20,11 @@ async def request_public_data_json(
     """공공데이터포털 API를 통신 오류에 한해 한 번 재시도합니다."""
     request_params = {api_key_name: unquote(api_key), **params}
     try:
-        async with httpx.AsyncClient(timeout=20.0) as client:
+        ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        async with httpx.AsyncClient(
+            timeout=20.0,
+            verify=ssl_context,
+        ) as client:
             response: httpx.Response | None = None
             for attempt in range(2):
                 try:

@@ -243,6 +243,18 @@
 
 환경변수 `KMA_API_KEY`가 없으면 `503`, 기상청 호출에 실패하면 `502`, 제공 범위 밖의 예보는 `404`를 반환한다.
 
+### `GET /weather/asos/hourly`
+
+기상청 지상 종관관측(ASOS)의 과거 시간자료를 지점번호로 조회한다. `stationId`는 ASOS 관측지점 번호이며, 시간은 한국시간 기준으로 전달한다.
+
+```text
+/weather/asos/hourly?stationId=108&startAt=2026-08-18T13:00:00%2B09:00&endAt=2026-08-18T14:00:00%2B09:00
+```
+
+응답의 `solarRadiation`은 ASOS `icsr` 시간 일사량(MJ/m²)을 모델 입력에 맞춰 W/m²로 변환한 값이고, `surfacePressure`는 ASOS `pa` 현지기압(hPa)이다. ASOS 원자료에는 직접일사 비율이 없으므로 이 응답만으로 Liljegren WBGT 라벨을 완성할 때는 직접일사 추정 또는 별도 일사 자료가 추가로 필요하다.
+
+ASOS API 키는 `KMA_ASOS_API_KEY`를 우선 사용하고, 비어 있으면 `KMA_API_KEY`를 재사용한다. API가 아직 제공하지 않는 최신 시간은 조회할 수 없다.
+
 ### `GET /heatwave/current`
 
 서울 지역의 기상청 공식 폭염 영향예보를 반환한다. 영향예보는 관심 단계 이상이 예상될 때만 발표되므로 자료가 없는 경우도 정상 응답이다.

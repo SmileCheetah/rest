@@ -16,6 +16,8 @@ class RiskFeaturesTest(unittest.TestCase):
             temperature=34.5,
             humidity=68,
             wind_speed=2.0,
+            solar_radiation=720.0,
+            surface_pressure=1008.0,
             walking_minutes=18,
             current_state=ExposureState(
                 continuous_exposure_minutes=25,
@@ -30,6 +32,8 @@ class RiskFeaturesTest(unittest.TestCase):
         )
 
         self.assertEqual(result.temperature, 34.5)
+        self.assertEqual(result.solar_radiation, 720.0)
+        self.assertEqual(result.surface_pressure, 1008.0)
         self.assertEqual(result.current_continuous_exposure_minutes, 25)
         self.assertEqual(result.expected_continuous_exposure_minutes, 43)
         self.assertEqual(result.expected_daily_exposure_minutes, 98)

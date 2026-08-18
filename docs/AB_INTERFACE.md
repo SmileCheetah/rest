@@ -33,6 +33,8 @@ Mock: `docs/mocks/risk-assessment-request.json`
   "humidity": 68.0,
   "observed_at": "2026-08-18T13:30:00+09:00",
   "wind_speed": 1.5,
+  "solar_radiation": 720.0,
+  "surface_pressure": 1008.0,
   "walking_minutes": 18,
   "current_continuous_exposure_minutes": 25,
   "expected_continuous_exposure_minutes": 43,
@@ -50,17 +52,19 @@ Mock: `docs/mocks/risk-assessment-response.json`
 {
   "route_option_id": 2,
   "apparentTemperature": 35.7,
-  "risk_level": "REST_RECOMMENDED",
-  "rest_required": false,
+  "risk_level": "REST_REQUIRED",
+  "rest_required": true,
   "recommended_rest_count": 1,
   "reason_codes": [
     "HIGH_APPARENT_TEMPERATURE",
     "LONG_CONTINUOUS_EXPOSURE"
   ],
-  "reason_message": "체감온도 35.7℃, 예상 연속 야외 노출 43분입니다. 이동 전후 휴식을 권장합니다.",
-  "model_version": "rule-classifier-mvp-1"
+  "reason_message": "체감온도 35.7℃, 예상 연속 야외 노출 43분입니다. 다음 방문 전 휴식이 필요합니다.",
+  "model_version": "hist_gradient_boosting_tuned:wbgt-osha-moderate-2"
 }
 ```
+
+`wind_speed`, `solar_radiation`, `surface_pressure`와 학습 모델이 모두 준비되면 AI 분류기를 사용한다. 모델 입력이 부족하거나 아티팩트가 없으면 규칙 분류기로 폴백하며 `model_version`은 `rule-classifier-mvp-1`이 된다.
 
 ## 4. 쿨링스팟 추천 입력
 
