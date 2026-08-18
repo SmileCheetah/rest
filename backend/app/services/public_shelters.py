@@ -16,25 +16,41 @@ def _time(value: object) -> time | None:
     text = str(value or "").strip()
     if len(text) != 4 or not text.isdigit():
         return None
-    return time(int(text[:2]), int(text[2:]))
+    hour, minute = int(text[:2]), int(text[2:])
+    if hour == 24 and minute == 0:
+        return time(23, 59, 59)
+    if hour > 23 or minute > 59:
+        return None
+    return time(hour, minute)
 
 
 async def sync_public_shelters(session: AsyncSession, *, limit: int = 1000) -> int:
     if not settings.public_shelter_api_key:
         raise RuntimeError("PUBLIC_SHELTER_API_KEY is not configured")
-    params = {
-        "serviceKey": settings.public_shelter_api_key,
-        "returnType": "json",
-        "pageNo": 1,
-        "numOfRows": min(limit, 1000),
-    }
+    page_size = min(limit, 1000)
+    items: list[dict] = []
     async with httpx.AsyncClient(timeout=20) as client:
-        response = await client.get(settings.public_shelter_api_url, params=params)
-        response.raise_for_status()
-    payload = response.json()
-    if payload.get("header", {}).get("resultCode") != "00":
-        raise RuntimeError(payload.get("header", {}).get("resultMsg", "public shelter API failed"))
-    items = payload.get("body", [])
+        page = 1
+        while True:
+            response = await client.get(
+                settings.public_shelter_api_url,
+                params={
+                    "serviceKey": settings.public_shelter_api_key,
+                    "returnType": "json",
+                    "pageNo": page,
+                    "numOfRows": page_size,
+                },
+            )
+            response.raise_for_status()
+            payload = response.json()
+            if payload.get("header", {}).get("resultCode") != "00":
+                raise RuntimeError(payload.get("header", {}).get("resultMsg", "public shelter API failed"))
+            page_items = payload.get("body", [])
+            items.extend(page_items)
+            total_count = int(payload.get("totalCount", len(items)))
+            if not page_items or len(items) >= total_count:
+                break
+            page += 1
     names = [str(item.get("RSTR_NM", "")).strip() for item in items if item.get("RSTR_NM")]
     existing = {
         spot.name: spot
