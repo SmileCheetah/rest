@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
@@ -17,15 +19,17 @@ def make_synthetic_data(size: int = 300, seed: int = 42) -> tuple[np.ndarray, np
     humidity = rng.uniform(35, 95, size)
     exposure = rng.uniform(0, 150, size)
     walking = rng.uniform(0, 60, size)
+    heat_alert = rng.integers(0, 2, size)
     # 실제 기준이 아니라, 위험도가 올라가는 방향을 보여주기 위한 임시 라벨입니다.
     risk = (
         (apparent - 24) * 3.2
         + np.maximum(humidity - 60, 0) * 0.25
         + exposure * 0.28
         + walking * 0.18
+        + heat_alert * 15
         + rng.normal(0, 3, size)
     )
-    return np.column_stack([apparent, humidity, exposure, walking]), np.clip(risk, 0, 100)
+    return np.column_stack([apparent, humidity, exposure, walking, heat_alert]), np.clip(risk, 0, 100)
 
 
 def risk_label(score: float) -> str:
@@ -34,6 +38,36 @@ def risk_label(score: float) -> str:
     if score >= 33:
         return "CAUTION"
     return "SAFE"
+
+
+def save_graphs(model) -> None:
+    output_dir = Path(__file__).resolve().parent / "output"
+    output_dir.mkdir(exist_ok=True)
+    base = np.array([32, 70, 30, 20, 0], dtype=float)
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8))
+    variables = [("야외노출 시간(분)", 2, np.arange(0, 151, 5)), ("체감온도(°C)", 0, np.arange(24, 43)), ("습도(%)", 1, np.arange(35, 96, 2))]
+    for axis, (title, column, values) in zip(axes.flat, variables):
+        samples = np.repeat(base[None, :], len(values), axis=0)
+        samples[:, column] = values
+        scores = np.clip(model.predict(samples), 0, 100)
+        axis.plot(values, scores, color="#1766e8", linewidth=2.5)
+        axis.axhline(33, color="#d9a900", linestyle="--", linewidth=1)
+        axis.axhline(66, color="#d52241", linestyle="--", linewidth=1)
+        axis.set_title(title)
+        axis.set_ylim(0, 100)
+        axis.set_ylabel("위험점수")
+        axis.grid(alpha=0.25)
+    alert_samples = np.array([[32, 70, 30, 20, 0], [32, 70, 30, 20, 1]], dtype=float)
+    alert_scores = np.clip(model.predict(alert_samples), 0, 100)
+    axes.flat[3].bar(["특보 없음", "폭염특보"], alert_scores, color=["#18a994", "#d52241"])
+    axes.flat[3].set_title("폭염특보 영향")
+    axes.flat[3].set_ylim(0, 100)
+    axes.flat[3].set_ylabel("위험점수")
+    for index, score in enumerate(alert_scores):
+        axes.flat[3].text(index, score + 2, f"{score:.1f}", ha="center")
+    fig.tight_layout()
+    fig.savefig(output_dir / "svr-risk-graphs.png", dpi=150)
+    plt.close(fig)
 
 
 def main() -> None:
@@ -50,18 +84,22 @@ def main() -> None:
     print(f"MAE(평균 오차): {mean_absolute_error(y_test, predictions):.2f}")
     print(f"R²(설명력): {r2_score(y_test, predictions):.2f}")
 
-    examples = np.array([
-        [27, 55, 10, 10],
-        [32, 75, 55, 25],
-        [38, 85, 110, 40],
-    ])
-    for values, score in zip(examples, model.predict(examples)):
-        score = float(np.clip(score, 0, 100))
+    examples = [
+        ("선선한 오전", [27, 55, 10, 10, 0]),
+        ("습하고 긴 이동", [32, 75, 55, 25, 0]),
+        ("폭염특보·장시간 노출", [38, 85, 110, 40, 1]),
+        ("높은 체감온도지만 특보 없음", [35, 70, 20, 15, 0]),
+    ]
+    for name, values in examples:
+        score = float(np.clip(model.predict([values])[0], 0, 100))
         print(
-            f"체감온도 {values[0]:.0f}°C / 습도 {values[1]:.0f}% / "
-            f"노출 {values[2]:.0f}분 / 도보 {values[3]:.0f}분 "
+            f"{name}: 체감온도 {values[0]:.0f}°C / 습도 {values[1]:.0f}% / "
+            f"노출 {values[2]:.0f}분 / 도보 {values[3]:.0f}분 / "
+            f"폭염특보 {'있음' if values[4] else '없음'} "
             f"→ 위험점수 {score:.1f}, {risk_label(score)}"
         )
+    save_graphs(model)
+    print(f"그래프 저장: {output_dir / 'svr-risk-graphs.png'}")
 
 
 if __name__ == "__main__":

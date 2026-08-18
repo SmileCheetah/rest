@@ -30,6 +30,8 @@ __pycache__/
 
 # OS files
 .DS_Store
+/output/
+/ai-test/output/
 Thumbs.db
 
 # Logs
@@ -40,4 +42,3 @@ yarn-error.log*
 
 # Deployment tools
 .vercel/
-
