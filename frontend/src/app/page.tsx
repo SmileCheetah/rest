@@ -306,6 +306,12 @@ export default function Home() {
     setIsBusy(true);
     try {
       await completeSchedule(scheduleId);
+      const next = await getNextSchedule();
+      if (next.workCompleted) {
+        const sessionId = workSession?.workSessionId ?? next.workSessionId;
+        setWorkSession(await completeWorkSession(sessionId));
+        setScreen("complete");
+      }
       await loadDashboard();
     } catch (error) {
       setApiMessage(error instanceof Error ? error.message : "방문 완료에 실패했습니다.");
@@ -475,11 +481,15 @@ export default function Home() {
     setIsBusy(true);
     try {
       await resetDemoWorkSession();
+      setVisits([]);
       setCompleted([]);
       setInProgressScheduleId(null);
       setActiveScheduleId(null);
+      setSelectedScheduleId(null);
+      setActiveRoute(null);
+      setRecommendedRoute(null);
+      setWorkSession(null);
       setScreen("schedule");
-      await loadDashboard();
     } catch (error) {
       setApiMessage(error instanceof Error ? error.message : "데모 초기화에 실패했습니다.");
     } finally {
