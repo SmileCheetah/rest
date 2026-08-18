@@ -1,14 +1,13 @@
 {
-  "routeOptionId": 2,
-  "currentContinuousExposureMinutes": 25,
-  "expectedContinuousExposureMinutes": 43,
-  "riskScore": 82.0,
-  "riskLevel": "REST_REQUIRED",
-  "restRequired": true,
-  "recommendedRestCount": 1,
-  "reasonCodes": [
+  "route_option_id": 2,
+  "apparentTemperature": 35.7,
+  "risk_level": "REST_RECOMMENDED",
+  "rest_required": false,
+  "recommended_rest_count": 1,
+  "reason_codes": [
     "HIGH_APPARENT_TEMPERATURE",
     "LONG_CONTINUOUS_EXPOSURE"
   ],
-  "modelVersion": "mvp-v1"
+  "reason_message": "체감온도 35.7℃, 예상 연속 야외 노출 43분입니다. 이동 전후 휴식을 권장합니다.",
+  "model_version": "rule-classifier-mvp-1"
 }

@@ -10,16 +10,16 @@
 - 출발지와 목적지 좌표
 - 이동거리와 예상 도보시간
 - 출발·도착 예정 시각
-- 기온, 습도, 체감온도
+- 기상 관측시각, 기온, 습도, 풍속
 - 지도 API가 계산한 쿨링스팟별 이탈거리와 추가시간
 
 ### B가 계산하는 값
 
 - 현재 및 이동 후 예상 연속 야외노출시간
-- 0~100 위험점수
-- `SAFE`, `CAUTION`, `REST_REQUIRED` 위험 단계
+- 체감온도
+- `MOVE_POSSIBLE`, `REST_RECOMMENDED`, `REST_REQUIRED` 분류 결과
 - 휴식 필요 여부와 추천 휴식 횟수
-- 판단 근거 코드
+- 판단 근거 코드와 사용자용 문장
 - 조건을 만족하는 최적 쿨링스팟 1곳
 
 ## 2. 위험판단 입력
@@ -28,23 +28,19 @@ Mock: `docs/mocks/risk-assessment-request.json`
 
 ```json
 {
-  "workSessionId": 1,
-  "scheduleId": 2,
-  "routeSegmentId": 2,
-  "routeOptionId": 2,
-  "distanceMeters": 1200,
-  "walkingMinutes": 18,
-  "departureTime": "2026-08-18T13:30:00+09:00",
-  "estimatedArrivalTime": "2026-08-18T13:48:00+09:00",
+  "route_option_id": 2,
   "temperature": 34.5,
   "humidity": 68.0,
-  "apparentTemperature": 38.2,
-  "currentContinuousExposureMinutes": 25,
-  "plannedVisitMinutes": 40
+  "observed_at": "2026-08-18T13:30:00+09:00",
+  "wind_speed": 1.5,
+  "walking_minutes": 18,
+  "current_continuous_exposure_minutes": 25,
+  "expected_continuous_exposure_minutes": 43,
+  "shelter_accessibility": 0.6
 }
 ```
 
-`currentContinuousExposureMinutes`는 B의 노출시간 계산 함수가 먼저 계산한 값을 사용한다. HTTP API로 통합할 때는 B의 노출시간 계산과 위험판단을 한 Service 안에서 연결해도 된다.
+`current_continuous_exposure_minutes`와 `expected_continuous_exposure_minutes`는 B의 노출시간 계산 함수가 계산한 값을 사용한다. HTTP API로 통합할 때는 B의 노출시간 계산과 위험판단을 한 Service 안에서 연결해도 된다.
 
 ## 3. 위험판단 출력
 
@@ -52,18 +48,17 @@ Mock: `docs/mocks/risk-assessment-response.json`
 
 ```json
 {
-  "routeOptionId": 2,
-  "currentContinuousExposureMinutes": 25,
-  "expectedContinuousExposureMinutes": 43,
-  "riskScore": 82.0,
-  "riskLevel": "REST_REQUIRED",
-  "restRequired": true,
-  "recommendedRestCount": 1,
-  "reasonCodes": [
+  "route_option_id": 2,
+  "apparentTemperature": 35.7,
+  "risk_level": "REST_RECOMMENDED",
+  "rest_required": false,
+  "recommended_rest_count": 1,
+  "reason_codes": [
     "HIGH_APPARENT_TEMPERATURE",
     "LONG_CONTINUOUS_EXPOSURE"
   ],
-  "modelVersion": "mvp-v1"
+  "reason_message": "체감온도 35.7℃, 예상 연속 야외 노출 43분입니다. 이동 전후 휴식을 권장합니다.",
+  "model_version": "rule-classifier-mvp-1"
 }
 ```
 
