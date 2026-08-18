@@ -208,6 +208,7 @@ export default function Home() {
   const [livingIndex, setLivingIndex] = useState<LivingWeatherIndex | null>(null);
   const [completed, setCompleted] = useState<number[]>([]);
   const [activeScheduleId, setActiveScheduleId] = useState<number | null>(null);
+  const [inProgressScheduleId, setInProgressScheduleId] = useState<number | null>(null);
   const [activeRoute, setActiveRoute] = useState<RouteSegment | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<number | null>(null);
@@ -330,6 +331,19 @@ export default function Home() {
     }
   };
 
+  const handleSelectVisit = (scheduleId: number) => {
+    if (completed.includes(scheduleId)) return;
+    setSelectedScheduleId(scheduleId);
+  };
+
+  const handleStartSelectedRoute = () => {
+    if (selectedScheduleId === null) return;
+    setActiveScheduleId(selectedScheduleId);
+    setInProgressScheduleId(selectedScheduleId);
+    setSelectedScheduleId(null);
+    setScreen("route");
+  };
+
   const handleAddSchedule = async () => {
     if (selectedTargetId === null) return;
     setIsBusy(true);
@@ -370,6 +384,7 @@ export default function Home() {
     setIsBusy(true);
     try {
       await completeSchedule(activeScheduleId);
+      setInProgressScheduleId(null);
       const next = await getNextSchedule();
       if (next.workCompleted) {
         const sessionId = workSession?.workSessionId ?? next.workSessionId;
@@ -414,12 +429,12 @@ export default function Home() {
           {weatherMessage && <button type="button" className="api-message" onClick={() => void loadWeather()}>{weatherMessage}</button>}
           {apiMessage && <button type="button" className="api-message" onClick={() => void loadDashboard()}>{apiMessage}</button>}
           <div className="section-header"><div><h2>오늘의 방문</h2><span>{completed.length} / {visits.length} 완료</span></div><button className="small-button" disabled={isBusy} onClick={() => setModal("add")}>+ 대상자 추가</button></div>
-          <div className="visit-list">{visits.map((visit) => <article className={`visit-card ${completed.includes(visit.scheduleId) ? "done" : ""}`} key={visit.scheduleId}>
-            <div className="visit-head"><span className="visit-index">{visit.visitOrder}</span><div className="visit-main"><div><strong>{visit.time}</strong><span>{visit.name}</span></div><p>{visit.address}</p></div><button className={`check-btn ${completed.includes(visit.scheduleId) ? "checked" : ""}`} disabled={isBusy} onClick={() => void handleVisitComplete(visit.scheduleId)} aria-label="방문 완료">{completed.includes(visit.scheduleId) && "✓"}</button>{!completed.includes(visit.scheduleId) && <button className="icon-btn sm" onClick={() => {setSelectedScheduleId(visit.scheduleId); setModal("menu");}} aria-label="더보기"><Icon name="more"/></button>}</div>
-            <div className="route-meta">도보 {visit.walk}<span>•</span>{visit.distance}</div><div className="visit-foot"><span className={`badge ${visit.tone}`}>{visit.riskStatus}</span><span className="ai-rec"><strong>추천 휴식 {visit.rests}회</strong><span className="ai-label">AI 분석</span></span></div>
-          </article>)}</div>
+          <div className="visit-list">{visits.map((visit) => { const isCompleted = completed.includes(visit.scheduleId); const isInProgress = inProgressScheduleId === visit.scheduleId; return <article className={`visit-card ${isCompleted ? "done" : ""} ${isInProgress ? "in-progress" : ""} ${selectedScheduleId === visit.scheduleId ? "selected" : ""}`} key={visit.scheduleId} onClick={() => handleSelectVisit(visit.scheduleId)}>
+            <div className="visit-head"><span className="visit-index">{visit.visitOrder}</span><div className="visit-main"><div><strong>{visit.time}</strong><span>{visit.name}</span></div><p>{visit.address}</p></div><button className={`check-btn ${isCompleted ? "checked" : ""}`} disabled={isBusy} onClick={(event) => { event.stopPropagation(); void handleVisitComplete(visit.scheduleId); }} aria-label="방문 완료">{isCompleted && "✓"}</button>{!isCompleted && <button className="icon-btn sm" onClick={(event) => { event.stopPropagation(); setSelectedScheduleId(visit.scheduleId); setModal("menu"); }} aria-label="더보기"><Icon name="more"/></button>}</div>
+            <div className="route-meta">도보 {visit.walk}<span>•</span>{visit.distance}</div><div className="visit-foot"><span className={`badge ${isInProgress ? "caution" : visit.tone}`}>{isInProgress ? "방문 중" : isCompleted ? "방문 완료" : visit.riskStatus}</span><span className="ai-rec"><strong>추천 휴식 {visit.rests}회</strong><span className="ai-label">AI 분석</span></span></div>
+          </article>; })}</div>
         </div>
-        <footer className="sticky-footer"><button className="button primary" disabled={isBusy || visits.length === 0} onClick={() => void handleStartWork()}>{isBusy ? "처리 중..." : "오늘 첫 방문 시작"}</button></footer>
+        <footer className="sticky-footer"><button className="button primary" disabled={isBusy || visits.length === 0} onClick={() => selectedScheduleId !== null ? handleStartSelectedRoute() : void handleStartWork()}>{isBusy ? "처리 중..." : selectedScheduleId !== null ? "경로 안내 시작" : "오늘 첫 방문 시작"}</button></footer>
       </>}
 
       {screen === "route" && <>
