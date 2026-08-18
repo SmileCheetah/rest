@@ -231,7 +231,7 @@ export default function Home() {
       const [schedules, targets, spots] = await Promise.all([
         getTodaySchedules(),
         getVisitTargets(),
-        getCoolingSpots(),
+        getCoolingSpots(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude),
       ]);
       setVisits(toVisitCards(schedules));
       setCompleted(
