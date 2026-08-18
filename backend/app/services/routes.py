@@ -358,7 +358,13 @@ async def create_safe_route(
     if not candidates:
         raise SafeRouteNotFoundError("운영 중인 쿨링스팟이 없습니다")
 
-    best = await _find_shortest_safe_route(origin, destination, candidates)
+    best = await _find_shortest_safe_route(
+        origin,
+        destination,
+        candidates,
+        normal_walking_minutes=normal.walking_minutes,
+        max_additional_minutes=max_additional_minutes,
+    )
     if best is None:
         raise SafeRouteNotFoundError(f"추가 이동 {max_additional_minutes}분 이내의 쿨링스팟이 없습니다")
 
@@ -443,8 +449,11 @@ async def _find_shortest_safe_route(
     origin: Coordinate,
     destination: Coordinate,
     candidates: list[CoolingSpot],
+    *,
+    normal_walking_minutes: int,
+    max_additional_minutes: int,
 ) -> tuple[CoolingSpot, PedestrianRoute, PedestrianRoute] | None:
-    """실제 보행시간 합계가 가장 짧은 쿨링스팟 경유 경로를 선택합니다."""
+    """우회 시간 상한 안에서 실제 보행시간이 가장 짧은 경로를 선택합니다."""
     shortlist = sorted(
         candidates,
         key=lambda spot: (
@@ -461,8 +470,12 @@ async def _find_shortest_safe_route(
         )
         to_spot = await get_pedestrian_route(origin, waypoint)
         from_spot = await get_pedestrian_route(waypoint, destination)
+        walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
+        additional_minutes = max(0, walking_minutes - normal_walking_minutes)
+        if additional_minutes > max_additional_minutes:
+            continue
         candidate_key = (
-            to_spot.walking_minutes + from_spot.walking_minutes,
+            walking_minutes,
             to_spot.distance_meters + from_spot.distance_meters,
         )
         if best is None:

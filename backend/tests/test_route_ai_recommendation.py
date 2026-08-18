@@ -81,10 +81,43 @@ class RouteAiRecommendationTest(unittest.IsolatedAsyncioTestCase):
                 origin,
                 destination,
                 [near_origin, shorter_total],
+                normal_walking_minutes=5,
+                max_additional_minutes=5,
             )
 
         self.assertIsNotNone(result)
         self.assertEqual(result[0].name, "총 경로 최단 쉼터")
+
+    async def test_route_over_detour_limit_is_excluded(self):
+        origin = Coordinate(latitude=37.5739, longitude=127.0105, name="현재 위치")
+        destination = Coordinate(latitude=37.5736, longitude=127.0099, name="방문지")
+        spot = SimpleNamespace(
+            id=1,
+            name="우회가 긴 쉼터",
+            latitude=Decimal("37.5738"),
+            longitude=Decimal("127.0104"),
+        )
+
+        async def route_between(start, end):
+            return PedestrianRoute(
+                distance_meters=500,
+                walking_minutes=5,
+                path=[
+                    RoutePathPoint(latitude=start.latitude, longitude=start.longitude),
+                    RoutePathPoint(latitude=end.latitude, longitude=end.longitude),
+                ],
+            )
+
+        with patch("app.services.routes.get_pedestrian_route", new=route_between):
+            result = await _find_shortest_safe_route(
+                origin,
+                destination,
+                [spot],
+                normal_walking_minutes=3,
+                max_additional_minutes=5,
+            )
+
+        self.assertIsNone(result)
 
     async def test_movable_ai_result_does_not_create_safe_route(self):
         async def resolve(request):
