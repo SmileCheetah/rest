@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     work_limit_model_path: Path | None = (
         BACKEND_DIR / "artifacts/risk-model-asos/work_limit_classifier.joblib"
     )
+    rest_status_model_path: Path | None = (
+        BACKEND_DIR / "artifacts/rest-status-model/rest_status_classifier.json"
+    )
     rest_decision_ai_url: str | None = None
     rest_decision_ai_api_key: str | None = None
     rest_decision_ai_timeout_seconds: float = 10.0

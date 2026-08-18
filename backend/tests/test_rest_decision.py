@@ -153,11 +153,58 @@ class RestDecisionTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(response.status_code, 200)
         payload = response.json()
-        self.assertIn("restNeedScore", payload)
-        self.assertIn("walkingScore", payload["details"])
+        self.assertIsNone(payload["restNeedScore"])
+        self.assertIsNone(payload["details"])
         self.assertIn("shouldRest", payload["decision"])
         self.assertEqual(payload["decisionSource"], "FALLBACK")
         self.assertEqual(payload["weatherSource"], "KMA_ASOS")
+
+    def test_api_uses_local_rest_status_model_when_wbgt_is_available(self):
+        with (
+            patch(
+                "app.routers.rest_decision.resolve_rest_weather",
+                new=AsyncMock(
+                    return_value=RestWeatherResult(
+                        request=_request(wbgt=27, distanceToCoolingSpotMeters=350),
+                        source="KMA_ASOS",
+                    )
+                ),
+            ),
+            patch.object(
+                RestDecisionService,
+                "predict_model_status",
+                return_value={
+                    "probabilities": {
+                        "MOVABLE": 0.05,
+                        "REST_RECOMMENDED": 0.25,
+                        "REST_BEFORE_NEXT_VISIT": 0.70,
+                    },
+                    "decision": "REST_BEFORE_NEXT_VISIT",
+                },
+            ),
+        ):
+            response = client.post(
+                "/rest/decision",
+                json={
+                    "continuousWalkingMinutes": 72,
+                    "totalWalkingMinutes": 82,
+                    "minutesSinceLastRest": 80,
+                    "recentRestMinutes": 0,
+                    "temperature": 30,
+                    "humidity": 70,
+                    "wbgt": 27,
+                    "observedAt": "2026-08-18T14:00:00+09:00",
+                    "nextTravelMinutes": 23,
+                    "coolingSpotNearby": False,
+                    "distanceToCoolingSpotMeters": 350,
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["decisionSource"], "MODEL")
+        self.assertEqual(payload["restStatusPrediction"]["decision"], "REST_BEFORE_NEXT_VISIT")
+        self.assertTrue(payload["decision"]["shouldRest"])
 
 
 if __name__ == "__main__":

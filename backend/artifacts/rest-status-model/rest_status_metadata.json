@@ -1,0 +1,123 @@
+{
+  "model": "XGBClassifier",
+  "features": [
+    "wbgt",
+    "continuous_exposure_minutes",
+    "next_travel_minutes",
+    "time_since_rest_minutes",
+    "cooling_spot_distance_m"
+  ],
+  "target": "rest_status",
+  "classes": [
+    "MOVABLE",
+    "REST_RECOMMENDED",
+    "REST_BEFORE_NEXT_VISIT"
+  ],
+  "train_rows": 8000,
+  "test_rows": 2000,
+  "class_distribution": {
+    "REST_RECOMMENDED": 4173,
+    "REST_BEFORE_NEXT_VISIT": 3715,
+    "MOVABLE": 2112
+  },
+  "train": {
+    "accuracy": 0.9619,
+    "macro_f1": 0.9621,
+    "classification_report": {
+      "MOVABLE": {
+        "precision": 0.960969840331165,
+        "recall": 0.9615384615384616,
+        "f1-score": 0.961254066844129,
+        "support": 1690.0
+      },
+      "REST_RECOMMENDED": {
+        "precision": 0.9528217378321887,
+        "recall": 0.9559616536848412,
+        "f1-score": 0.9543891132047256,
+        "support": 3338.0
+      },
+      "REST_BEFORE_NEXT_VISIT": {
+        "precision": 0.9726351351351351,
+        "recall": 0.9687079407806191,
+        "f1-score": 0.9706675657451113,
+        "support": 2972.0
+      },
+      "accuracy": 0.961875,
+      "macro avg": {
+        "precision": 0.9621422377661629,
+        "recall": 0.9620693520013073,
+        "f1-score": 0.9621035819313221,
+        "support": 8000.0
+      },
+      "weighted avg": {
+        "precision": 0.9619037015831421,
+        "recall": 0.961875,
+        "f1-score": 0.9618867797798027,
+        "support": 8000.0
+      }
+    }
+  },
+  "test": {
+    "accuracy": 0.92,
+    "macro_f1": 0.919,
+    "classification_report": {
+      "MOVABLE": {
+        "precision": 0.9305210918114144,
+        "recall": 0.8886255924170616,
+        "f1-score": 0.9090909090909091,
+        "support": 422.0
+      },
+      "REST_RECOMMENDED": {
+        "precision": 0.895662368112544,
+        "recall": 0.9149700598802395,
+        "f1-score": 0.9052132701421801,
+        "support": 835.0
+      },
+      "REST_BEFORE_NEXT_VISIT": {
+        "precision": 0.9422043010752689,
+        "recall": 0.9434724091520862,
+        "f1-score": 0.9428379287155346,
+        "support": 743.0
+      },
+      "accuracy": 0.92,
+      "macro avg": {
+        "precision": 0.9227959203330758,
+        "recall": 0.9156893538164624,
+        "f1-score": 0.9190473693162079,
+        "support": 2000.0
+      },
+      "weighted avg": {
+        "precision": 0.920307886908658,
+        "recall": 0.92,
+        "f1-score": 0.9200090126203632,
+        "support": 2000.0
+      }
+    }
+  },
+  "confusion_matrix": [
+    [
+      375,
+      47,
+      0
+    ],
+    [
+      28,
+      764,
+      43
+    ],
+    [
+      0,
+      42,
+      701
+    ]
+  ],
+  "feature_importance": {
+    "wbgt": 0.573172,
+    "continuous_exposure_minutes": 0.234308,
+    "next_travel_minutes": 0.079269,
+    "time_since_rest_minutes": 0.073608,
+    "cooling_spot_distance_m": 0.039644
+  },
+  "trained_at": "2026-08-18T18:38:10.408324+00:00",
+  "mvp_label_note": "The 50/25/10/10/5 score weights and 0-39/40-69/70-100 thresholds are synthetic MVP policy values, not official NIOSH/OSHA outputs."
+}
