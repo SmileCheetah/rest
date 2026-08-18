@@ -143,26 +143,40 @@ function aiRiskDisplay(result: RestDecisionResponse): Pick<VisitCard, "riskStatu
     return { riskStatus: "다음 방문 전 휴식 필요", tone: "danger", rests: 1 };
   }
   if (status === "REST_RECOMMENDED" || result.decision.shouldRest) {
-    return { riskStatus: "휴식 권장", tone: "caution", rests: 1 };
+    return { riskStatus: "휴식 권유", tone: "caution", rests: 1 };
   }
   return { riskStatus: "이동 가능", tone: "safe", rests: 0 };
+}
+
+function restDecisionRequest(
+  visit: VisitCard,
+  spots: CoolingSpot[],
+  continuousWalkingMinutes: number,
+  nextTravelMinutes = walkingMinutes(visit.walk),
+) {
+  const distanceToCoolingSpotMeters = nearestCoolingSpotDistance(visit, spots);
+  return {
+    continuousWalkingMinutes,
+    totalWalkingMinutes: continuousWalkingMinutes + nextTravelMinutes,
+    minutesSinceLastRest: continuousWalkingMinutes,
+    recentRestMinutes: 0,
+    observedAt: new Date().toISOString(),
+    nextTravelMinutes,
+    coolingSpotNearby: distanceToCoolingSpotMeters !== null && distanceToCoolingSpotMeters <= 500,
+    distanceToCoolingSpotMeters,
+  };
 }
 
 async function applyAiRiskToVisits(visits: VisitCard[], spots: CoolingSpot[]): Promise<VisitCard[]> {
   let accumulatedMinutes = 0;
   const requests = visits.map((visit) => {
     const nextTravelMinutes = walkingMinutes(visit.walk);
-    const distanceToCoolingSpotMeters = nearestCoolingSpotDistance(visit, spots);
-    const request = evaluateRestDecision({
-      continuousWalkingMinutes: accumulatedMinutes,
-      totalWalkingMinutes: accumulatedMinutes + nextTravelMinutes,
-      minutesSinceLastRest: accumulatedMinutes,
-      recentRestMinutes: 0,
-      observedAt: new Date().toISOString(),
+    const request = evaluateRestDecision(restDecisionRequest(
+      visit,
+      spots,
+      accumulatedMinutes,
       nextTravelMinutes,
-      coolingSpotNearby: distanceToCoolingSpotMeters !== null && distanceToCoolingSpotMeters <= 500,
-      distanceToCoolingSpotMeters,
-    });
+    ));
     accumulatedMinutes += nextTravelMinutes;
     return request;
   });
@@ -279,6 +293,7 @@ export default function Home() {
   const [inProgressScheduleId, setInProgressScheduleId] = useState<number | null>(null);
   const [activeRoute, setActiveRoute] = useState<RouteSegment | null>(null);
   const [recommendedRoute, setRecommendedRoute] = useState<RouteRecommendation | null>(null);
+  const [activeRestDecision, setActiveRestDecision] = useState<RestDecisionResponse | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<number | null>(null);
   const [scheduleTime, setScheduleTime] = useState("14:30");
@@ -380,6 +395,24 @@ export default function Home() {
     }
   };
 
+  const loadActiveRestDecision = async (
+    visit: VisitCard,
+    nextTravelMinutes: number,
+  ) => {
+    try {
+      const decision = await evaluateRestDecision(restDecisionRequest(
+        visit,
+        coolingSpots,
+        exposureBeforeVisit(visits, visit.visitOrder),
+        nextTravelMinutes,
+      ));
+      setActiveRestDecision(decision);
+    } catch {
+      // 기존 안전경로 판단은 계속 진행하고, AI 배지는 기존 결과를 fallback으로 표시한다.
+      setActiveRestDecision(null);
+    }
+  };
+
   const handleStartWork = async () => {
     setIsBusy(true);
     try {
@@ -390,6 +423,7 @@ export default function Home() {
       setApiMessage(null);
       setActiveRoute(null);
       setRecommendedRoute(null);
+      setActiveRestDecision(null);
       if (next.workCompleted || !next.nextSchedule) {
         setScreen("complete");
       } else {
@@ -408,6 +442,8 @@ export default function Home() {
             departureTime: new Date().toISOString(),
           });
           setActiveRoute(route);
+          const firstVisit = visits.find((visit) => visit.scheduleId === next.nextSchedule?.scheduleId);
+          if (firstVisit) await loadActiveRestDecision(firstVisit, route.walkingMinutes);
           try {
             const recommendation = await recommendRoute(
               route.routeSegmentId,
@@ -459,6 +495,7 @@ export default function Home() {
         },
         departureTime: new Date().toISOString(),
       });
+      await loadActiveRestDecision(visit, route.walkingMinutes);
       const recommendation = await recommendRoute(
         route.routeSegmentId,
         exposureBeforeVisit(visits, visit.visitOrder),
@@ -579,7 +616,8 @@ export default function Home() {
   const hasRecommendedSafeRoute = Boolean(safeRoute);
   const risk = recommendedRoute?.risk;
   const recommendedSpot = recommendedRoute?.safeRoute?.coolingSpot ?? null;
-  const recommendedRestCount = risk?.recommended_rest_count ?? 0;
+  const aiRouteDisplay = activeRestDecision ? aiRiskDisplay(activeRestDecision) : null;
+  const recommendedRestCount = aiRouteDisplay?.rests ?? risk?.recommended_rest_count ?? 0;
   const expectedExposureMinutes = (workSession?.maxContinuousExposureMinutes ?? 0) + (activeRoute?.walkingMinutes ?? 0);
   const facilityLabels = recommendedSpot?.facilities
     ? Object.entries(recommendedSpot.facilities)
@@ -590,8 +628,8 @@ export default function Home() {
     ?? (risk?.risk_level === "MOVE_POSSIBLE"
       ? "현재 구간은 휴식이 필요하지 않아요."
       : "AI 분석 후 추천 경로를 표시합니다.");
-  const riskBadge = risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe";
-  const riskLabel = risk?.risk_level === "REST_REQUIRED" ? "휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권장" : "이동 가능";
+  const riskBadge = aiRouteDisplay?.tone ?? (risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe");
+  const riskLabel = aiRouteDisplay?.riskStatus ?? (risk?.risk_level === "REST_REQUIRED" ? "다음 방문 전 휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권유" : "이동 가능");
   const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
   const displayedHeatTone = heatwaveImpact
     ? getHeatwaveTone(heatwaveImpact.level)
