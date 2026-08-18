@@ -291,8 +291,6 @@ async def create_safe_route(
         from_spot = await get_pedestrian_route(waypoint, destination)
         walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
         additional = max(0, walking_minutes - normal.walking_minutes)
-        if additional > max_additional_minutes:
-            continue
         if best is None or walking_minutes < best[3]:
             best = (spot, to_spot, from_spot, walking_minutes)
     if best is None:
