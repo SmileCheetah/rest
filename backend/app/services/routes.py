@@ -282,9 +282,9 @@ async def create_safe_route(
         raise SafeRouteNotFoundError("운영 중인 쿨링스팟이 없습니다")
 
     best: tuple[CoolingSpot, PedestrianRoute, PedestrianRoute, int] | None = None
-    # 공공 쉼터와 기업 쿨링스팟을 구분하지 않고, 출발지·방문지에 가장
-    # 가까운 후보 하나를 우선 경유지로 사용한다. 후보마다 TMAP을 호출해
-    # 우회시간만 비교하면 먼 쉼터가 선택될 수 있고 API 호출도 불필요하게 늘어난다.
+    # 공공 쉼터와 기업 쿨링스팟을 구분하지 않고, 현재 위치에서 가장
+    # 가까운 후보 하나를 우선 경유지로 사용한다. 방문지까지의 거리까지
+    # 합산하면 출발지 바로 옆 쉼터보다 먼 후보가 선택될 수 있다.
     for spot in candidates[:1]:
         waypoint = Coordinate(latitude=float(spot.latitude), longitude=float(spot.longitude), name=spot.name)
         to_spot = await get_pedestrian_route(origin, waypoint)
@@ -358,10 +358,11 @@ async def _safe_route_candidates(
             <= settings.cooling_spot_search_radius_meters
         )
     ]
-    # TMAP 호출 수를 제한하기 위해 직선거리 기준 상위 후보만 먼저 계산한다.
+    # 현재 위치에서 가까운 순서로 정렬한다. 안전경로는 "현재 위치 →
+    # 쿨링스팟 → 방문지" 흐름이므로, 경유지 접근성이 최우선이다.
     return sorted(
         open_spots,
-        key=lambda spot: _approximate_route_distance(origin, spot) + _approximate_route_distance(destination, spot),
+        key=lambda spot: _approximate_route_distance(origin, spot),
     )
 
 

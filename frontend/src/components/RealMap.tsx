@@ -79,10 +79,11 @@ export default function RealMap({ route, normalRoute, safeRoute, compareRoutes =
       const safePath = (compareRoutes ? safeRoute?.path : route?.routeType === "SAFE" ? route.path : undefined)?.map((point) => [point.latitude, point.longitude] as [number, number]) ?? [];
       const paths = [normalPath, safePath].filter((path) => path.length > 1);
       if (paths.length) {
-        // 비교 화면에서는 회색 일반 경로를 바탕에 먼저 그리고,
-        // 파란 안전 경로를 위에 얹어 겹치는 구간도 구분되도록 한다.
-        if (normalPath.length > 1) L.polyline(normalPath, { color: compareRoutes ? "#5f6b7a" : "#1766e8", weight: compareRoutes ? 8 : 6, opacity: 0.95, dashArray: compareRoutes ? "9 6" : undefined }).addTo(map);
-        if (safePath.length > 1) L.polyline(safePath, { color: "#1766e8", weight: compareRoutes ? 5 : 6, opacity: 0.98 }).addTo(map);
+        // 안전 경로를 먼저 그리고 일반 경로를 회색으로 위에 표시한다.
+        // 두 경로가 일부 겹쳐도 일반 경로가 사라지지 않고, 우회 구간만
+        // 파란색으로 남아 두 경로의 차이를 바로 확인할 수 있다.
+        if (safePath.length > 1) L.polyline(safePath, { color: "#1766e8", weight: compareRoutes ? 6 : 6, opacity: 0.98 }).addTo(map);
+        if (normalPath.length > 1) L.polyline(normalPath, { color: compareRoutes ? "#5f6b7a" : "#1766e8", weight: compareRoutes ? 5 : 6, opacity: 1, dashArray: compareRoutes ? "9 6" : undefined }).addTo(map);
         // 쉼터 전체를 bounds에 포함하면 지도가 지나치게 축소되므로
         // 처음에는 이동 경로와 방문지 주변만 보이도록 한다.
         map.fitBounds(L.latLngBounds(paths.flat()), { padding: [36, 36], maxZoom: 17, animate: false });
