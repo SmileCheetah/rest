@@ -3,7 +3,15 @@ from datetime import date
 from sqlalchemy import case, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import ActivityLog, RiskAssessment, RouteOption, RouteSegment, Schedule, WorkSession
+from app.models import (
+    ActivityLog,
+    CoolingSpot,
+    RiskAssessment,
+    RouteOption,
+    RouteSegment,
+    Schedule,
+    WorkSession,
+)
 from app.models.base import utc_now
 from app.models.enums import ActivityType, ScheduleStatus, WorkSessionStatus
 from app.schemas.work_session import WorkSessionResponse
@@ -92,6 +100,7 @@ async def complete_work_session(
     if completed_count < total_count:
         return work_session, "incomplete_schedules"
 
+    await update_work_session_summary(session, work_session)
     work_session.status = WorkSessionStatus.COMPLETED
     work_session.completed_at = utc_now()
     session.add(
@@ -135,6 +144,7 @@ async def build_work_session_response(
         session,
         work_session.id,
     )
+    used_cooling_spot_names = await get_used_cooling_spot_names(session, work_session.id)
     return WorkSessionResponse(
         work_session_id=work_session.id,
         work_date=work_session.work_date,
@@ -149,7 +159,74 @@ async def build_work_session_response(
         ),
         total_rest_minutes=work_session.total_rest_minutes,
         rest_count=work_session.rest_count,
+        heat_exposure_reduction_minutes=work_session.total_rest_minutes,
+        used_cooling_spot_names=used_cooling_spot_names,
     )
+
+
+async def update_work_session_summary(
+    session: AsyncSession,
+    work_session: WorkSession,
+) -> None:
+    """완료된 일정에서 실제로 선택한 경로만 합산합니다."""
+    total_walking_minutes, rest_count, total_rest_minutes = (
+        await session.execute(
+            select(
+                func.coalesce(func.sum(RouteOption.walking_minutes), 0),
+                func.coalesce(
+                    func.sum(
+                        case((RouteOption.route_type == "SAFE", 1), else_=0)
+                    ),
+                    0,
+                ),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (
+                                RouteOption.route_type == "SAFE",
+                                func.coalesce(RouteOption.planned_rest_minutes, 0),
+                            ),
+                            else_=0,
+                        )
+                    ),
+                    0,
+                ),
+            )
+            .join(RouteSegment, RouteOption.route_segment_id == RouteSegment.id)
+            .join(Schedule, RouteSegment.schedule_id == Schedule.id)
+            .where(
+                Schedule.work_session_id == work_session.id,
+                Schedule.status == ScheduleStatus.COMPLETED,
+                RouteOption.selected.is_(True),
+            )
+        )
+    ).one()
+    work_session.total_exposure_minutes = int(total_walking_minutes)
+    work_session.max_continuous_exposure_minutes = int(total_walking_minutes)
+    work_session.rest_count = int(rest_count)
+    work_session.total_rest_minutes = int(total_rest_minutes)
+    await session.flush()
+
+
+async def get_used_cooling_spot_names(
+    session: AsyncSession,
+    work_session_id: int,
+) -> list[str]:
+    rows = await session.execute(
+        select(CoolingSpot.name)
+        .join(RouteOption, RouteOption.cooling_spot_id == CoolingSpot.id)
+        .join(RouteSegment, RouteOption.route_segment_id == RouteSegment.id)
+        .join(Schedule, RouteSegment.schedule_id == Schedule.id)
+        .where(
+            Schedule.work_session_id == work_session_id,
+            Schedule.status == ScheduleStatus.COMPLETED,
+            RouteOption.selected.is_(True),
+            RouteOption.route_type == "SAFE",
+        )
+        .distinct()
+        .order_by(CoolingSpot.name)
+    )
+    return list(rows.scalars().all())
 
 
 async def reset_demo_work_session(

@@ -19,6 +19,7 @@ from app.services.asos import (
     AsosProviderError,
     get_asos_hourly,
 )
+from app.time_utils import to_utc_aware
 from app.services.weather import calculate_apparent_temperature
 from earthkit.meteo.solar.array import cos_solar_zenith_angle_integrated
 
@@ -146,9 +147,10 @@ async def resolve_weather(
 ) -> WeatherRiskWeather:
     try:
         response = await get_asos_hourly(station_id, observed_at, observed_at)
+        target_time = to_utc_aware(observed_at)
         observation = min(
             response.observations,
-            key=lambda item: abs((item.observed_at - observed_at).total_seconds()),
+            key=lambda item: abs((to_utc_aware(item.observed_at) - target_time).total_seconds()),
         )
         return WeatherRiskWeather(observation=observation, source="KMA_ASOS")
     except (

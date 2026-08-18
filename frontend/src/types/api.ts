@@ -51,6 +51,8 @@ export interface WorkSession {
   maxContinuousExposureMinutes: number;
   totalRestMinutes: number;
   restCount: number;
+  heatExposureReductionMinutes: number;
+  usedCoolingSpotNames: string[];
 }
 
 export interface CreateScheduleRequest {
@@ -179,4 +181,35 @@ export interface RouteRecommendation {
   normalRoute: RouteSegment;
   safeRoute: SafeRoute | null;
   shelterRecommendationMessage: string | null;
+}
+
+export type RestStatus = "MOVABLE" | "REST_RECOMMENDED" | "REST_BEFORE_NEXT_VISIT";
+
+export interface RestDecisionRequest {
+  continuousWalkingMinutes: number;
+  totalWalkingMinutes: number;
+  minutesSinceLastRest: number;
+  recentRestMinutes: number;
+  temperature?: number;
+  humidity?: number;
+  observedAt: string;
+  nextTravelMinutes: number;
+  coolingSpotNearby: boolean;
+  distanceToCoolingSpotMeters: number | null;
+}
+
+export interface RestDecisionResponse {
+  decision: {
+    shouldRest: boolean;
+    restTiming: "NOW" | "AFTER_NEXT_VISIT" | "SOON" | "NOT_NEEDED";
+    recommendation: string;
+    reason: string;
+    recommendedRestMinutes: number;
+  };
+  restStatusPrediction: {
+    probabilities: Record<RestStatus, number>;
+    decision: RestStatus;
+  } | null;
+  decisionSource: "AI" | "MODEL" | "FALLBACK";
+  weatherSource: "KMA_ASOS" | "REQUEST_FALLBACK";
 }

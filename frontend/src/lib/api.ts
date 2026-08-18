@@ -9,6 +9,8 @@ import type {
   Schedule,
   RouteSegment,
   RouteRecommendation,
+  RestDecisionRequest,
+  RestDecisionResponse,
   VisitTarget,
   WorkSession,
 } from "@/types/api";
@@ -102,6 +104,12 @@ export function completeWorkSession(workSessionId: number): Promise<WorkSession>
   });
 }
 
+export function selectRouteOption(routeOptionId: number): Promise<{ routeOptionId: number; selected: boolean }> {
+  return apiRequest(`/routes/options/${routeOptionId}/select`, {
+    method: "PATCH",
+  });
+}
+
 export function resetDemoWorkSession(): Promise<WorkSession> {
   return apiRequest("/work-sessions/reset", { method: "POST" });
 }
@@ -164,5 +172,15 @@ export function recommendRoute(
       plannedRestMinutes: 10,
       maxAdditionalMinutes: 5,
     }),
+  });
+}
+
+/** XGBoost 기반 휴식 판단 결과를 반환합니다. */
+export function evaluateRestDecision(
+  request: RestDecisionRequest,
+): Promise<RestDecisionResponse> {
+  return apiRequest("/rest/decision", {
+    method: "POST",
+    body: JSON.stringify(request),
   });
 }

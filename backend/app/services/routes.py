@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 from decimal import Decimal
 from math import cos, radians
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -17,6 +17,7 @@ from app.schemas.route import (
 )
 from app.schemas.cooling_spot import CoolingSpotResponse
 from app.schemas.risk_analysis import RiskEvaluateRequest, RiskEvaluateResponse
+from app.schemas.rest_decision import RestDecisionRequest
 from app.schemas.weather import ForecastWeatherResponse
 from app.services.asos import (
     AsosConfigurationError,
@@ -27,12 +28,14 @@ from app.services.asos import (
 from app.services.tmap import PedestrianRoute, get_pedestrian_route
 from app.config import settings
 from app.services.risk_analysis import evaluate_risk
+from app.services.rest_decision import RestDecisionService
+from app.services.rest_weather import resolve_rest_weather
 from app.services.weather import (
     WeatherForecastNotFoundError,
     get_current_weather,
     get_forecast_weather,
 )
-from app.time_utils import to_utc_naive, utc_naive_to_seoul
+from app.time_utils import to_utc_aware, to_utc_naive, utc_naive_to_seoul
 
 
 class RouteSegmentNotFoundError(Exception):
@@ -45,6 +48,15 @@ class RouteSegmentConflictError(Exception):
 
 class SafeRouteNotFoundError(Exception):
     """조건에 맞는 쿨링스팟 안전경로를 찾을 수 없습니다."""
+
+
+class RouteOptionNotFoundError(Exception):
+    """선택할 경로를 찾을 수 없습니다."""
+
+
+# 모든 쉼터에 대해 두 번씩 TMAP을 호출하지 않도록, 직선거리로 가까운
+# 후보만 먼저 추린 뒤 실제 보행 경로를 비교한다.
+SAFE_ROUTE_COMPARISON_LIMIT = 5
 
 
 async def recommend_route(
@@ -88,7 +100,29 @@ async def recommend_route(
             surface_pressure=model_weather["surface_pressure"],
         )
     )
-    if risk.risk_level == "MOVE_POSSIBLE":
+    origin = normal_route.origin
+    destination = normal_route.destination
+    departure = normal_route.departure_time
+    candidates = await _safe_route_candidates(
+        session,
+        cooling_spot_id=None,
+        at=departure.time(),
+        origin=origin,
+        destination=destination,
+    )
+    nearest_distance = (
+        int(round(_approximate_route_distance(origin, candidates[0])))
+        if candidates
+        else None
+    )
+    should_recommend_safe_route = await _should_recommend_safe_route(
+        normal_route=normal_route,
+        weather=weather,
+        model_weather=model_weather,
+        current_continuous_exposure_minutes=current_continuous_exposure_minutes,
+        nearest_cooling_spot_distance_meters=nearest_distance,
+    )
+    if not should_recommend_safe_route:
         return risk, normal_route, None, None
     try:
         safe_route = await create_safe_route(
@@ -101,6 +135,52 @@ async def recommend_route(
     except SafeRouteNotFoundError as exc:
         return risk, normal_route, None, str(exc)
     return risk, normal_route, safe_route, None
+
+
+async def _should_recommend_safe_route(
+    *,
+    normal_route: RouteSegmentResponse,
+    weather: ForecastWeatherResponse,
+    model_weather: dict[str, float | None],
+    current_continuous_exposure_minutes: int,
+    nearest_cooling_spot_distance_meters: int | None,
+) -> bool:
+    """동일한 XGBoost 휴식 판단으로 안전경로 생성 여부를 결정합니다."""
+    observed_at = (
+        weather.forecast_at
+        if hasattr(weather, "forecast_at")
+        else weather.observed_at
+    )
+    request = RestDecisionRequest(
+        continuousWalkingMinutes=current_continuous_exposure_minutes,
+        totalWalkingMinutes=(
+            current_continuous_exposure_minutes + normal_route.walking_minutes
+        ),
+        minutesSinceLastRest=current_continuous_exposure_minutes,
+        recentRestMinutes=0,
+        stationId=settings.kma_asos_station_id,
+        temperature=weather.temperature,
+        humidity=weather.humidity,
+        windSpeed=model_weather["wind_speed"],
+        observedAt=observed_at,
+        nextTravelMinutes=normal_route.walking_minutes,
+        coolingSpotNearby=(
+            nearest_cooling_spot_distance_meters is not None
+            and nearest_cooling_spot_distance_meters <= 500
+        ),
+        distanceToCoolingSpotMeters=nearest_cooling_spot_distance_meters,
+    )
+    resolved_weather = await resolve_rest_weather(request)
+    service = RestDecisionService()
+    prediction = service.predict_model_status(
+        resolved_weather.request,
+        resolved_weather.wbgt,
+    )
+    decision, _ = await service.decide(
+        resolved_weather.request,
+        model_prediction=prediction,
+    )
+    return decision.should_rest
 
 
 async def _get_model_weather(departure_time: datetime) -> dict[str, float | None]:
@@ -130,9 +210,10 @@ async def _get_model_weather(departure_time: datetime) -> dict[str, float | None
         return empty
     if not response.observations:
         return empty
+    target_time = to_utc_aware(departure_time)
     observation = min(
         response.observations,
-        key=lambda item: abs((item.observed_at - departure_time).total_seconds()),
+        key=lambda item: abs((to_utc_aware(item.observed_at) - target_time).total_seconds()),
     )
     return {
         "wind_speed": observation.wind_speed,
@@ -158,6 +239,30 @@ async def calculate_normal_route(
         estimated_arrival_time=estimated_arrival_time,
         path=route.path,
     )
+
+
+async def select_route_option(
+    session: AsyncSession,
+    route_option_id: int,
+) -> RouteOption:
+    """한 이동구간에서 실제로 이용한 경로 하나를 선택 상태로 기록합니다."""
+    route_option = (
+        await session.execute(
+            select(RouteOption)
+            .where(RouteOption.id == route_option_id)
+            .with_for_update()
+        )
+    ).scalar_one_or_none()
+    if route_option is None:
+        raise RouteOptionNotFoundError("route option not found")
+    await session.execute(
+        update(RouteOption)
+        .where(RouteOption.route_segment_id == route_option.route_segment_id)
+        .values(selected=False)
+    )
+    route_option.selected = True
+    await session.flush()
+    return route_option
 
 
 async def create_route_segment(
@@ -281,22 +386,18 @@ async def create_safe_route(
     if not candidates:
         raise SafeRouteNotFoundError("운영 중인 쿨링스팟이 없습니다")
 
-    best: tuple[CoolingSpot, PedestrianRoute, PedestrianRoute, int] | None = None
-    # 공공 쉼터와 기업 쿨링스팟을 구분하지 않고, 현재 위치에서 가장
-    # 가까운 후보 하나를 우선 경유지로 사용한다. 방문지까지의 거리까지
-    # 합산하면 출발지 바로 옆 쉼터보다 먼 후보가 선택될 수 있다.
-    for spot in candidates[:1]:
-        waypoint = Coordinate(latitude=float(spot.latitude), longitude=float(spot.longitude), name=spot.name)
-        to_spot = await get_pedestrian_route(origin, waypoint)
-        from_spot = await get_pedestrian_route(waypoint, destination)
-        walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
-        additional = max(0, walking_minutes - normal.walking_minutes)
-        if best is None or walking_minutes < best[3]:
-            best = (spot, to_spot, from_spot, walking_minutes)
+    best = await _find_shortest_safe_route(
+        origin,
+        destination,
+        candidates,
+        normal_walking_minutes=normal.walking_minutes,
+        max_additional_minutes=max_additional_minutes,
+    )
     if best is None:
         raise SafeRouteNotFoundError(f"추가 이동 {max_additional_minutes}분 이내의 쿨링스팟이 없습니다")
 
-    spot, to_spot, from_spot, walking_minutes = best
+    spot, to_spot, from_spot = best
+    walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
     additional = max(0, walking_minutes - normal.walking_minutes)
     arrival_utc = (segment.departure_time or datetime.utcnow()) + timedelta(minutes=walking_minutes + planned_rest_minutes)
     spot_arrival_utc = (segment.departure_time or datetime.utcnow()) + timedelta(minutes=to_spot.walking_minutes)
@@ -370,6 +471,51 @@ def _approximate_route_distance(point: Coordinate, spot: CoolingSpot) -> float:
     latitude_delta = (point.latitude - float(spot.latitude)) * 111_000
     longitude_delta = (point.longitude - float(spot.longitude)) * 111_000 * cos(radians(point.latitude))
     return (latitude_delta**2 + longitude_delta**2) ** 0.5
+
+
+async def _find_shortest_safe_route(
+    origin: Coordinate,
+    destination: Coordinate,
+    candidates: list[CoolingSpot],
+    *,
+    normal_walking_minutes: int,
+    max_additional_minutes: int,
+) -> tuple[CoolingSpot, PedestrianRoute, PedestrianRoute] | None:
+    """우회 시간 상한 안에서 실제 보행시간이 가장 짧은 경로를 선택합니다."""
+    shortlist = sorted(
+        candidates,
+        key=lambda spot: (
+            _approximate_route_distance(origin, spot)
+            + _approximate_route_distance(destination, spot)
+        ),
+    )[:SAFE_ROUTE_COMPARISON_LIMIT]
+    best: tuple[CoolingSpot, PedestrianRoute, PedestrianRoute] | None = None
+    for spot in shortlist:
+        waypoint = Coordinate(
+            latitude=float(spot.latitude),
+            longitude=float(spot.longitude),
+            name=spot.name,
+        )
+        to_spot = await get_pedestrian_route(origin, waypoint)
+        from_spot = await get_pedestrian_route(waypoint, destination)
+        walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
+        additional_minutes = max(0, walking_minutes - normal_walking_minutes)
+        if additional_minutes > max_additional_minutes:
+            continue
+        candidate_key = (
+            walking_minutes,
+            to_spot.distance_meters + from_spot.distance_meters,
+        )
+        if best is None:
+            best = (spot, to_spot, from_spot)
+            continue
+        best_key = (
+            best[1].walking_minutes + best[2].walking_minutes,
+            best[1].distance_meters + best[2].distance_meters,
+        )
+        if candidate_key < best_key:
+            best = (spot, to_spot, from_spot)
+    return best
 
 
 def _is_open(spot: CoolingSpot, at: time) -> bool:

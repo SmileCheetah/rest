@@ -23,3 +23,13 @@ def to_utc_naive(value: datetime) -> datetime:
     if value.tzinfo is None:
         value = value.replace(tzinfo=SEOUL_TIMEZONE)
     return value.astimezone(UTC).replace(tzinfo=None)
+
+
+def to_utc_aware(value: datetime) -> datetime:
+    """시간대 유무와 무관하게 비교 가능한 UTC aware datetime을 반환합니다.
+
+    API로 받은 시간대 없는 값은 서비스 기준 시간대(서울)로 해석합니다.
+    """
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=SEOUL_TIMEZONE)
+    return value.astimezone(UTC)

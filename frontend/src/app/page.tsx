@@ -7,10 +7,12 @@ import {
   completeSchedule,
   completeWorkSession,
   resetDemoWorkSession,
+  selectRouteOption,
   createRouteSegment,
   recommendRoute,
   createSchedule,
   deleteSchedule,
+  evaluateRestDecision,
   getCurrentWeather,
   getCurrentHeatwave,
   getLivingWeatherIndex,
@@ -28,6 +30,7 @@ import type {
   RoutePathPoint,
   RouteSegment,
   RouteRecommendation,
+  RestDecisionResponse,
   CoolingSpot,
   Schedule,
   VisitTarget,
@@ -123,6 +126,76 @@ function toVisitCards(schedules: Schedule[]): VisitCard[] {
     longitude: schedule.visitTarget.longitude,
     ...routeMocks[index % routeMocks.length],
   }));
+}
+
+function nearestCoolingSpotDistance(visit: VisitCard, spots: CoolingSpot[]): number | null {
+  if (!spots.length) return null;
+  const latitudeScale = 111_000;
+  const longitudeScale = 111_000 * Math.cos((visit.latitude * Math.PI) / 180);
+  return Math.round(Math.min(...spots.map((spot) => Math.hypot(
+    (spot.latitude - visit.latitude) * latitudeScale,
+    (spot.longitude - visit.longitude) * longitudeScale,
+  ))));
+}
+
+function aiRiskDisplay(result: RestDecisionResponse): Pick<VisitCard, "riskStatus" | "tone" | "rests"> {
+  const status = result.restStatusPrediction?.decision;
+  if (status === "REST_BEFORE_NEXT_VISIT" || result.decision.restTiming === "NOW") {
+    return { riskStatus: "다음 방문 전 휴식 필요", tone: "danger", rests: 1 };
+  }
+  if (status === "REST_RECOMMENDED" || result.decision.shouldRest) {
+    return { riskStatus: "휴식 권유", tone: "caution", rests: 1 };
+  }
+  return { riskStatus: "이동 가능", tone: "safe", rests: 0 };
+}
+
+function restDecisionRequest(
+  visit: VisitCard,
+  spots: CoolingSpot[],
+  continuousWalkingMinutes: number,
+  nextTravelMinutes = walkingMinutes(visit.walk),
+  weather: CurrentWeather | null = null,
+) {
+  const distanceToCoolingSpotMeters = nearestCoolingSpotDistance(visit, spots);
+  return {
+    continuousWalkingMinutes,
+    totalWalkingMinutes: continuousWalkingMinutes + nextTravelMinutes,
+    minutesSinceLastRest: continuousWalkingMinutes,
+    recentRestMinutes: 0,
+    temperature: weather?.temperature,
+    humidity: weather?.humidity,
+    observedAt: new Date().toISOString(),
+    nextTravelMinutes,
+    coolingSpotNearby: distanceToCoolingSpotMeters !== null && distanceToCoolingSpotMeters <= 500,
+    distanceToCoolingSpotMeters,
+  };
+}
+
+async function applyAiRiskToVisits(visits: VisitCard[], spots: CoolingSpot[]): Promise<VisitCard[]> {
+  const weather = await getCurrentWeather(
+    DEFAULT_LOCATION.latitude,
+    DEFAULT_LOCATION.longitude,
+  ).catch(() => null);
+  let accumulatedMinutes = 0;
+  const requests = visits.map((visit) => {
+    const nextTravelMinutes = walkingMinutes(visit.walk);
+    const request = evaluateRestDecision(restDecisionRequest(
+      visit,
+      spots,
+      accumulatedMinutes,
+      nextTravelMinutes,
+      weather,
+    ));
+    accumulatedMinutes += nextTravelMinutes;
+    return request;
+  });
+  const results = await Promise.allSettled(requests);
+  return visits.map((visit, index) => {
+    const result = results[index];
+    return result.status === "fulfilled"
+      ? { ...visit, ...aiRiskDisplay(result.value) }
+      : visit;
+  });
 }
 
 function seoulDateString(): string {
@@ -229,6 +302,7 @@ export default function Home() {
   const [inProgressScheduleId, setInProgressScheduleId] = useState<number | null>(null);
   const [activeRoute, setActiveRoute] = useState<RouteSegment | null>(null);
   const [recommendedRoute, setRecommendedRoute] = useState<RouteRecommendation | null>(null);
+  const [activeRestDecision, setActiveRestDecision] = useState<RestDecisionResponse | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<number | null>(null);
   const [scheduleTime, setScheduleTime] = useState("14:30");
@@ -252,7 +326,13 @@ export default function Home() {
         // 지도에는 현재 위치 기준 반경 2km 이내 쉼터만 표시한다.
         getCoolingSpots(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude, 2_000),
       ]);
-      setVisits(toVisitCards(schedules));
+      const cards = toVisitCards(schedules);
+      setVisits(cards);
+      // 일정 카드는 먼저 표시하고, XGBoost 휴식 판단 결과가 도착하면
+      // 실제 AI 상태 배지(이동 가능/휴식 권장/다음 방문 전 휴식 필요)로 교체한다.
+      void applyAiRiskToVisits(cards, spots)
+        .then(setVisits)
+        .catch(() => undefined);
       setCompleted(
         schedules
           .filter((schedule) => schedule.status === "COMPLETED")
@@ -324,6 +404,25 @@ export default function Home() {
     }
   };
 
+  const loadActiveRestDecision = async (
+    visit: VisitCard,
+    nextTravelMinutes: number,
+  ) => {
+    try {
+      const decision = await evaluateRestDecision(restDecisionRequest(
+        visit,
+        coolingSpots,
+        exposureBeforeVisit(visits, visit.visitOrder),
+        nextTravelMinutes,
+        currentWeather,
+      ));
+      setActiveRestDecision(decision);
+    } catch {
+      // 기존 안전경로 판단은 계속 진행하고, AI 배지는 기존 결과를 fallback으로 표시한다.
+      setActiveRestDecision(null);
+    }
+  };
+
   const handleStartWork = async () => {
     setIsBusy(true);
     try {
@@ -334,6 +433,7 @@ export default function Home() {
       setApiMessage(null);
       setActiveRoute(null);
       setRecommendedRoute(null);
+      setActiveRestDecision(null);
       if (next.workCompleted || !next.nextSchedule) {
         setScreen("complete");
       } else {
@@ -352,6 +452,8 @@ export default function Home() {
             departureTime: new Date().toISOString(),
           });
           setActiveRoute(route);
+          const firstVisit = visits.find((visit) => visit.scheduleId === next.nextSchedule?.scheduleId);
+          if (firstVisit) await loadActiveRestDecision(firstVisit, route.walkingMinutes);
           try {
             const recommendation = await recommendRoute(
               route.routeSegmentId,
@@ -403,6 +505,7 @@ export default function Home() {
         },
         departureTime: new Date().toISOString(),
       });
+      await loadActiveRestDecision(visit, route.walkingMinutes);
       const recommendation = await recommendRoute(
         route.routeSegmentId,
         exposureBeforeVisit(visits, visit.visitOrder),
@@ -462,6 +565,9 @@ export default function Home() {
     if (activeScheduleId === null) return;
     setIsBusy(true);
     try {
+      if (displayedRoute) {
+        await selectRouteOption(displayedRoute.routeOptionId);
+      }
       await completeSchedule(activeScheduleId);
       setInProgressScheduleId(null);
       const next = await getNextSchedule();
@@ -523,7 +629,8 @@ export default function Home() {
   const hasRecommendedSafeRoute = Boolean(safeRoute);
   const risk = recommendedRoute?.risk;
   const recommendedSpot = recommendedRoute?.safeRoute?.coolingSpot ?? null;
-  const recommendedRestCount = risk?.recommended_rest_count ?? 0;
+  const aiRouteDisplay = activeRestDecision ? aiRiskDisplay(activeRestDecision) : null;
+  const recommendedRestCount = aiRouteDisplay?.rests ?? risk?.recommended_rest_count ?? 0;
   const expectedExposureMinutes = (workSession?.maxContinuousExposureMinutes ?? 0) + (activeRoute?.walkingMinutes ?? 0);
   const facilityLabels = recommendedSpot?.facilities
     ? Object.entries(recommendedSpot.facilities)
@@ -534,8 +641,8 @@ export default function Home() {
     ?? (risk?.risk_level === "MOVE_POSSIBLE"
       ? "현재 구간은 휴식이 필요하지 않아요."
       : "AI 분석 후 추천 경로를 표시합니다.");
-  const riskBadge = risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe";
-  const riskLabel = risk?.risk_level === "REST_REQUIRED" ? "휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권장" : "이동 가능";
+  const riskBadge = aiRouteDisplay?.tone ?? (risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe");
+  const riskLabel = aiRouteDisplay?.riskStatus ?? (risk?.risk_level === "REST_REQUIRED" ? "다음 방문 전 휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권유" : "이동 가능");
   const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
   const displayedHeatTone = heatwaveImpact
     ? getHeatwaveTone(heatwaveImpact.level)
@@ -596,7 +703,7 @@ export default function Home() {
         <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{selectedRoute === "safe" && recommendedSpot && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedSpot.name}</strong><small>경로에 추가 시 약 {recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 소요</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row">{selectedRoute === "safe" && recommendedSpot && <button className="button secondary" onClick={() => {setSelectedRoute("normal"); setFinishAfterSkipSurvey(false); setModal("skip");}}>쉼터 건너뛰기</button>}<button className="button teal" disabled={isBusy} onClick={() => handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
       </>}
 
-      {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 72}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 2}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 15}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>15분</strong><small>안전하게 이동했어요!</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2><p>창신동 주민센터</p><p>동부여성문화센터</p></section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}
+      {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 0}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 0}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 0}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>{workSession?.heatExposureReductionMinutes ?? 0}분</strong><small>쿨링스팟에서 휴식한 시간이에요.</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2>{workSession?.usedCoolingSpotNames?.length ? workSession.usedCoolingSpotNames.map((name) => <p key={name}>{name}</p>) : <p>이용한 쿨링스팟이 없어요.</p>}</section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}
 
       {modal && <><div className="dim" onClick={() => setModal(null)}/>{modal === "add" && <section className="bottom-sheet tall"><div className="handle"/><div className="sheet-header"><h2>대상자 추가</h2><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>오늘 방문할 대상자를 선택해주세요.</p><label className="search-box"><Icon name="search"/><input placeholder="이름 검색" value={targetSearch} onChange={(event) => setTargetSearch(event.target.value)} /></label><div className="chip-grid">{filteredVisitTargets.map(target => <button key={target.visitTargetId} onClick={() => setSelectedTargetId(target.visitTargetId)} className={selectedTargetId === target.visitTargetId ? "active" : ""}>{target.name}</button>)}</div>{filteredVisitTargets.length === 0 && <p className="empty-state">검색 결과가 없습니다.</p>}<label className="form-label" htmlFor="schedule-time">방문 예정 시간</label><div className="time-input"><input id="schedule-time" type="time" value={scheduleTime} onChange={(event) => setScheduleTime(event.target.value)} required/></div><button className="button primary" disabled={isBusy || selectedTargetId === null || !scheduleTime} onClick={() => void handleAddSchedule()}>일정에 추가</button></section>}
       {modal === "menu" && <div className="context-menu"><button disabled={isBusy} onClick={() => void handleDeleteSchedule()}>일정에서 삭제</button></div>}
