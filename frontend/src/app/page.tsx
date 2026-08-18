@@ -231,7 +231,8 @@ export default function Home() {
       const [schedules, targets, spots] = await Promise.all([
         getTodaySchedules(),
         getVisitTargets(),
-        getCoolingSpots(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude, 20_000),
+        // 지도에는 현재 위치 기준 반경 2km 이내 쉼터만 표시한다.
+        getCoolingSpots(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude, 2_000),
       ]);
       setVisits(toVisitCards(schedules));
       setCompleted(

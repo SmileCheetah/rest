@@ -15,6 +15,8 @@ class RiskEvaluateRequest(BaseModel):
     humidity: float = Field(..., ge=0, le=100)
     observed_at: datetime
     wind_speed: float | None = Field(default=None, ge=0)
+    solar_radiation: float | None = Field(default=None, ge=0)
+    surface_pressure: float | None = Field(default=None, ge=800, le=1_100)
     walking_minutes: int = Field(..., ge=0)
     current_continuous_exposure_minutes: int = Field(..., ge=0)
     expected_continuous_exposure_minutes: int = Field(..., ge=0)

@@ -12,6 +12,8 @@ class RouteRiskFeatures(BaseModel):
     temperature: float
     humidity: float = Field(..., ge=0, le=100)
     wind_speed: float | None = Field(default=None, ge=0)
+    solar_radiation: float | None = Field(default=None, ge=0)
+    surface_pressure: float | None = Field(default=None, ge=800, le=1_100)
     walking_minutes: int = Field(..., ge=0)
     current_continuous_exposure_minutes: int = Field(..., ge=0)
     expected_continuous_exposure_minutes: int = Field(..., ge=0)
@@ -28,6 +30,8 @@ def build_route_risk_features(
     temperature: float,
     humidity: float,
     wind_speed: float | None,
+    solar_radiation: float | None = None,
+    surface_pressure: float | None = None,
     walking_minutes: int,
     current_state: ExposureState,
     projected_state: ExposureState,
@@ -39,6 +43,8 @@ def build_route_risk_features(
         temperature=temperature,
         humidity=humidity,
         wind_speed=wind_speed,
+        solar_radiation=solar_radiation,
+        surface_pressure=surface_pressure,
         walking_minutes=walking_minutes,
         current_continuous_exposure_minutes=current_state.continuous_exposure_minutes,
         expected_continuous_exposure_minutes=projected_state.continuous_exposure_minutes,

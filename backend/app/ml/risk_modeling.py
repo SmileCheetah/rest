@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 import joblib
 import numpy as np
+import sklearn
 from sklearn.inspection import permutation_importance
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import (
@@ -24,12 +25,13 @@ from sklearn.metrics import (
 )
 from thermofeel import calculate_wbgt_liljegren
 
+from app.ml.era5 import WeatherObservations
 from app.schemas.risk_analysis import RiskLevel
 from app.services.risk_analysis import classify_risk
 from app.services.weather import calculate_apparent_temperature
 
 SEOUL_TZ = ZoneInfo("Asia/Seoul")
-LABEL_POLICY_VERSION = "wbgt-niosh-moderate-mvp-1"
+LABEL_POLICY_VERSION = "wbgt-osha-moderate-2"
 FEATURE_SELECTION_TOLERANCE = 0.005
 RISK_LABELS: tuple[RiskLevel, ...] = (
     "MOVE_POSSIBLE",
@@ -45,10 +47,6 @@ FEATURE_NAMES = (
     "walking_minutes",
     "current_continuous_exposure_minutes",
     "expected_continuous_exposure_minutes",
-    "current_daily_exposure_minutes",
-    "expected_daily_exposure_minutes",
-    "current_daily_rest_minutes",
-    "shelter_accessibility",
 )
 
 
@@ -59,6 +57,7 @@ class RiskDataset:
     weather_at: np.ndarray
     estimated_wbgt: np.ndarray
     apparent_temperature: np.ndarray
+    source: str
 
 
 @dataclass(frozen=True)
@@ -69,12 +68,10 @@ class ModelComparison:
     selected_feature_names: tuple[str, ...]
 
 
-def moderate_work_limit_minutes(estimated_wbgt: float) -> int:
-    """Return permitted work minutes per hour for the MVP moderate-work policy."""
-    if estimated_wbgt < 25.0:
-        return 120
+def moderate_work_limit_minutes(estimated_wbgt: float) -> int | None:
+    """Return permitted work minutes per hour from OSHA's moderate-work table."""
     if estimated_wbgt < 26.7:
-        return 60
+        return None
     if estimated_wbgt < 28.0:
         return 45
     if estimated_wbgt < 29.4:
@@ -84,48 +81,28 @@ def moderate_work_limit_minutes(estimated_wbgt: float) -> int:
     return 0
 
 
-def cumulative_exposure_penalty_minutes(
-    daily_exposure_minutes: int,
-    daily_rest_minutes: int,
-) -> int:
-    """MVP policy adjustment; this is not a value published by NIOSH."""
-    if daily_exposure_minutes >= 240 and daily_rest_minutes < 30:
-        return 15
-    if daily_exposure_minutes >= 120 and daily_rest_minutes < 20:
-        return 10
-    return 0
-
-
 def create_synthetic_label(
     *,
     estimated_wbgt: float,
     current_continuous_exposure_minutes: int,
     expected_continuous_exposure_minutes: int,
-    current_daily_exposure_minutes: int,
-    current_daily_rest_minutes: int,
 ) -> RiskLevel:
-    base_limit = moderate_work_limit_minutes(estimated_wbgt)
-    penalty = cumulative_exposure_penalty_minutes(
-        current_daily_exposure_minutes,
-        current_daily_rest_minutes,
-    )
-    adjusted_limit = max(0, base_limit - penalty)
-
-    if adjusted_limit == 0 or current_continuous_exposure_minutes >= adjusted_limit:
+    work_limit = moderate_work_limit_minutes(estimated_wbgt)
+    if work_limit == 0:
         return "REST_REQUIRED"
-    if (
-        estimated_wbgt >= 25.0
-        or expected_continuous_exposure_minutes >= adjusted_limit
-        or penalty > 0
-    ):
+    if work_limit is None:
+        return "MOVE_POSSIBLE"
+    if current_continuous_exposure_minutes >= work_limit:
+        return "REST_REQUIRED"
+    if expected_continuous_exposure_minutes >= work_limit:
         return "REST_RECOMMENDED"
     return "MOVE_POSSIBLE"
 
 
 def generate_synthetic_dataset(
     *,
-    weather_samples: int = 2_000,
-    scenarios_per_weather: int = 6,
+    weather_samples: int = 1_000,
+    scenarios_per_weather: int = 4,
     seed: int = 20260818,
 ) -> RiskDataset:
     if weather_samples < 10:
@@ -160,7 +137,6 @@ def generate_synthetic_dataset(
         0.0,
         0.9,
     )
-    direct_solar_radiation = solar_radiation * direct_fraction
     humidity = np.clip(
         82.0
         - 0.9 * (temperature - 20.0)
@@ -176,43 +152,67 @@ def generate_synthetic_dataset(
         1_035.0,
     )
 
+    observations = WeatherObservations(
+        observed_at=np.array(weather_at, dtype=object),
+        temperature=temperature,
+        humidity=humidity,
+        wind_speed=wind_speed,
+        solar_radiation=solar_radiation,
+        direct_solar_fraction=direct_fraction,
+        surface_pressure=surface_pressure,
+        cosine_solar_zenith=cos_solar_zenith,
+    )
+    return generate_dataset_from_weather(
+        observations,
+        scenarios_per_weather=scenarios_per_weather,
+        seed=seed,
+        source="synthetic_weather",
+    )
+
+
+def generate_dataset_from_weather(
+    observations: WeatherObservations,
+    *,
+    scenarios_per_weather: int = 4,
+    seed: int = 20260818,
+    source: str = "era5_netcdf",
+) -> RiskDataset:
+    if scenarios_per_weather < 1:
+        raise ValueError("scenarios_per_weather must be positive")
+    if len(observations.observed_at) < 10:
+        raise ValueError("at least 10 weather observations are required")
+
     wbgt_kelvin = calculate_wbgt_liljegren(
-        temperature + 273.15,
-        humidity,
-        surface_pressure,
-        wind_speed,
-        solar_radiation,
-        direct_solar_radiation,
-        cos_solar_zenith,
+        observations.temperature + 273.15,
+        observations.humidity,
+        observations.surface_pressure,
+        observations.wind_speed,
+        observations.solar_radiation,
+        observations.direct_solar_fraction,
+        observations.cosine_solar_zenith,
     )
     wbgt_celsius = np.asarray(wbgt_kelvin, dtype=float) - 273.15
-    if np.isnan(wbgt_celsius).any():
+    if not np.isfinite(wbgt_celsius).all():
         raise ValueError("Liljegren WBGT calculation did not converge")
 
+    weather_samples = len(observations.observed_at)
     weather_index = np.repeat(np.arange(weather_samples), scenarios_per_weather)
     row_count = len(weather_index)
+    rng = np.random.default_rng(seed)
     walking_minutes = rng.integers(5, 61, row_count)
-    current_continuous = rng.integers(0, 121, row_count)
+    current_continuous = rng.integers(0, 61, row_count)
     expected_continuous = current_continuous + walking_minutes
-    current_daily_exposure = current_continuous + rng.integers(0, 241, row_count)
-    expected_daily_exposure = current_daily_exposure + walking_minutes
-    current_daily_rest = rng.integers(0, 91, row_count)
-    shelter_accessibility = rng.uniform(0.0, 1.0, row_count)
 
     features = np.column_stack(
         (
-            temperature[weather_index],
-            humidity[weather_index],
-            wind_speed[weather_index],
-            solar_radiation[weather_index],
-            surface_pressure[weather_index],
+            observations.temperature[weather_index],
+            observations.humidity[weather_index],
+            observations.wind_speed[weather_index],
+            observations.solar_radiation[weather_index],
+            observations.surface_pressure[weather_index],
             walking_minutes,
             current_continuous,
             expected_continuous,
-            current_daily_exposure,
-            expected_daily_exposure,
-            current_daily_rest,
-            shelter_accessibility,
         )
     )
     labels = np.array(
@@ -221,8 +221,6 @@ def generate_synthetic_dataset(
                 estimated_wbgt=float(wbgt_celsius[weather_idx]),
                 current_continuous_exposure_minutes=int(current_continuous[row]),
                 expected_continuous_exposure_minutes=int(expected_continuous[row]),
-                current_daily_exposure_minutes=int(current_daily_exposure[row]),
-                current_daily_rest_minutes=int(current_daily_rest[row]),
             )
             for row, weather_idx in enumerate(weather_index)
         ]
@@ -230,10 +228,10 @@ def generate_synthetic_dataset(
     apparent_by_weather = np.array(
         [
             calculate_apparent_temperature(
-                float(temperature[index]),
-                float(humidity[index]),
-                weather_at[index],
-                float(wind_speed[index]),
+                float(observations.temperature[index]),
+                float(observations.humidity[index]),
+                observations.observed_at[index],
+                float(observations.wind_speed[index]),
             )
             for index in range(weather_samples)
         ]
@@ -242,9 +240,10 @@ def generate_synthetic_dataset(
     return RiskDataset(
         features=features,
         labels=labels,
-        weather_at=np.array(weather_at, dtype=object)[weather_index],
+        weather_at=observations.observed_at[weather_index],
         estimated_wbgt=wbgt_celsius[weather_index],
         apparent_temperature=apparent_by_weather[weather_index],
+        source=source,
     )
 
 
@@ -334,6 +333,7 @@ def compare_models(
             "test_rows": int(len(test_indices)),
         },
         "dataset": {
+            "source": dataset.source,
             "rows": int(len(dataset.labels)),
             "label_distribution": dict(sorted(Counter(dataset.labels).items())),
             "wbgt_min": round(float(dataset.estimated_wbgt.min()), 3),
@@ -378,11 +378,15 @@ def save_comparison_artifacts(
     artifact_directory.mkdir(parents=True, exist_ok=True)
     joblib.dump(
         {
+            "artifact_format_version": 1,
             "model": comparison.best_model,
             "model_name": comparison.best_model_name,
             "feature_names": comparison.selected_feature_names,
             "risk_labels": RISK_LABELS,
             "label_policy_version": LABEL_POLICY_VERSION,
+            "sklearn_version": sklearn.__version__,
+            "trained_at": datetime.now(SEOUL_TZ).isoformat(),
+            "training_data_source": comparison.report["dataset"]["source"],
         },
         artifact_directory / "risk_classifier.joblib",
     )
@@ -438,14 +442,14 @@ def _classification_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str,
 def _default_model_parameters() -> dict[str, dict[str, Any]]:
     return {
         "random_forest": {
-            "n_estimators": 300,
+            "n_estimators": 120,
             "min_samples_leaf": 2,
             "max_features": "sqrt",
             "max_depth": None,
         },
         "hist_gradient_boosting": {
             "learning_rate": 0.08,
-            "max_iter": 200,
+            "max_iter": 150,
             "max_leaf_nodes": 31,
             "min_samples_leaf": 20,
             "l2_regularization": 0.1,
@@ -458,13 +462,13 @@ def _tuning_candidates(model_name: str) -> list[dict[str, Any]]:
         return [
             _default_model_parameters()[model_name],
             {
-                "n_estimators": 500,
+                "n_estimators": 200,
                 "min_samples_leaf": 1,
                 "max_features": "sqrt",
                 "max_depth": None,
             },
             {
-                "n_estimators": 400,
+                "n_estimators": 160,
                 "min_samples_leaf": 3,
                 "max_features": 0.8,
                 "max_depth": 18,
@@ -475,21 +479,21 @@ def _tuning_candidates(model_name: str) -> list[dict[str, Any]]:
             _default_model_parameters()[model_name],
             {
                 "learning_rate": 0.05,
-                "max_iter": 300,
+                "max_iter": 200,
                 "max_leaf_nodes": 31,
                 "min_samples_leaf": 15,
                 "l2_regularization": 0.2,
             },
             {
                 "learning_rate": 0.08,
-                "max_iter": 250,
+                "max_iter": 180,
                 "max_leaf_nodes": 15,
                 "min_samples_leaf": 15,
                 "l2_regularization": 0.5,
             },
             {
                 "learning_rate": 0.06,
-                "max_iter": 300,
+                "max_iter": 200,
                 "max_leaf_nodes": 63,
                 "min_samples_leaf": 25,
                 "l2_regularization": 0.5,
@@ -579,9 +583,9 @@ def _feature_importance(
         features,
         labels,
         scoring=scorer,
-        n_repeats=3,
+        n_repeats=2,
         random_state=seed,
-        n_jobs=1,
+        n_jobs=-1,
     )
     order = np.argsort(result.importances_mean)[::-1]
     return [
@@ -610,20 +614,10 @@ def _select_feature_subset(
     validation_indices = outer_train_indices[relative_validation]
     candidate_names = {
         "all_features": FEATURE_NAMES,
-        "drop_label_unused": tuple(
+        "drop_redundant_walking": tuple(
             name
             for name in FEATURE_NAMES
-            if name not in {"expected_daily_exposure_minutes", "shelter_accessibility"}
-        ),
-        "compact": tuple(
-            name
-            for name in FEATURE_NAMES
-            if name
-            not in {
-                "walking_minutes",
-                "expected_daily_exposure_minutes",
-                "shelter_accessibility",
-            }
+            if name != "walking_minutes"
         ),
     }
     candidates: list[dict[str, Any]] = []
@@ -683,7 +677,6 @@ def _predict_with_rule_classifier(
     walking = FEATURE_NAMES.index("walking_minutes")
     current = FEATURE_NAMES.index("current_continuous_exposure_minutes")
     expected = FEATURE_NAMES.index("expected_continuous_exposure_minutes")
-    shelter = FEATURE_NAMES.index("shelter_accessibility")
     return np.array(
         [
             classify_risk(
@@ -695,7 +688,7 @@ def _predict_with_rule_classifier(
                 expected_continuous_exposure_minutes=int(
                     dataset.features[index, expected]
                 ),
-                shelter_accessibility=float(dataset.features[index, shelter]),
+                shelter_accessibility=None,
             )
             for index in indices
         ]
