@@ -3,6 +3,7 @@ uvicorn==0.35.0
 SQLAlchemy[asyncio]==2.0.52
 alembic==1.19.1
 asyncmy==0.2.14
+cryptography==50.0.0
 pydantic-settings==2.15.0
 httpx==0.28.1
 truststore==0.10.4
