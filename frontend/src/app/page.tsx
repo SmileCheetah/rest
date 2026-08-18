@@ -495,6 +495,10 @@ export default function Home() {
     : null;
   const displayedRoute = selectedRoute === "safe" && safeRoute ? safeRoute : activeRoute;
   const risk = recommendedRoute?.risk;
+  const safeRouteUnavailableMessage = recommendedRoute?.shelterRecommendationMessage
+    ?? (risk?.risk_level === "MOVE_POSSIBLE"
+      ? "현재 구간은 휴식이 필요하지 않아요."
+      : "AI 분석 후 추천 경로를 표시합니다.");
   const riskBadge = risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe";
   const riskLabel = risk?.risk_level === "REST_REQUIRED" ? "휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권장" : "이동 가능";
   const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
@@ -531,7 +535,7 @@ export default function Home() {
         <Map route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
         <section className="route-panel"><div className="route-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary onClick={() => setModal("ai")}/></div><p>{risk?.reason_message ?? "경로와 날씨 정보를 분석하고 있습니다."}</p><div className="route-options">
           <button className={`route-card ${selectedRoute === "normal" ? "selected" : ""}`} onClick={() => setSelectedRoute("normal")}><span>일반 경로</span><strong>{activeRoute ? `${activeRoute.walkingMinutes}분` : "계산 전"}</strong><small>{activeRoute ? formatDistance(activeRoute.distanceMeters) : "TMAP 연결 확인 필요"}</small><b>휴식 없음</b></button>
-          {safeRoute && <button className={`route-card ${selectedRoute === "safe" ? "selected" : ""}`} onClick={() => setSelectedRoute("safe")}><span>안전 경로 <em>추천</em></span><strong>{recommendedRoute?.safeRoute ? `${recommendedRoute.safeRoute.walkingMinutes}분` : "계산 전"}</strong><small>{recommendedRoute?.safeRoute ? formatDistance(recommendedRoute.safeRoute.distanceMeters) : ""}</small><b>휴식 1회</b><i>추천 쉼터: {recommendedRoute?.safeRoute?.coolingSpot.name}</i></button>}
+          <button className={`route-card ${selectedRoute === "safe" ? "selected" : ""} ${safeRoute ? "" : "unavailable"}`} disabled={!safeRoute} onClick={() => setSelectedRoute("safe")}><span>안전 경로 {safeRoute && <em>추천</em>}</span><strong>{safeRoute ? `${safeRoute.walkingMinutes}분` : "추천 없음"}</strong><small>{safeRoute ? formatDistance(safeRoute.distanceMeters) : "추천 조건 확인 중"}</small><b>{safeRoute ? "휴식 1회" : "일반 경로 이용"}</b><i>{safeRoute ? `추천 쉼터: ${recommendedRoute?.safeRoute?.coolingSpot.name}` : safeRouteUnavailableMessage}</i></button>
         </div>{apiMessage && <p className="route-error">{apiMessage}</p>}{safeRoute && <p className="route-delta">일반 경로보다 <strong>{recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 걸리지만</strong> 이동 중 1회 쉴 수 있어요.</p>}{recommendedRoute?.shelterRecommendationMessage && <p className="route-delta">{recommendedRoute.shelterRecommendationMessage}</p>}<button className="button primary" onClick={startRoute}>{selectedRoute === "safe" && safeRoute ? "안전 경로로 안내 시작" : "일반 경로로 안내 시작"}</button></section>
       </>}
 
