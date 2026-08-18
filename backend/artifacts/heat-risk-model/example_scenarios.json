@@ -1,0 +1,77 @@
+[
+  {
+    "scenario": "cool_short",
+    "input": {
+      "wbgt": 18,
+      "continuous_exposure_minutes": 10,
+      "next_travel_minutes": 5,
+      "time_since_rest_minutes": 10,
+      "cooling_spot_distance_m": 100
+    },
+    "rule_score": 0.0,
+    "ai_prediction": {
+      "heat_risk_score": 0.21,
+      "risk_level": "LOW"
+    }
+  },
+  {
+    "scenario": "moderate_long_exposure",
+    "input": {
+      "wbgt": 24,
+      "continuous_exposure_minutes": 120,
+      "next_travel_minutes": 23,
+      "time_since_rest_minutes": 80,
+      "cooling_spot_distance_m": 350
+    },
+    "rule_score": 61.0,
+    "ai_prediction": {
+      "heat_risk_score": 61.0,
+      "risk_level": "REST_RECOMMENDED"
+    }
+  },
+  {
+    "scenario": "hot_near_shelter",
+    "input": {
+      "wbgt": 30,
+      "continuous_exposure_minutes": 45,
+      "next_travel_minutes": 10,
+      "time_since_rest_minutes": 40,
+      "cooling_spot_distance_m": 100
+    },
+    "rule_score": 64.0,
+    "ai_prediction": {
+      "heat_risk_score": 62.02,
+      "risk_level": "REST_RECOMMENDED"
+    }
+  },
+  {
+    "scenario": "hot_long_exposure",
+    "input": {
+      "wbgt": 30,
+      "continuous_exposure_minutes": 120,
+      "next_travel_minutes": 35,
+      "time_since_rest_minutes": 120,
+      "cooling_spot_distance_m": 1200
+    },
+    "rule_score": 100.0,
+    "ai_prediction": {
+      "heat_risk_score": 99.8,
+      "risk_level": "IMMEDIATE_REST"
+    }
+  },
+  {
+    "scenario": "extreme",
+    "input": {
+      "wbgt": 35,
+      "continuous_exposure_minutes": 180,
+      "next_travel_minutes": 60,
+      "time_since_rest_minutes": 180,
+      "cooling_spot_distance_m": 3000
+    },
+    "rule_score": 100.0,
+    "ai_prediction": {
+      "heat_risk_score": 100.0,
+      "risk_level": "IMMEDIATE_REST"
+    }
+  }
+]
