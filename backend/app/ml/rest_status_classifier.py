@@ -166,5 +166,8 @@ def predict_rest_status(
         label: round(float(raw_probabilities[index]), 4)
         for index, label in enumerate(STATUS_LABELS)
     }
-    prediction = max(probability_map, key=probability_map.get)
+    # 표시용 반올림 값이 아니라 모델의 원본 확률로 최종 클래스를 고릅니다.
+    # 경계에 아주 가까운 두 확률이 같은 값으로 반올림되는 경우에도 결과가
+    # 클래스 선언 순서에 의해 바뀌지 않게 합니다.
+    prediction = STATUS_LABELS[int(np.argmax(raw_probabilities))]
     return {"probabilities": probability_map, "decision": prediction}

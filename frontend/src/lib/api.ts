@@ -2,6 +2,7 @@ import type {
   CreateScheduleRequest,
   CreateRouteSegmentRequest,
   CurrentWeather,
+  HourlyWeather,
   CoolingSpot,
   HeatwaveImpact,
   LivingWeatherIndex,
@@ -138,6 +139,19 @@ export function getCurrentWeather(
     longitude: String(longitude),
   });
   return apiRequest(`/weather/current?${params}`);
+}
+
+export function getHourlyWeather(
+  latitude: number,
+  longitude: number,
+  date: string,
+): Promise<HourlyWeather> {
+  const params = new URLSearchParams({
+    latitude: String(latitude),
+    longitude: String(longitude),
+    date,
+  });
+  return apiRequest(`/weather/hourly?${params}`);
 }
 
 export function getCurrentHeatwave(): Promise<HeatwaveImpact> {

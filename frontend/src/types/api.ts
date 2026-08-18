@@ -75,6 +75,21 @@ export interface CurrentWeather {
   source: "KMA";
 }
 
+export interface ForecastWeatherValue {
+  forecastAt: string;
+  temperature: number;
+  humidity: number;
+  apparentTemperature: number;
+}
+
+export interface HourlyWeather {
+  latitude: number;
+  longitude: number;
+  forecastDate: string;
+  forecasts: ForecastWeatherValue[];
+  source: "KMA";
+}
+
 export type HeatwaveLevel = "NONE" | "INTEREST" | "CAUTION" | "WARNING" | "DANGER";
 
 export interface HeatwaveImpact {

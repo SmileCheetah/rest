@@ -14,6 +14,7 @@ import {
   deleteSchedule,
   evaluateRestDecision,
   getCurrentWeather,
+  getHourlyWeather,
   getCurrentHeatwave,
   getLivingWeatherIndex,
   getCurrentWorkSession,
@@ -25,6 +26,7 @@ import {
 } from "@/lib/api";
 import type {
   CurrentWeather,
+  ForecastWeatherValue,
   HeatwaveImpact,
   LivingWeatherIndex,
   RoutePathPoint,
@@ -51,10 +53,24 @@ type VisitCard = {
   walk: string;
   distance: string;
   riskStatus: string;
-  tone: "safe" | "caution" | "danger";
+  tone: "pending" | "safe" | "caution" | "danger";
   rests: number;
+  plannedVisitMinutes: number;
+  scheduledAt: string;
   latitude: number;
   longitude: number;
+};
+
+type RestExposureContext = {
+  continuousExposureMinutes: number;
+  minutesSinceLastRest: number;
+  totalWalkingMinutes: number;
+};
+
+type AiWeatherInput = {
+  temperature: number;
+  humidity: number;
+  observedAt: string;
 };
 
 const routeMocks = [
@@ -70,10 +86,10 @@ const DEFAULT_LOCATION = { latitude: 37.5739, longitude: 127.0105 };
 const USE_MOCK_LOCATION = process.env.NEXT_PUBLIC_USE_MOCK_LOCATION !== "false";
 
 const fallbackVisits: VisitCard[] = [
-  { scheduleId: -1, visitOrder: 1, time: "10:00", name: "김○○", address: "종로구 창신동 ○○길 00", ...routeMocks[0], ...DEFAULT_LOCATION },
-  { scheduleId: -2, visitOrder: 2, time: "11:30", name: "이○○", address: "종로구 창신동 ○○길 00", ...routeMocks[1], ...DEFAULT_LOCATION },
-  { scheduleId: -3, visitOrder: 3, time: "14:00", name: "박○○", address: "종로구 창신동 ○○길 00", ...routeMocks[2], ...DEFAULT_LOCATION },
-  { scheduleId: -4, visitOrder: 4, time: "15:30", name: "최○○", address: "종로구 창신동 ○○길 00", ...routeMocks[3], ...DEFAULT_LOCATION },
+  { scheduleId: -1, visitOrder: 1, time: "10:00", name: "김○○", address: "종로구 창신동 ○○길 00", plannedVisitMinutes: 40, scheduledAt: new Date().toISOString(), ...routeMocks[0], ...DEFAULT_LOCATION },
+  { scheduleId: -2, visitOrder: 2, time: "11:30", name: "이○○", address: "종로구 창신동 ○○길 00", plannedVisitMinutes: 40, scheduledAt: new Date().toISOString(), ...routeMocks[1], ...DEFAULT_LOCATION },
+  { scheduleId: -3, visitOrder: 3, time: "14:00", name: "박○○", address: "종로구 창신동 ○○길 00", plannedVisitMinutes: 40, scheduledAt: new Date().toISOString(), ...routeMocks[2], ...DEFAULT_LOCATION },
+  { scheduleId: -4, visitOrder: 4, time: "15:30", name: "최○○", address: "종로구 창신동 ○○길 00", plannedVisitMinutes: 40, scheduledAt: new Date().toISOString(), ...routeMocks[3], ...DEFAULT_LOCATION },
 ];
 
 function getBrowserLocation(): Promise<{ latitude: number; longitude: number }> {
@@ -124,7 +140,15 @@ function toVisitCards(schedules: Schedule[]): VisitCard[] {
     address: schedule.visitTarget.address,
     latitude: schedule.visitTarget.latitude,
     longitude: schedule.visitTarget.longitude,
+    plannedVisitMinutes: schedule.plannedVisitMinutes ?? 40,
+    scheduledAt: new Date(
+      `${seoulDateString()}T${schedule.scheduledTime}+09:00`,
+    ).toISOString(),
     ...routeMocks[index % routeMocks.length],
+    // API 응답 전에는 mock 위험도를 실제 AI 판단처럼 표시하지 않습니다.
+    riskStatus: "AI 분석 중",
+    tone: "pending" as const,
+    rests: 0,
   }));
 }
 
@@ -152,19 +176,19 @@ function aiRiskDisplay(result: RestDecisionResponse): Pick<VisitCard, "riskStatu
 function restDecisionRequest(
   visit: VisitCard,
   spots: CoolingSpot[],
-  continuousWalkingMinutes: number,
+  exposure: RestExposureContext,
   nextTravelMinutes = walkingMinutes(visit.walk),
-  weather: CurrentWeather | null = null,
+  weather: AiWeatherInput | null = null,
 ) {
   const distanceToCoolingSpotMeters = nearestCoolingSpotDistance(visit, spots);
   return {
-    continuousWalkingMinutes,
-    totalWalkingMinutes: continuousWalkingMinutes + nextTravelMinutes,
-    minutesSinceLastRest: continuousWalkingMinutes,
+    continuousWalkingMinutes: exposure.continuousExposureMinutes,
+    totalWalkingMinutes: exposure.totalWalkingMinutes + nextTravelMinutes,
+    minutesSinceLastRest: exposure.minutesSinceLastRest,
     recentRestMinutes: 0,
     temperature: weather?.temperature,
     humidity: weather?.humidity,
-    observedAt: new Date().toISOString(),
+    observedAt: weather?.observedAt ?? visit.scheduledAt,
     nextTravelMinutes,
     coolingSpotNearby: distanceToCoolingSpotMeters !== null && distanceToCoolingSpotMeters <= 500,
     distanceToCoolingSpotMeters,
@@ -172,21 +196,26 @@ function restDecisionRequest(
 }
 
 async function applyAiRiskToVisits(visits: VisitCard[], spots: CoolingSpot[]): Promise<VisitCard[]> {
-  const weather = await getCurrentWeather(
-    DEFAULT_LOCATION.latitude,
-    DEFAULT_LOCATION.longitude,
-  ).catch(() => null);
-  let accumulatedMinutes = 0;
+  const [currentResult, hourlyResult] = await Promise.allSettled([
+    getCurrentWeather(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude),
+    getHourlyWeather(
+      DEFAULT_LOCATION.latitude,
+      DEFAULT_LOCATION.longitude,
+      seoulDateString(),
+    ),
+  ]);
+  const currentWeather = currentResult.status === "fulfilled" ? currentResult.value : null;
+  const hourlyForecasts = hourlyResult.status === "fulfilled" ? hourlyResult.value.forecasts : [];
   const requests = visits.map((visit) => {
     const nextTravelMinutes = walkingMinutes(visit.walk);
+    const weather = weatherForVisit(visit, hourlyForecasts, currentWeather);
     const request = evaluateRestDecision(restDecisionRequest(
       visit,
       spots,
-      accumulatedMinutes,
+      restExposureBeforeVisit(visits, visit.visitOrder),
       nextTravelMinutes,
       weather,
     ));
-    accumulatedMinutes += nextTravelMinutes;
     return request;
   });
   const results = await Promise.allSettled(requests);
@@ -194,7 +223,7 @@ async function applyAiRiskToVisits(visits: VisitCard[], spots: CoolingSpot[]): P
     const result = results[index];
     return result.status === "fulfilled"
       ? { ...visit, ...aiRiskDisplay(result.value) }
-      : visit;
+      : { ...visit, riskStatus: "AI 분석 실패", tone: "pending", rests: 0 };
   });
 }
 
@@ -253,10 +282,62 @@ function walkingMinutes(value: string): number {
   return match ? Number(match[0]) : 0;
 }
 
-function exposureBeforeVisit(visits: VisitCard[], visitOrder: number): number {
-  return visits
+function weatherForVisit(
+  visit: VisitCard,
+  forecasts: ForecastWeatherValue[],
+  currentWeather: CurrentWeather | null,
+): AiWeatherInput | null {
+  const scheduledAt = new Date(visit.scheduledAt).getTime();
+  const nearest = forecasts.reduce<ForecastWeatherValue | null>((closest, forecast) => {
+    if (!closest) return forecast;
+    const closestGap = Math.abs(new Date(closest.forecastAt).getTime() - scheduledAt);
+    const forecastGap = Math.abs(new Date(forecast.forecastAt).getTime() - scheduledAt);
+    return forecastGap < closestGap ? forecast : closest;
+  }, null);
+  if (nearest) {
+    const gap = Math.abs(new Date(nearest.forecastAt).getTime() - scheduledAt);
+    if (gap <= 2 * 60 * 60 * 1_000) {
+      return {
+        temperature: nearest.temperature,
+        humidity: nearest.humidity,
+        observedAt: nearest.forecastAt,
+      };
+    }
+  }
+  return currentWeather
+    ? {
+        temperature: currentWeather.temperature,
+        humidity: currentWeather.humidity,
+        observedAt: currentWeather.observedAt,
+      }
+    : null;
+}
+
+function restExposureBeforeVisit(
+  visits: VisitCard[],
+  visitOrder: number,
+): RestExposureContext {
+  let continuousExposureMinutes = 0;
+  let minutesSinceLastRest = 0;
+  let totalWalkingMinutes = 0;
+  const previousVisits = visits
     .filter((visit) => visit.visitOrder < visitOrder)
-    .reduce((total, visit) => total + walkingMinutes(visit.walk), 0);
+    .sort((left, right) => left.visitOrder - right.visitOrder);
+
+  for (const visit of previousVisits) {
+    const travelMinutes = walkingMinutes(visit.walk);
+    continuousExposureMinutes += travelMinutes;
+    totalWalkingMinutes += travelMinutes;
+    minutesSinceLastRest += travelMinutes + visit.plannedVisitMinutes;
+    // 30분 이상 실내 방문은 연속 야외노출을 끊지만 Cooling Spot
+    // 휴식으로 집계하지 않으므로 마지막 휴식 후 경과시간은 유지합니다.
+    if (visit.plannedVisitMinutes >= 30) continuousExposureMinutes = 0;
+  }
+  return { continuousExposureMinutes, minutesSinceLastRest, totalWalkingMinutes };
+}
+
+function exposureBeforeVisit(visits: VisitCard[], visitOrder: number): number {
+  return restExposureBeforeVisit(visits, visitOrder).continuousExposureMinutes;
 }
 
 // 이전 SVG 지도 구현은 비교용으로 보존합니다.
@@ -412,7 +493,7 @@ export default function Home() {
       const decision = await evaluateRestDecision(restDecisionRequest(
         visit,
         coolingSpots,
-        exposureBeforeVisit(visits, visit.visitOrder),
+        restExposureBeforeVisit(visits, visit.visitOrder),
         nextTravelMinutes,
         currentWeather,
       ));
