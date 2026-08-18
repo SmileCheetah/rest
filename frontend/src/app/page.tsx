@@ -28,6 +28,7 @@ import type {
   VisitTarget,
   WorkSession,
 } from "@/types/api";
+import RealMap from "@/components/RealMap";
 
 type Screen = "schedule" | "route" | "guidance" | "complete";
 type Modal = "add" | "menu" | "ai" | "warning" | "spot" | "skip" | null;
@@ -164,7 +165,9 @@ function formatDistance(distanceMeters: number): string {
     : `${distanceMeters}m`;
 }
 
-function Map({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
+// 이전 SVG 지도 구현은 비교용으로 보존합니다.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function SvgMap({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
   const height = moving ? 470 : 450;
   const actualPath = routePathToSvg(route?.path ?? [], height);
   const normalPath = actualPath ?? "M70 355 105 330 110 265 160 250 165 190 235 175 235 120 310 105";
@@ -184,6 +187,11 @@ function Map({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () 
   </div>;
 }
 
+function Map({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
+  const destination = route?.destination ?? { ...DEFAULT_LOCATION, name: "방문지" };
+  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} /></div>;
+}
+
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("schedule");
   const [modal, setModal] = useState<Modal>(null);
@@ -199,9 +207,15 @@ export default function Home() {
   const [activeRoute, setActiveRoute] = useState<RouteSegment | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<number | null>(null);
+  const [scheduleTime, setScheduleTime] = useState("14:30");
+  const [targetSearch, setTargetSearch] = useState("");
   const [apiMessage, setApiMessage] = useState<string | null>(null);
   const [weatherMessage, setWeatherMessage] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+
+  const filteredVisitTargets = visitTargets.filter((target) =>
+    target.name.toLowerCase().includes(targetSearch.trim().toLowerCase()),
+  );
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -319,7 +333,7 @@ export default function Home() {
       await createSchedule({
         visitTargetId: selectedTargetId,
         scheduleDate: seoulDateString(),
-        scheduledTime: "14:30:00",
+        scheduledTime: `${scheduleTime}:00`,
         visitOrder: Math.max(0, ...visits.map((visit) => visit.visitOrder)) + 1,
         plannedVisitMinutes: 40,
       });
@@ -397,7 +411,7 @@ export default function Home() {
           {apiMessage && <button type="button" className="api-message" onClick={() => void loadDashboard()}>{apiMessage}</button>}
           <div className="section-header"><div><h2>오늘의 방문</h2><span>{completed.length} / {visits.length} 완료</span></div><button className="small-button" disabled={isBusy} onClick={() => setModal("add")}>+ 대상자 추가</button></div>
           <div className="visit-list">{visits.map((visit) => <article className={`visit-card ${completed.includes(visit.scheduleId) ? "done" : ""}`} key={visit.scheduleId}>
-            <div className="visit-head"><span className="visit-index">{visit.visitOrder}</span><div className="visit-main"><div><strong>{visit.time}</strong><span>{visit.name}</span></div><p>{visit.address}</p></div><button className={`check-btn ${completed.includes(visit.scheduleId) ? "checked" : ""}`} disabled={isBusy} onClick={() => void handleVisitComplete(visit.scheduleId)} aria-label="방문 완료">{completed.includes(visit.scheduleId) && "✓"}</button><button className="icon-btn sm" onClick={() => {setSelectedScheduleId(visit.scheduleId); setModal("menu");}} aria-label="더보기"><Icon name="more"/></button></div>
+            <div className="visit-head"><span className="visit-index">{visit.visitOrder}</span><div className="visit-main"><div><strong>{visit.time}</strong><span>{visit.name}</span></div><p>{visit.address}</p></div><button className={`check-btn ${completed.includes(visit.scheduleId) ? "checked" : ""}`} disabled={isBusy} onClick={() => void handleVisitComplete(visit.scheduleId)} aria-label="방문 완료">{completed.includes(visit.scheduleId) && "✓"}</button>{!completed.includes(visit.scheduleId) && <button className="icon-btn sm" onClick={() => {setSelectedScheduleId(visit.scheduleId); setModal("menu");}} aria-label="더보기"><Icon name="more"/></button>}</div>
             <div className="route-meta">도보 {visit.walk}<span>•</span>{visit.distance}</div><div className="visit-foot"><span className={`badge ${visit.tone}`}>{visit.riskStatus}</span><span className="ai-rec"><strong>추천 휴식 {visit.rests}회</strong><span className="ai-label">AI 분석</span></span></div>
           </article>)}</div>
         </div>
@@ -421,7 +435,7 @@ export default function Home() {
 
       {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 72}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 2}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 15}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>15분</strong><small>안전하게 이동했어요!</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2><p>창신동 주민센터</p><p>동부여성문화센터</p></section><button className="button teal" onClick={() => setScreen("schedule")}>확인</button></div>}
 
-      {modal && <><div className="dim" onClick={() => setModal(null)}/>{modal === "add" && <section className="bottom-sheet tall"><div className="handle"/><div className="sheet-header"><h2>대상자 추가</h2><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>오늘 방문할 대상자를 선택해주세요.</p><label className="search-box"><Icon name="search"/><input placeholder="이름 검색"/></label><div className="chip-grid">{visitTargets.map(target => <button key={target.visitTargetId} onClick={() => setSelectedTargetId(target.visitTargetId)} className={selectedTargetId === target.visitTargetId ? "active" : ""}>{target.name}</button>)}</div><label className="form-label">방문 예정 시간</label><div className="time-input"><span>14</span><span>:</span><span>30</span></div><button className="button primary" disabled={isBusy || selectedTargetId === null} onClick={() => void handleAddSchedule()}>일정에 추가</button></section>}
+      {modal && <><div className="dim" onClick={() => setModal(null)}/>{modal === "add" && <section className="bottom-sheet tall"><div className="handle"/><div className="sheet-header"><h2>대상자 추가</h2><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>오늘 방문할 대상자를 선택해주세요.</p><label className="search-box"><Icon name="search"/><input placeholder="이름 검색" value={targetSearch} onChange={(event) => setTargetSearch(event.target.value)} /></label><div className="chip-grid">{filteredVisitTargets.map(target => <button key={target.visitTargetId} onClick={() => setSelectedTargetId(target.visitTargetId)} className={selectedTargetId === target.visitTargetId ? "active" : ""}>{target.name}</button>)}</div>{filteredVisitTargets.length === 0 && <p className="empty-state">검색 결과가 없습니다.</p>}<label className="form-label" htmlFor="schedule-time">방문 예정 시간</label><div className="time-input"><input id="schedule-time" type="time" value={scheduleTime} onChange={(event) => setScheduleTime(event.target.value)} required/></div><button className="button primary" disabled={isBusy || selectedTargetId === null || !scheduleTime} onClick={() => void handleAddSchedule()}>일정에 추가</button></section>}
       {modal === "menu" && <div className="context-menu"><button disabled={isBusy} onClick={() => void handleDeleteSchedule()}>일정에서 삭제</button></div>}
       {modal === "ai" && <section className="dialog"><div className="dialog-icon"><Icon name="info"/></div><h2>AI 분석 근거</h2><p>다음 기준으로 휴식이 필요하다고 판단했어요.</p><ul><li>체감온도 36°C로 높음</li><li>연속 야외 이동시간이 길어지고 있음</li><li>다음 구간까지 이동거리 1.4km</li></ul><button className="button primary" onClick={() => setModal(null)}>확인</button></section>}
       {modal === "warning" && <section className="dialog danger-dialog"><div className="dialog-icon danger"><Icon name="alert"/></div><h2>휴식이 필요한 구간이에요</h2><p>일반 경로는 휴식 없이 이동해야 해요. 그래도 일반 경로로 이동하시겠어요?</p><div className="button-row"><button className="button secondary" onClick={() => setModal(null)}>취소</button><button className="button danger-button" onClick={() => {setModal(null); setScreen("guidance");}}>일반 경로로 이동</button></div></section>}
