@@ -41,5 +41,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Generated ML datasets and model artifacts
+backend/artifacts/
+backend/data/generated/
+
 # Deployment tools
 .vercel/

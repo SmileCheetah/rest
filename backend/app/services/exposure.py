@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -8,6 +9,22 @@ class ExposureState(BaseModel):
     daily_exposure_minutes: int = Field(0, ge=0)
     daily_rest_minutes: int = Field(0, ge=0)
     current_rest_minutes: int = Field(0, ge=0)
+
+
+class ExposureEvent(BaseModel):
+    """One activity applied to an exposure state."""
+
+    activity_type: Literal["MOVING", "VISITING", "RESTING", "IDLE"]
+    duration_minutes: int = Field(..., gt=0)
+    is_outdoor: bool = True
+
+
+class ExposureProjection(BaseModel):
+    """Result of applying an ordered activity sequence."""
+
+    state: ExposureState
+    rest_completed: bool
+    reasons: list[str]
 
 
 def update_exposure(
@@ -38,3 +55,27 @@ def update_exposure(
         next_state.current_rest_minutes = 0
         reasons.append("실내 활동으로 야외 노출에 반영하지 않았습니다.")
     return next_state, rest_completed, reasons
+
+
+def project_exposure(
+    state: ExposureState,
+    events: Sequence[ExposureEvent],
+) -> ExposureProjection:
+    """Apply movement, visit, and rest events in the supplied order."""
+    next_state = state
+    rest_completed = False
+    reasons: list[str] = []
+    for event in events:
+        next_state, completed, event_reasons = update_exposure(
+            next_state,
+            event.activity_type,
+            event.duration_minutes,
+            event.is_outdoor,
+        )
+        rest_completed = rest_completed or completed
+        reasons.extend(event_reasons)
+    return ExposureProjection(
+        state=next_state,
+        rest_completed=rest_completed,
+        reasons=reasons,
+    )
