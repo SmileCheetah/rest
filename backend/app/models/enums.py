@@ -19,8 +19,8 @@ class RouteType(StrEnum):
 
 
 class RiskLevel(StrEnum):
-    SAFE = "SAFE"
-    CAUTION = "CAUTION"
+    MOVE_POSSIBLE = "MOVE_POSSIBLE"
+    REST_RECOMMENDED = "REST_RECOMMENDED"
     REST_REQUIRED = "REST_REQUIRED"
 
 

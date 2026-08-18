@@ -32,6 +32,7 @@ __pycache__/
 .DS_Store
 /output/
 /ai-test/output/
+/ai-test/comparison-output/
 Thumbs.db
 
 # Logs
@@ -39,6 +40,10 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Generated ML datasets and model artifacts
+backend/artifacts/
+backend/data/generated/
 
 # Deployment tools
 .vercel/
