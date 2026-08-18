@@ -2,7 +2,6 @@ from fastapi import APIRouter
 
 from app.schemas.rest_decision import RestDecisionRequest, RestDecisionResponse
 from app.services.rest_decision import RestDecisionService
-from app.services.rest_need import calculate_rest_need
 from app.services.rest_weather import RestWeatherUnavailableError, resolve_rest_weather
 
 router = APIRouter(prefix="/rest", tags=["rest-decision"])
@@ -21,13 +20,16 @@ async def evaluate_rest_decision(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=str(exc),
         ) from exc
-    score = calculate_rest_need(weather.request)
-    decision, source = await RestDecisionService().decide(weather.request, score)
+    decision_service = RestDecisionService()
+    model_prediction = decision_service.predict_model_status(weather.request, weather.wbgt)
+    decision, source = await decision_service.decide(
+        weather.request,
+        None,
+        model_prediction,
+    )
     return RestDecisionResponse(
-        restNeedScore=score.score,
-        restNeedLevel=score.level,
-        details=score.details,
         decision=decision,
+        restStatusPrediction=model_prediction,
         decisionSource=source,
         weatherSource=weather.source,
     )

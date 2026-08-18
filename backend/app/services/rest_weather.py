@@ -10,6 +10,7 @@ from app.services.asos import (
     AsosProviderError,
     get_asos_hourly,
 )
+from app.services.weather_risk import calculate_weather_risk, station_coordinates
 
 
 class RestWeatherUnavailableError(RuntimeError):
@@ -20,6 +21,7 @@ class RestWeatherUnavailableError(RuntimeError):
 class RestWeatherResult:
     request: RestDecisionRequest
     source: str
+    wbgt: float | None = None
 
 
 async def resolve_rest_weather(request: RestDecisionRequest) -> RestWeatherResult:
@@ -34,6 +36,32 @@ async def resolve_rest_weather(request: RestDecisionRequest) -> RestWeatherResul
             raise RestWeatherUnavailableError(
                 "ASOS observation is missing temperature or humidity"
             )
+        coordinates = station_coordinates(request.station_id)
+        # A caller-provided WBGT is an explicit fallback; ASOS-derived WBGT
+        # replaces it whenever the required observation fields are available.
+        wbgt = request.wbgt
+        if (
+            observation.wind_speed is not None
+            and observation.solar_radiation is not None
+            and observation.surface_pressure is not None
+            and coordinates is not None
+        ):
+            try:
+                _, _, basis, input_value, _, _ = calculate_weather_risk(
+                    temperature=observation.temperature,
+                    humidity=observation.humidity,
+                    wind_speed=observation.wind_speed,
+                    observed_at=observation.observed_at,
+                    wbgt=None,
+                    solar_radiation=observation.solar_radiation,
+                    surface_pressure=observation.surface_pressure,
+                    latitude=coordinates[0],
+                    longitude=coordinates[1],
+                )
+                if basis == "WBGT":
+                    wbgt = input_value
+            except (ValueError, TypeError, OverflowError):
+                wbgt = None
         return RestWeatherResult(
             request=request.model_copy(
                 update={
@@ -44,6 +72,7 @@ async def resolve_rest_weather(request: RestDecisionRequest) -> RestWeatherResul
                 }
             ),
             source="KMA_ASOS",
+            wbgt=wbgt,
         )
     except (
         AsosConfigurationError,
@@ -55,7 +84,7 @@ async def resolve_rest_weather(request: RestDecisionRequest) -> RestWeatherResul
             raise RestWeatherUnavailableError(
                 "ASOS weather is unavailable and request weather fallback is incomplete"
             ) from exc
-        return RestWeatherResult(request=request, source="REQUEST_FALLBACK")
+        return RestWeatherResult(request=request, source="REQUEST_FALLBACK", wbgt=request.wbgt)
 
 
 def _nearest_observation(

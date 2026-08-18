@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 RestNeedLevel = Literal["LOW", "MEDIUM", "HIGH"]
 RestTiming = Literal["NOW", "AFTER_NEXT_VISIT", "SOON", "NOT_NEEDED"]
 HeatLevel = Literal["LOW", "MEDIUM", "HIGH"]
+RestStatus = Literal["MOVABLE", "REST_RECOMMENDED", "REST_BEFORE_NEXT_VISIT"]
 
 
 class RestDecisionRequest(BaseModel):
@@ -18,6 +19,7 @@ class RestDecisionRequest(BaseModel):
     station_id: int = Field(default=108, ge=1, alias="stationId")
     temperature: float | None = None
     humidity: float | None = Field(default=None, ge=0, le=100)
+    wbgt: float | None = Field(default=None, ge=-20, le=60)
     wind_speed: float | None = Field(default=None, ge=0, alias="windSpeed")
     observed_at: datetime = Field(..., alias="observedAt")
     next_travel_minutes: int = Field(..., ge=0, alias="nextTravelMinutes")
@@ -52,11 +54,15 @@ class RestDecision(BaseModel):
 class RestDecisionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    rest_need_score: int = Field(alias="restNeedScore")
-    rest_need_level: RestNeedLevel = Field(alias="restNeedLevel")
-    details: RestScoreDetails
+    rest_need_score: int | None = Field(default=None, alias="restNeedScore")
+    rest_need_level: RestNeedLevel | None = Field(default=None, alias="restNeedLevel")
+    details: RestScoreDetails | None = None
     decision: RestDecision
-    decision_source: Literal["AI", "FALLBACK"] = Field(alias="decisionSource")
+    rest_status_prediction: dict[str, object] | None = Field(
+        default=None,
+        alias="restStatusPrediction",
+    )
+    decision_source: Literal["AI", "MODEL", "FALLBACK"] = Field(alias="decisionSource")
     weather_source: Literal["KMA_ASOS", "REQUEST_FALLBACK"] = Field(
         alias="weatherSource"
     )
