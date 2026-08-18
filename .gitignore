@@ -32,6 +32,7 @@ __pycache__/
 .DS_Store
 /output/
 /ai-test/output/
+/ai-test/comparison-output/
 Thumbs.db
 
 # Logs
