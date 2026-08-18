@@ -15,6 +15,11 @@ const DEFAULT_LOCATION = { latitude: 37.5739, longitude: 127.0105 };
 /** 실제 타일 지도와 경로/마커를 그리는 클라이언트 전용 지도입니다. */
 export default function RealMap({ route, destination, onSpot }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const onSpotRef = useRef(onSpot);
+
+  useEffect(() => {
+    onSpotRef.current = onSpot;
+  }, [onSpot]);
 
   useEffect(() => {
     let map: import("leaflet").Map | undefined;
@@ -46,7 +51,7 @@ export default function RealMap({ route, destination, onSpot }: Props) {
       spots.forEach((spot, index) => {
         const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon }).addTo(map!);
         marker.bindTooltip(spot.name);
-        if (index === 0 && onSpot) marker.on("click", onSpot);
+        if (index === 0) marker.on("click", () => onSpotRef.current?.());
       });
 
       const path = route?.path?.map((point) => [point.latitude, point.longitude] as [number, number]) ?? [];
@@ -63,7 +68,7 @@ export default function RealMap({ route, destination, onSpot }: Props) {
       cancelled = true;
       map?.remove();
     };
-  }, [destination.latitude, destination.longitude, destination.name, onSpot, route]);
+  }, [destination.latitude, destination.longitude, destination.name, route]);
 
   return <div ref={containerRef} className="real-map" aria-label="현재 위치와 방문지 지도" />;
 }
