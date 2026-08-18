@@ -721,16 +721,20 @@ export default function Home() {
     ?? (risk?.risk_level === "MOVE_POSSIBLE"
       ? "현재 구간은 휴식이 필요하지 않아요."
       : "AI 분석 후 추천 경로를 표시합니다.");
-  const riskBadge = aiRouteDisplay?.tone ?? (risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe");
-  const riskLabel = aiRouteDisplay?.riskStatus ?? (risk?.risk_level === "REST_REQUIRED" ? "다음 방문 전 휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권유" : "이동 가능");
-  // 경로 추천 API와 로컬 AI 응답 중 하나라도 '즉시 휴식 필요'로 판단하면
-  // 일반 경로 선택 시 안전 확인을 거칩니다. 안전경로 후보가 없더라도
-  // 휴식 필요 경고 자체는 생략하지 않습니다.
+  // 일정 미리보기·실시간 AI·경로 추천 중 하나라도 최고 위험 단계이면
+  // 해당 이동이 끝날 때까지 상태를 낮추지 않습니다.
   const requiresRestBeforeNextVisit = Boolean(
-    risk?.risk_level === "REST_REQUIRED"
+    activeVisit.riskStatus === "다음 방문 전 휴식 필요"
+      || risk?.risk_level === "REST_REQUIRED"
       || activeRestDecision?.restStatusPrediction?.decision === "REST_BEFORE_NEXT_VISIT"
       || activeRestDecision?.decision.restTiming === "NOW",
   );
+  const riskBadge = requiresRestBeforeNextVisit
+    ? "danger"
+    : aiRouteDisplay?.tone ?? (risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe");
+  const riskLabel = requiresRestBeforeNextVisit
+    ? "다음 방문 전 휴식 필요"
+    : aiRouteDisplay?.riskStatus ?? (risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권유" : "이동 가능");
   const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
   const displayedHeatTone = heatwaveImpact
     ? getHeatwaveTone(heatwaveImpact.level)
