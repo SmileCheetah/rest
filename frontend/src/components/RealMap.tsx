@@ -17,6 +17,7 @@ const DEFAULT_LOCATION = { latitude: 37.5739, longitude: 127.0105 };
 export default function RealMap({ route, destination, onSpot, spots = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onSpotRef = useRef(onSpot);
+  const mapRef = useRef<import("leaflet").Map | null>(null);
 
   useEffect(() => {
     onSpotRef.current = onSpot;
@@ -30,7 +31,17 @@ export default function RealMap({ route, destination, onSpot, spots = [] }: Prop
       if (cancelled || !containerRef.current) return;
       const origin = route?.origin ?? DEFAULT_LOCATION;
       const destinationPoint: [number, number] = [destination.latitude, destination.longitude];
-      map = L.map(containerRef.current, { zoomControl: false }).setView(destinationPoint, 16);
+      // 빠른 화면 전환 중 이전 지도 애니메이션이 남으면 Leaflet 내부 위치값이
+      // 제거된 map pane을 참조할 수 있어, 새 지도를 만들기 전에 확실히 정리한다.
+      mapRef.current?.remove();
+      mapRef.current = null;
+      map = L.map(containerRef.current, {
+        zoomControl: false,
+        zoomAnimation: false,
+        fadeAnimation: false,
+        markerZoomAnimation: false,
+      }).setView(destinationPoint, 16, { animate: false });
+      mapRef.current = map;
       L.control.zoom({ position: "topright" }).addTo(map);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors",
@@ -65,16 +76,17 @@ export default function RealMap({ route, destination, onSpot, spots = [] }: Prop
         L.polyline(path, { color: "#1766e8", weight: 6, opacity: 0.9 }).addTo(map);
         // 쉼터 전체를 bounds에 포함하면 지도가 지나치게 축소되므로
         // 처음에는 이동 경로와 방문지 주변만 보이도록 한다.
-        map.fitBounds(L.latLngBounds(path), { padding: [36, 36], maxZoom: 17 });
+        map.fitBounds(L.latLngBounds(path), { padding: [36, 36], maxZoom: 17, animate: false });
       } else {
         L.polyline([[origin.latitude, origin.longitude], destinationPoint], { color: "#727b87", weight: 5, dashArray: "8 8" }).addTo(map);
-        map.fitBounds(L.latLngBounds([[origin.latitude, origin.longitude], destinationPoint]), { padding: [36, 36], maxZoom: 17 });
+        map.fitBounds(L.latLngBounds([[origin.latitude, origin.longitude], destinationPoint]), { padding: [36, 36], maxZoom: 17, animate: false });
       }
     });
 
     return () => {
       cancelled = true;
       map?.remove();
+      if (mapRef.current === map) mapRef.current = null;
     };
   }, [destination.latitude, destination.longitude, destination.name, route, spots]);
 
