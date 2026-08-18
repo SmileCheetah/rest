@@ -707,7 +707,6 @@ export default function Home() {
     : null;
   const displayedRoute = selectedRoute === "safe" && safeRoute ? safeRoute : activeRoute;
   const isSafeRouteSelected = selectedRoute === "safe" && Boolean(safeRoute);
-  const hasRecommendedSafeRoute = Boolean(safeRoute);
   const risk = recommendedRoute?.risk;
   const recommendedSpot = recommendedRoute?.safeRoute?.coolingSpot ?? null;
   const aiRouteDisplay = activeRestDecision ? aiRiskDisplay(activeRestDecision) : null;
@@ -724,7 +723,14 @@ export default function Home() {
       : "AI 분석 후 추천 경로를 표시합니다.");
   const riskBadge = aiRouteDisplay?.tone ?? (risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe");
   const riskLabel = aiRouteDisplay?.riskStatus ?? (risk?.risk_level === "REST_REQUIRED" ? "다음 방문 전 휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권유" : "이동 가능");
-  const requiresRestBeforeNextVisit = riskLabel === "다음 방문 전 휴식 필요";
+  // 경로 추천 API와 로컬 AI 응답 중 하나라도 '즉시 휴식 필요'로 판단하면
+  // 일반 경로 선택 시 안전 확인을 거칩니다. 안전경로 후보가 없더라도
+  // 휴식 필요 경고 자체는 생략하지 않습니다.
+  const requiresRestBeforeNextVisit = Boolean(
+    risk?.risk_level === "REST_REQUIRED"
+      || activeRestDecision?.restStatusPrediction?.decision === "REST_BEFORE_NEXT_VISIT"
+      || activeRestDecision?.decision.restTiming === "NOW",
+  );
   const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
   const displayedHeatTone = heatwaveImpact
     ? getHeatwaveTone(heatwaveImpact.level)
@@ -732,7 +738,7 @@ export default function Home() {
 
   const startRoute = () => {
     setSkipReasonRecorded(false);
-    if (selectedRoute === "normal" && hasRecommendedSafeRoute && requiresRestBeforeNextVisit) {
+    if (selectedRoute === "normal" && requiresRestBeforeNextVisit) {
       setModal("warning");
       return;
     }
@@ -740,7 +746,7 @@ export default function Home() {
   };
 
   const handleGuidanceComplete = () => {
-    if (selectedRoute === "normal" && hasRecommendedSafeRoute && requiresRestBeforeNextVisit && !skipReasonRecorded) {
+    if (selectedRoute === "normal" && requiresRestBeforeNextVisit && !skipReasonRecorded) {
       setFinishAfterSkipSurvey(true);
       setModal("skip");
       return;
