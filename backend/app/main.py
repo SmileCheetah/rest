@@ -11,6 +11,7 @@ from app.routers.schedules import router as schedules_router
 from app.routers.visit_targets import router as visit_targets_router
 from app.routers.weather import router as weather_router
 from app.routers.work_sessions import router as work_sessions_router
+from app.routers.risk import router as risk_router
 
 app = FastAPI(
     title="폭염 이동 안전 지원 API",
@@ -33,6 +34,7 @@ app.include_router(weather_router)
 app.include_router(heatwave_router)
 app.include_router(routes_router)
 app.include_router(route_segments_router)
+app.include_router(risk_router)
 
 
 @app.get("/health", tags=["system"])
