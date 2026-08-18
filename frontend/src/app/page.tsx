@@ -174,6 +174,17 @@ function formatDistance(distanceMeters: number): string {
     : `${distanceMeters}m`;
 }
 
+function walkingMinutes(value: string): number {
+  const match = value.match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function exposureBeforeVisit(visits: VisitCard[], visitOrder: number): number {
+  return visits
+    .filter((visit) => visit.visitOrder < visitOrder)
+    .reduce((total, visit) => total + walkingMinutes(visit.walk), 0);
+}
+
 // 이전 SVG 지도 구현은 비교용으로 보존합니다.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function SvgMap({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
@@ -334,7 +345,7 @@ export default function Home() {
           try {
             const recommendation = await recommendRoute(
               route.routeSegmentId,
-              session.maxContinuousExposureMinutes,
+              exposureBeforeVisit(visits, next.nextSchedule.visitOrder),
             );
             setRecommendedRoute(recommendation);
             setSelectedRoute(recommendation.safeRoute ? "safe" : "normal");
@@ -384,7 +395,7 @@ export default function Home() {
       });
       const recommendation = await recommendRoute(
         route.routeSegmentId,
-        session.maxContinuousExposureMinutes,
+        exposureBeforeVisit(visits, visit.visitOrder),
       );
       setWorkSession(session);
       setActiveRoute(route);
