@@ -14,52 +14,52 @@ from app.time_utils import seoul_today
 
 VISIT_TARGETS: tuple[dict[str, Any], ...] = (
     {
-        "name": "김영희",
-        "address": "서울특별시 종로구 창신동 데모 주소 1",
-        "latitude": Decimal("37.5747100"),
-        "longitude": Decimal("127.0114200"),
+        "name": "김순자",
+        "address": "서울특별시 종로구 종로53길 22-5",
+        "latitude": Decimal("37.5735761"),
+        "longitude": Decimal("127.0138082"),
     },
     {
-        "name": "이정수",
-        "address": "서울특별시 종로구 창신동 데모 주소 2",
-        "latitude": Decimal("37.5751800"),
-        "longitude": Decimal("127.0122600"),
+        "name": "이영자",
+        "address": "서울특별시 종로구 종로53길 30",
+        "latitude": Decimal("37.5737402"),
+        "longitude": Decimal("127.0134561"),
     },
     {
-        "name": "박순자",
-        "address": "서울특별시 종로구 창신동 데모 주소 3",
-        "latitude": Decimal("37.5739200"),
-        "longitude": Decimal("127.0130500"),
+        "name": "박종수",
+        "address": "서울특별시 종로구 창신4길 11",
+        "latitude": Decimal("37.5735769"),
+        "longitude": Decimal("127.0099609"),
     },
     {
-        "name": "최동호",
-        "address": "서울특별시 종로구 창신동 데모 주소 4",
-        "latitude": Decimal("37.5729800"),
-        "longitude": Decimal("127.0118900"),
+        "name": "최정숙",
+        "address": "서울특별시 종로구 창신4길 22",
+        "latitude": Decimal("37.5736246"),
+        "longitude": Decimal("127.0093361"),
     },
     {
-        "name": "정미숙",
-        "address": "서울특별시 종로구 창신동 데모 주소 5",
-        "latitude": Decimal("37.5761200"),
-        "longitude": Decimal("127.0107600"),
+        "name": "윤태호",
+        "address": "서울특별시 종로구 창신6가길 9",
+        "latitude": Decimal("37.5750676"),
+        "longitude": Decimal("127.0117088"),
     },
     {
-        "name": "강병철",
-        "address": "서울특별시 종로구 창신동 데모 주소 6",
-        "latitude": Decimal("37.5743600"),
-        "longitude": Decimal("127.0099300"),
+        "name": "우말순",
+        "address": "서울특별시 종로구 지봉로 77-6",
+        "latitude": Decimal("37.5770470"),
+        "longitude": Decimal("127.0149481"),
     },
     {
-        "name": "윤정희",
-        "address": "서울특별시 종로구 창신동 데모 주소 7",
-        "latitude": Decimal("37.5734100"),
-        "longitude": Decimal("127.0105200"),
+        "name": "정병철",
+        "address": "서울특별시 종로구 지봉로13길 64-4",
+        "latitude": Decimal("37.5778079"),
+        "longitude": Decimal("127.0127604"),
     },
     {
-        "name": "한기수",
-        "address": "서울특별시 종로구 창신동 데모 주소 8",
-        "latitude": Decimal("37.5756200"),
-        "longitude": Decimal("127.0134800"),
+        "name": "한금",
+        "address": "서울특별시 종로구 창신11길 68",
+        "latitude": Decimal("37.5770667"),
+        "longitude": Decimal("127.0117850"),
     },
 )
 
@@ -153,26 +153,26 @@ COOLING_SPOTS: tuple[dict[str, Any], ...] = (
 
 TODAY_SCHEDULES: tuple[dict[str, Any], ...] = (
     {
-        "visit_target_name": "김영희",
-        "scheduled_time": time(9, 0),
+        "visit_target_name": "김순자",
+        "scheduled_time": time(10, 0),
         "visit_order": 1,
         "planned_visit_minutes": 40,
     },
     {
-        "visit_target_name": "이정수",
-        "scheduled_time": time(10, 30),
+        "visit_target_name": "이영자",
+        "scheduled_time": time(11, 0),
         "visit_order": 2,
         "planned_visit_minutes": 40,
     },
     {
-        "visit_target_name": "박순자",
-        "scheduled_time": time(13, 0),
+        "visit_target_name": "박종수",
+        "scheduled_time": time(12, 0),
         "visit_order": 3,
         "planned_visit_minutes": 40,
     },
     {
-        "visit_target_name": "최동호",
-        "scheduled_time": time(15, 0),
+        "visit_target_name": "최정숙",
+        "scheduled_time": time(14, 0),
         "visit_order": 4,
         "planned_visit_minutes": 40,
     },
@@ -181,19 +181,17 @@ TODAY_SCHEDULES: tuple[dict[str, Any], ...] = (
 
 async def seed_visit_targets() -> tuple[int, int]:
     async with AsyncSessionLocal() as session, session.begin():
-        names = [item["name"] for item in VISIT_TARGETS]
-        existing_names = set(
-            (await session.execute(select(VisitTarget.name).where(VisitTarget.name.in_(names))))
-            .scalars()
-            .all()
-        )
-        new_items = [
-            VisitTarget(**item)
-            for item in VISIT_TARGETS
-            if item["name"] not in existing_names
-        ]
+        existing = list((await session.execute(select(VisitTarget).order_by(VisitTarget.id))).scalars().all())
+        new_items = []
+        for index, item in enumerate(VISIT_TARGETS):
+            if index < len(existing):
+                # 기존 개발용 mock 8명도 새 창신동 데이터로 갱신합니다.
+                for field, value in item.items():
+                    setattr(existing[index], field, value)
+            else:
+                new_items.append(VisitTarget(**item))
         session.add_all(new_items)
-        return len(new_items), len(VISIT_TARGETS) - len(new_items)
+        return len(new_items), len(existing)
 
 
 async def seed_cooling_spots() -> tuple[int, int]:
@@ -264,6 +262,18 @@ async def seed_today_schedules() -> tuple[int, int, int, int, int]:
             .scalars()
             .all()
         )
+        existing_schedules = (
+            await session.execute(
+                select(Schedule).where(Schedule.work_session_id == work_session.id)
+            )
+        ).scalars().all()
+        schedule_by_order = {schedule.visit_order: schedule for schedule in existing_schedules}
+        for item in TODAY_SCHEDULES:
+            schedule = schedule_by_order.get(item["visit_order"])
+            if schedule is not None:
+                schedule.visit_target_id = target_ids_by_name[item["visit_target_name"]]
+                schedule.scheduled_time = item["scheduled_time"]
+                schedule.planned_visit_minutes = item["planned_visit_minutes"]
         new_schedules = [
             Schedule(
                 work_session_id=work_session.id,

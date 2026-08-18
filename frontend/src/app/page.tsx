@@ -28,6 +28,7 @@ import type {
   VisitTarget,
   WorkSession,
 } from "@/types/api";
+import RealMap from "@/components/RealMap";
 
 type Screen = "schedule" | "route" | "guidance" | "complete";
 type Modal = "add" | "menu" | "ai" | "warning" | "spot" | "skip" | null;
@@ -164,7 +165,9 @@ function formatDistance(distanceMeters: number): string {
     : `${distanceMeters}m`;
 }
 
-function Map({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
+// 이전 SVG 지도 구현은 비교용으로 보존합니다.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function SvgMap({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
   const height = moving ? 470 : 450;
   const actualPath = routePathToSvg(route?.path ?? [], height);
   const normalPath = actualPath ?? "M70 355 105 330 110 265 160 250 165 190 235 175 235 120 310 105";
@@ -182,6 +185,11 @@ function Map({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () 
     </svg>
     {!moving && <><div className="map-legend"><span><i className="line-normal"/>일반 경로 {route ? `${route.walkingMinutes}분 (${formatDistance(route.distanceMeters)})` : "계산 전"}</span><span><i className="line-safe"/>안전 경로 22분 (1.4km)</span></div><button className="map-tag" onClick={onSpot}>추천 쉼터</button></>}
   </div>;
+}
+
+function Map({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
+  const destination = route?.destination ?? { ...DEFAULT_LOCATION, name: "방문지" };
+  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} /></div>;
 }
 
 export default function Home() {
@@ -403,7 +411,7 @@ export default function Home() {
           {apiMessage && <button type="button" className="api-message" onClick={() => void loadDashboard()}>{apiMessage}</button>}
           <div className="section-header"><div><h2>오늘의 방문</h2><span>{completed.length} / {visits.length} 완료</span></div><button className="small-button" disabled={isBusy} onClick={() => setModal("add")}>+ 대상자 추가</button></div>
           <div className="visit-list">{visits.map((visit) => <article className={`visit-card ${completed.includes(visit.scheduleId) ? "done" : ""}`} key={visit.scheduleId}>
-            <div className="visit-head"><span className="visit-index">{visit.visitOrder}</span><div className="visit-main"><div><strong>{visit.time}</strong><span>{visit.name}</span></div><p>{visit.address}</p></div><button className={`check-btn ${completed.includes(visit.scheduleId) ? "checked" : ""}`} disabled={isBusy} onClick={() => void handleVisitComplete(visit.scheduleId)} aria-label="방문 완료">{completed.includes(visit.scheduleId) && "✓"}</button><button className="icon-btn sm" onClick={() => {setSelectedScheduleId(visit.scheduleId); setModal("menu");}} aria-label="더보기"><Icon name="more"/></button></div>
+            <div className="visit-head"><span className="visit-index">{visit.visitOrder}</span><div className="visit-main"><div><strong>{visit.time}</strong><span>{visit.name}</span></div><p>{visit.address}</p></div><button className={`check-btn ${completed.includes(visit.scheduleId) ? "checked" : ""}`} disabled={isBusy} onClick={() => void handleVisitComplete(visit.scheduleId)} aria-label="방문 완료">{completed.includes(visit.scheduleId) && "✓"}</button>{!completed.includes(visit.scheduleId) && <button className="icon-btn sm" onClick={() => {setSelectedScheduleId(visit.scheduleId); setModal("menu");}} aria-label="더보기"><Icon name="more"/></button>}</div>
             <div className="route-meta">도보 {visit.walk}<span>•</span>{visit.distance}</div><div className="visit-foot"><span className={`badge ${visit.tone}`}>{visit.riskStatus}</span><span className="ai-rec"><strong>추천 휴식 {visit.rests}회</strong><span className="ai-label">AI 분석</span></span></div>
           </article>)}</div>
         </div>
