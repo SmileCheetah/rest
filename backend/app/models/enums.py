@@ -9,6 +9,7 @@ class WorkSessionStatus(StrEnum):
 
 class ScheduleStatus(StrEnum):
     PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
 
 
