@@ -8,6 +8,9 @@ from typing import Any
 import numpy as np
 from earthkit.meteo.solar.array import cos_solar_zenith_angle_integrated
 from thermofeel import calculate_relative_humidity_percent
+from thermofeel.approximations import approximate_fdir_erbs
+
+from app.schemas.asos import AsosHourlyResponse
 
 
 ERA5_VARIABLE_ALIASES = {
@@ -124,6 +127,70 @@ def load_era5_netcdf(
         solar_radiation=solar_radiation,
         direct_solar_fraction=direct_fraction,
         surface_pressure=pressure_pa / 100.0,
+        cosine_solar_zenith=cosine_solar_zenith,
+    )
+    _validate_observations(result)
+    return result
+
+
+def asos_to_weather_observations(
+    response: AsosHourlyResponse,
+    *,
+    latitude: float,
+    longitude: float,
+) -> WeatherObservations:
+    """Convert KMA ASOS hourly data into Liljegren input columns.
+
+    ASOS provides global hourly radiation (icsr), not direct radiation. The
+    direct component is therefore estimated with the Erbs model for labels.
+    """
+    rows = [
+        item
+        for item in response.observations
+        if None not in (
+            item.temperature,
+            item.humidity,
+            item.wind_speed,
+            item.solar_radiation,
+            item.surface_pressure,
+        )
+    ]
+    if len(rows) < 10:
+        raise ValueError("at least 10 complete ASOS observations are required")
+
+    observed_at = np.array([item.observed_at for item in rows], dtype=object)
+    solar_radiation = np.array([item.solar_radiation for item in rows], dtype=float)
+    utc_times = [value.astimezone(UTC) for value in observed_at]
+    cosine_solar_zenith = np.array(
+        [
+            _hourly_cosine_solar_zenith(value, latitude, longitude)
+            for value in utc_times
+        ],
+        dtype=float,
+    )
+    direct_radiation = np.where(
+        solar_radiation > 0,
+        np.asarray(approximate_fdir_erbs(solar_radiation, cosine_solar_zenith)),
+        0.0,
+    )
+    direct_fraction = np.clip(
+        np.divide(
+            direct_radiation,
+            solar_radiation,
+            out=np.zeros_like(solar_radiation),
+            where=solar_radiation > 0,
+        ),
+        0.0,
+        0.9,
+    )
+    result = WeatherObservations(
+        observed_at=observed_at,
+        temperature=np.array([item.temperature for item in rows], dtype=float),
+        humidity=np.array([item.humidity for item in rows], dtype=float),
+        wind_speed=np.array([item.wind_speed for item in rows], dtype=float),
+        solar_radiation=solar_radiation,
+        direct_solar_fraction=direct_fraction,
+        surface_pressure=np.array([item.surface_pressure for item in rows], dtype=float),
         cosine_solar_zenith=cosine_solar_zenith,
     )
     _validate_observations(result)

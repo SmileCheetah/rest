@@ -48,7 +48,9 @@ async def get_asos_hourly(
             api_key,
             {
                 "pageNo": 1,
-                "numOfRows": 1_000,
+                # The ASOS gateway rejects exactly 1,000 despite documenting a
+                # 1,000-row ceiling, so use the largest accepted value.
+                "numOfRows": 999,
                 "dataType": "JSON",
                 "dataCd": "ASOS",
                 "dateCd": "HR",
@@ -99,10 +101,7 @@ def _parse_observation(item: dict[str, Any]) -> AsosHourlyObservation:
     try:
         station_id = int(item["stnId"])
         station_name = str(item["stnNm"])
-        observed_at = datetime.strptime(
-            str(item["tm"]),
-            "%Y-%m-%d %H",
-        ).replace(tzinfo=SEOUL_TZ)
+        observed_at = _parse_observed_at(str(item["tm"]))
     except (KeyError, TypeError, ValueError) as exc:
         raise AsosProviderError("ASOS observation has invalid identity fields") from exc
 
@@ -124,6 +123,15 @@ def _parse_observation(item: dict[str, Any]) -> AsosHourlyObservation:
         sea_level_pressure=_number(item.get("ps")),
         dew_point=_number(item.get("td")),
     )
+
+
+def _parse_observed_at(value: str) -> datetime:
+    for date_format in ("%Y-%m-%d %H:%M", "%Y-%m-%d %H"):
+        try:
+            return datetime.strptime(value, date_format).replace(tzinfo=SEOUL_TZ)
+        except ValueError:
+            continue
+    raise ValueError(f"unsupported ASOS timestamp: {value}")
 
 
 def _number(value: Any) -> float | None:

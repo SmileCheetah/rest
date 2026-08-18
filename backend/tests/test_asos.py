@@ -24,7 +24,7 @@ class AsosServiceTest(unittest.IsolatedAsyncioTestCase):
                             {
                                 "stnId": "108",
                                 "stnNm": "서울",
-                                "tm": "2026-08-18 13",
+                                "tm": "2026-08-18 13:00",
                                 "ta": "34.5",
                                 "hm": "68",
                                 "ws": "1.5",
@@ -58,6 +58,7 @@ class AsosServiceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(request_key, "asos-key")
         self.assertEqual(request_params["dataCd"], "ASOS")
         self.assertEqual(request_params["dateCd"], "HR")
+        self.assertEqual(request_params["numOfRows"], 999)
         self.assertEqual(request_params["stnIds"], 108)
         self.assertEqual(result.observations[0].temperature, 34.5)
         self.assertEqual(result.observations[0].surface_pressure, 1008.0)
