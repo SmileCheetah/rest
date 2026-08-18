@@ -56,6 +56,9 @@ const routeMocks = [
 ];
 
 const DEFAULT_LOCATION = { latitude: 37.5739, longitude: 127.0105 };
+// 데모 중에는 창신동 중심 위치를 사용해 경로 결과를 고정합니다.
+// 실제 GPS를 사용하려면 NEXT_PUBLIC_USE_MOCK_LOCATION=false로 바꿉니다.
+const USE_MOCK_LOCATION = process.env.NEXT_PUBLIC_USE_MOCK_LOCATION !== "false";
 
 const fallbackVisits: VisitCard[] = [
   { scheduleId: -1, visitOrder: 1, time: "10:00", name: "김○○", address: "종로구 창신동 ○○길 00", ...routeMocks[0], ...DEFAULT_LOCATION },
@@ -65,6 +68,7 @@ const fallbackVisits: VisitCard[] = [
 ];
 
 function getBrowserLocation(): Promise<{ latitude: number; longitude: number }> {
+  if (USE_MOCK_LOCATION) return Promise.resolve(DEFAULT_LOCATION);
   if (!navigator.geolocation) return Promise.resolve(DEFAULT_LOCATION);
   return new Promise((resolve) => {
     navigator.geolocation.getCurrentPosition(
