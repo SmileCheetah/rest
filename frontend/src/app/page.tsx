@@ -332,7 +332,10 @@ export default function Home() {
           });
           setActiveRoute(route);
           try {
-            const recommendation = await recommendRoute(route.routeSegmentId);
+            const recommendation = await recommendRoute(
+              route.routeSegmentId,
+              session.maxContinuousExposureMinutes,
+            );
             setRecommendedRoute(recommendation);
             setSelectedRoute(recommendation.safeRoute ? "safe" : "normal");
           } catch (recommendationError) {
@@ -355,12 +358,48 @@ export default function Home() {
     setSelectedScheduleId(scheduleId);
   };
 
-  const handleStartSelectedRoute = () => {
+  const handleStartSelectedRoute = async () => {
     if (selectedScheduleId === null) return;
-    setActiveScheduleId(selectedScheduleId);
-    setInProgressScheduleId(selectedScheduleId);
-    setSelectedScheduleId(null);
-    setScreen("route");
+    const visit = visits.find((item) => item.scheduleId === selectedScheduleId);
+    if (!visit || visit.scheduleId < 0) {
+      setApiMessage("Backend 일정이 준비된 뒤 경로를 생성할 수 있습니다.");
+      return;
+    }
+    setIsBusy(true);
+    try {
+      const session = workSession?.status === "IN_PROGRESS"
+        ? workSession
+        : await startWorkSession(seoulDateString());
+      const location = await getBrowserLocation();
+      const route = await createRouteSegment({
+        workSessionId: session.workSessionId,
+        scheduleId: visit.scheduleId,
+        origin: { ...location, name: "현재 위치" },
+        destination: {
+          latitude: visit.latitude,
+          longitude: visit.longitude,
+          name: visit.name,
+        },
+        departureTime: new Date().toISOString(),
+      });
+      const recommendation = await recommendRoute(
+        route.routeSegmentId,
+        session.maxContinuousExposureMinutes,
+      );
+      setWorkSession(session);
+      setActiveRoute(route);
+      setRecommendedRoute(recommendation);
+      setSelectedRoute(recommendation.safeRoute ? "safe" : "normal");
+      setActiveScheduleId(visit.scheduleId);
+      setInProgressScheduleId(visit.scheduleId);
+      setSelectedScheduleId(null);
+      setApiMessage(null);
+      setScreen("route");
+    } catch (error) {
+      setApiMessage(error instanceof Error ? error.message : "경로 추천에 실패했습니다.");
+    } finally {
+      setIsBusy(false);
+    }
   };
 
   const handleAddSchedule = async () => {
@@ -484,7 +523,7 @@ export default function Home() {
             <div className="route-meta">도보 {visit.walk}<span>•</span>{visit.distance}</div><div className="visit-foot"><span className={`badge ${isInProgress ? "caution" : visit.tone}`}>{isInProgress ? "방문 중" : isCompleted ? "방문 완료" : visit.riskStatus}</span><span className="ai-rec"><strong>추천 휴식 {visit.rests}회</strong><span className="ai-label">AI 분석</span></span></div>
           </article>; })}</div>
         </div>
-        <footer className="sticky-footer"><button className="button primary" disabled={isBusy || visits.length === 0} onClick={() => selectedScheduleId !== null ? handleStartSelectedRoute() : void handleStartWork()}>{isBusy ? "처리 중..." : selectedScheduleId !== null ? "경로 안내 시작" : "오늘 첫 방문 시작"}</button></footer>
+        <footer className="sticky-footer"><button className="button primary" disabled={isBusy || visits.length === 0} onClick={() => selectedScheduleId !== null ? void handleStartSelectedRoute() : void handleStartWork()}>{isBusy ? "처리 중..." : selectedScheduleId !== null ? "경로 안내 시작" : "오늘 첫 방문 시작"}</button></footer>
       </>}
 
       {screen === "route" && <>
