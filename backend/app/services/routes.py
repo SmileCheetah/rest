@@ -347,7 +347,17 @@ async def _safe_route_candidates(
     if cooling_spot_id is not None:
         statement = statement.where(CoolingSpot.id == cooling_spot_id)
     spots = list((await session.execute(statement)).scalars().all())
-    open_spots = [spot for spot in spots if _is_open(spot, at)]
+    open_spots = [
+        spot
+        for spot in spots
+        if _is_open(spot, at)
+        and (
+            _approximate_route_distance(origin, spot)
+            <= settings.cooling_spot_search_radius_meters
+            or _approximate_route_distance(destination, spot)
+            <= settings.cooling_spot_search_radius_meters
+        )
+    ]
     # TMAP 호출 수를 제한하기 위해 직선거리 기준 상위 후보만 먼저 계산한다.
     return sorted(
         open_spots,

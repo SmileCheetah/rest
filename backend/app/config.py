@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     tmap_api_base_url: str = "https://apis.openapi.sk.com/tmap"
     public_shelter_api_key: str | None = None
     public_shelter_api_url: str = "https://www.safetydata.go.kr/V2/api/DSSP-IF-10942"
+    cooling_spot_search_radius_meters: int = 2_000
     risk_model_path: Path | None = BACKEND_DIR / "artifacts/risk-model/risk_classifier.joblib"
     work_limit_model_path: Path | None = (
         BACKEND_DIR / "artifacts/risk-model-asos/work_limit_classifier.joblib"
