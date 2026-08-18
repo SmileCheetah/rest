@@ -8,6 +8,7 @@ from app.schemas.weather import (
     ForecastWeatherResponse,
     HourlyWeatherResponse,
 )
+from app.schemas.asos import AsosHourlyResponse
 from app.schemas.living_index import LivingIndexResponse
 from app.services.living_index import (
     LivingIndexConfigurationError,
@@ -21,6 +22,12 @@ from app.services.weather import (
     get_current_weather,
     get_forecast_weather,
     get_hourly_weather,
+)
+from app.services.asos import (
+    AsosConfigurationError,
+    AsosDataNotFoundError,
+    AsosProviderError,
+    get_asos_hourly,
 )
 
 router = APIRouter(prefix="/weather", tags=["weather"])
@@ -94,6 +101,40 @@ async def forecast_weather(
     return await _handle_weather_request(
         lambda: get_forecast_weather(latitude, longitude, forecast_at)
     )
+
+
+@router.get(
+    "/asos/hourly",
+    response_model=AsosHourlyResponse,
+    summary="ASOS 시간 관측자료 조회",
+)
+async def asos_hourly(
+    station_id: Annotated[int, Query(alias="stationId", gt=0)],
+    start_at: Annotated[datetime, Query(alias="startAt")],
+    end_at: Annotated[datetime, Query(alias="endAt")],
+) -> AsosHourlyResponse:
+    try:
+        return await get_asos_hourly(station_id, start_at, end_at)
+    except AsosConfigurationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+    except AsosDataNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+    except AsosProviderError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
 
 
 async def _handle_weather_request(

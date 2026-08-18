@@ -11,10 +11,14 @@ class Settings(BaseSettings):
     app_env: str = "development"
     frontend_origin: str = "http://localhost:3000"
     kma_api_key: str | None = None
+    kma_asos_api_key: str | None = None
     kma_impact_api_key: str | None = None
     kma_living_index_api_key: str | None = None
     kma_api_base_url: str = (
         "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
+    )
+    kma_asos_api_base_url: str = (
+        "https://apis.data.go.kr/1360000/AsosHourlyInfoService"
     )
     kma_impact_api_base_url: str = (
         "https://apis.data.go.kr/1360000/ImpactInfoServiceV2"
