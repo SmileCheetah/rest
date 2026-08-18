@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 from app.models.enums import RouteType
 from app.schemas.cooling_spot import CoolingSpotResponse
+from app.schemas.risk_analysis import RiskEvaluateResponse
 from app.schemas.weather import ForecastWeatherResponse
 from app.time_utils import utc_naive_to_seoul
 
@@ -97,3 +98,24 @@ class SafeRouteResponse(BaseModel):
     planned_rest_minutes: int = Field(serialization_alias="plannedRestMinutes")
     estimated_arrival_time: datetime = Field(serialization_alias="estimatedArrivalTime")
     path: list[RoutePathPoint]
+
+
+class RouteRecommendationRequest(BaseModel):
+    """위험 판단부터 쿨링스팟 경유 안전경로 추천까지 한 번에 실행합니다."""
+
+    routeSegmentId: int = Field(gt=0)
+    currentContinuousExposureMinutes: int = Field(default=0, ge=0, le=600)
+    plannedRestMinutes: int = Field(default=10, ge=5, le=60)
+    maxAdditionalMinutes: int = Field(default=5, ge=0, le=20)
+
+
+class RouteRecommendationResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    risk: RiskEvaluateResponse
+    normal_route: RouteSegmentResponse = Field(serialization_alias="normalRoute")
+    safe_route: SafeRouteResponse | None = Field(default=None, serialization_alias="safeRoute")
+    shelter_recommendation_message: str | None = Field(
+        default=None,
+        serialization_alias="shelterRecommendationMessage",
+    )

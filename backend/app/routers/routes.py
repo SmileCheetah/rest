@@ -9,6 +9,8 @@ from app.schemas.route import (
     NormalRouteResponse,
     RouteSegmentCreateRequest,
     RouteSegmentResponse,
+    RouteRecommendationRequest,
+    RouteRecommendationResponse,
     SafeRouteRequest,
     SafeRouteResponse,
 )
@@ -20,6 +22,7 @@ from app.services.routes import (
     create_safe_route,
     create_route_segment,
     get_route_segment,
+    recommend_route,
 )
 from app.services.tmap import TmapConfigurationError, TmapProviderError
 from app.services.weather import (
@@ -76,6 +79,40 @@ async def safe_route(request: SafeRouteRequest, session: DbSession) -> SafeRoute
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
     except TmapProviderError as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
+
+
+@routes_router.post(
+    "/recommendation",
+    response_model=RouteRecommendationResponse,
+    summary="위험 판단 기반 안전경로 추천",
+)
+async def route_recommendation(
+    request: RouteRecommendationRequest,
+    session: DbSession,
+) -> RouteRecommendationResponse:
+    try:
+        async with session.begin():
+            risk, normal_route, safe_route, message = await recommend_route(
+                session,
+                route_segment_id=request.routeSegmentId,
+                current_continuous_exposure_minutes=request.currentContinuousExposureMinutes,
+                planned_rest_minutes=request.plannedRestMinutes,
+                max_additional_minutes=request.maxAdditionalMinutes,
+            )
+        return RouteRecommendationResponse(
+            risk=risk,
+            normal_route=normal_route,
+            safe_route=safe_route,
+            shelter_recommendation_message=message,
+        )
+    except RouteSegmentNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except (TmapConfigurationError, WeatherConfigurationError) as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except (TmapProviderError, WeatherProviderError) as exc:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
+    except WeatherForecastNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
 
 @route_segments_router.post(

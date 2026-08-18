@@ -16,8 +16,10 @@ from app.schemas.route import (
     RouteSegmentResponse,
 )
 from app.schemas.cooling_spot import CoolingSpotResponse
+from app.schemas.risk_analysis import RiskEvaluateRequest, RiskEvaluateResponse
 from app.schemas.weather import ForecastWeatherResponse
 from app.services.tmap import PedestrianRoute, get_pedestrian_route
+from app.services.risk_analysis import evaluate_risk
 from app.services.weather import get_forecast_weather
 from app.time_utils import to_utc_naive, utc_naive_to_seoul
 
@@ -32,6 +34,50 @@ class RouteSegmentConflictError(Exception):
 
 class SafeRouteNotFoundError(Exception):
     """조건에 맞는 쿨링스팟 안전경로를 찾을 수 없습니다."""
+
+
+async def recommend_route(
+    session: AsyncSession,
+    *,
+    route_segment_id: int,
+    current_continuous_exposure_minutes: int,
+    planned_rest_minutes: int,
+    max_additional_minutes: int,
+) -> tuple[RiskEvaluateResponse, RouteSegmentResponse, SafeRouteResponse | None, str | None]:
+    """정상 경로의 위험도를 판정하고 필요할 때만 안전경로를 추천합니다."""
+    normal_route = await get_route_segment(session, route_segment_id)
+    if normal_route.departure_time is None:
+        raise RouteSegmentNotFoundError("route segment departure time is missing")
+    weather = await get_forecast_weather(
+        normal_route.destination.latitude,
+        normal_route.destination.longitude,
+        normal_route.departure_time,
+    )
+    expected_exposure = current_continuous_exposure_minutes + normal_route.walking_minutes
+    risk = evaluate_risk(
+        RiskEvaluateRequest(
+            route_option_id=normal_route.route_option_id,
+            temperature=weather.temperature,
+            humidity=weather.humidity,
+            observed_at=weather.forecast_at,
+            walking_minutes=normal_route.walking_minutes,
+            current_continuous_exposure_minutes=current_continuous_exposure_minutes,
+            expected_continuous_exposure_minutes=expected_exposure,
+        )
+    )
+    if risk.risk_level == "MOVE_POSSIBLE":
+        return risk, normal_route, None, None
+    try:
+        safe_route = await create_safe_route(
+            session,
+            route_segment_id=route_segment_id,
+            cooling_spot_id=None,
+            planned_rest_minutes=planned_rest_minutes,
+            max_additional_minutes=max_additional_minutes,
+        )
+    except SafeRouteNotFoundError as exc:
+        return risk, normal_route, None, str(exc)
+    return risk, normal_route, safe_route, None
 
 
 async def calculate_normal_route(
