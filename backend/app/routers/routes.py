@@ -9,11 +9,15 @@ from app.schemas.route import (
     NormalRouteResponse,
     RouteSegmentCreateRequest,
     RouteSegmentResponse,
+    SafeRouteRequest,
+    SafeRouteResponse,
 )
 from app.services.routes import (
     RouteSegmentConflictError,
     RouteSegmentNotFoundError,
+    SafeRouteNotFoundError,
     calculate_normal_route,
+    create_safe_route,
     create_route_segment,
     get_route_segment,
 )
@@ -51,6 +55,27 @@ async def normal_route(request: NormalRouteRequest) -> NormalRouteResponse:
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=str(exc),
         ) from exc
+
+
+@routes_router.post("/safe", response_model=SafeRouteResponse, summary="쿨링스팟 경유 안전경로 생성")
+async def safe_route(request: SafeRouteRequest, session: DbSession) -> SafeRouteResponse:
+    try:
+        async with session.begin():
+            return await create_safe_route(
+                session,
+                route_segment_id=request.routeSegmentId,
+                cooling_spot_id=request.coolingSpotId,
+                planned_rest_minutes=request.plannedRestMinutes,
+                max_additional_minutes=request.maxAdditionalMinutes,
+            )
+    except RouteSegmentNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except SafeRouteNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    except TmapConfigurationError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except TmapProviderError as exc:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
 
 
 @route_segments_router.post(
