@@ -18,7 +18,14 @@ from app.schemas.route import (
 from app.schemas.cooling_spot import CoolingSpotResponse
 from app.schemas.risk_analysis import RiskEvaluateRequest, RiskEvaluateResponse
 from app.schemas.weather import ForecastWeatherResponse
+from app.services.asos import (
+    AsosConfigurationError,
+    AsosDataNotFoundError,
+    AsosProviderError,
+    get_asos_hourly,
+)
 from app.services.tmap import PedestrianRoute, get_pedestrian_route
+from app.config import settings
 from app.services.risk_analysis import evaluate_risk
 from app.services.weather import (
     WeatherForecastNotFoundError,
@@ -65,6 +72,7 @@ async def recommend_route(
             normal_route.destination.latitude,
             normal_route.destination.longitude,
         )
+    model_weather = await _get_model_weather(normal_route.departure_time)
     expected_exposure = current_continuous_exposure_minutes + normal_route.walking_minutes
     risk = evaluate_risk(
         RiskEvaluateRequest(
@@ -75,6 +83,9 @@ async def recommend_route(
             walking_minutes=normal_route.walking_minutes,
             current_continuous_exposure_minutes=current_continuous_exposure_minutes,
             expected_continuous_exposure_minutes=expected_exposure,
+            wind_speed=model_weather["wind_speed"],
+            solar_radiation=model_weather["solar_radiation"],
+            surface_pressure=model_weather["surface_pressure"],
         )
     )
     if risk.risk_level == "MOVE_POSSIBLE":
@@ -90,6 +101,44 @@ async def recommend_route(
     except SafeRouteNotFoundError as exc:
         return risk, normal_route, None, str(exc)
     return risk, normal_route, safe_route, None
+
+
+async def _get_model_weather(departure_time: datetime) -> dict[str, float | None]:
+    """Load optional ASOS features required by the trained risk artifact.
+
+    Forecast/current weather remains the source for the displayed route weather.
+    ASOS is only an enrichment step for wind, solar radiation, and pressure; if
+    it is unavailable, risk analysis safely falls back to the existing rules.
+    """
+    empty = {
+        "wind_speed": None,
+        "solar_radiation": None,
+        "surface_pressure": None,
+    }
+    try:
+        response = await get_asos_hourly(
+            settings.kma_asos_station_id,
+            departure_time,
+            departure_time,
+        )
+    except (
+        AsosConfigurationError,
+        AsosDataNotFoundError,
+        AsosProviderError,
+        ValueError,
+    ):
+        return empty
+    if not response.observations:
+        return empty
+    observation = min(
+        response.observations,
+        key=lambda item: abs((item.observed_at - departure_time).total_seconds()),
+    )
+    return {
+        "wind_speed": observation.wind_speed,
+        "solar_radiation": observation.solar_radiation,
+        "surface_pressure": observation.surface_pressure,
+    }
 
 
 async def calculate_normal_route(
@@ -233,14 +282,15 @@ async def create_safe_route(
         raise SafeRouteNotFoundError("운영 중인 쿨링스팟이 없습니다")
 
     best: tuple[CoolingSpot, PedestrianRoute, PedestrianRoute, int] | None = None
-    for spot in candidates[:5]:
+    # 공공 쉼터와 기업 쿨링스팟을 구분하지 않고, 현재 위치에서 가장
+    # 가까운 후보 하나를 우선 경유지로 사용한다. 방문지까지의 거리까지
+    # 합산하면 출발지 바로 옆 쉼터보다 먼 후보가 선택될 수 있다.
+    for spot in candidates[:1]:
         waypoint = Coordinate(latitude=float(spot.latitude), longitude=float(spot.longitude), name=spot.name)
         to_spot = await get_pedestrian_route(origin, waypoint)
         from_spot = await get_pedestrian_route(waypoint, destination)
         walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
         additional = max(0, walking_minutes - normal.walking_minutes)
-        if additional > max_additional_minutes:
-            continue
         if best is None or walking_minutes < best[3]:
             best = (spot, to_spot, from_spot, walking_minutes)
     if best is None:
@@ -297,11 +347,22 @@ async def _safe_route_candidates(
     if cooling_spot_id is not None:
         statement = statement.where(CoolingSpot.id == cooling_spot_id)
     spots = list((await session.execute(statement)).scalars().all())
-    open_spots = [spot for spot in spots if _is_open(spot, at)]
-    # TMAP 호출 수를 제한하기 위해 직선거리 기준 상위 후보만 먼저 계산한다.
+    open_spots = [
+        spot
+        for spot in spots
+        if _is_open(spot, at)
+        and (
+            _approximate_route_distance(origin, spot)
+            <= settings.cooling_spot_search_radius_meters
+            or _approximate_route_distance(destination, spot)
+            <= settings.cooling_spot_search_radius_meters
+        )
+    ]
+    # 현재 위치에서 가까운 순서로 정렬한다. 안전경로는 "현재 위치 →
+    # 쿨링스팟 → 방문지" 흐름이므로, 경유지 접근성이 최우선이다.
     return sorted(
         open_spots,
-        key=lambda spot: _approximate_route_distance(origin, spot) + _approximate_route_distance(destination, spot),
+        key=lambda spot: _approximate_route_distance(origin, spot),
     )
 
 
