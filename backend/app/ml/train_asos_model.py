@@ -11,6 +11,10 @@ from app.ml.risk_modeling import (
     generate_dataset_from_weather,
     save_comparison_artifacts,
 )
+from app.ml.work_limit_modeling import (
+    compare_work_limit_models,
+    save_work_limit_artifacts,
+)
 from app.services.asos import get_asos_hourly
 
 
@@ -65,10 +69,17 @@ async def _run(args: argparse.Namespace) -> None:
     )
     comparison = compare_models(dataset, seed=args.seed)
     save_comparison_artifacts(comparison, args.artifact_directory)
+    work_limit_comparison = compare_work_limit_models(dataset, seed=args.seed)
+    save_work_limit_artifacts(work_limit_comparison, args.artifact_directory)
     print(f"observations: {len(combined.observed_at)}")
     print(f"rows: {len(dataset.labels)}")
     print(f"final_model: {comparison.best_model_name}")
     print(f"model: {args.artifact_directory / 'risk_classifier.joblib'}")
+    print(f"work_limit_model: {work_limit_comparison.best_model_name}")
+    print(
+        "work_limit_report: "
+        f"{args.artifact_directory / 'work_limit_comparison.json'}"
+    )
 
 
 def main() -> None:
