@@ -40,7 +40,7 @@ def risk_label(score: float) -> str:
     return "SAFE"
 
 
-def save_graphs(model) -> None:
+def save_graphs(model) -> Path:
     output_dir = Path(__file__).resolve().parent / "output"
     output_dir.mkdir(exist_ok=True)
     base = np.array([32, 70, 30, 20, 0], dtype=float)
@@ -66,8 +66,10 @@ def save_graphs(model) -> None:
     for index, score in enumerate(alert_scores):
         axes.flat[3].text(index, score + 2, f"{score:.1f}", ha="center")
     fig.tight_layout()
-    fig.savefig(output_dir / "svr-risk-graphs.png", dpi=150)
+    output_path = output_dir / "svr-risk-graphs.png"
+    fig.savefig(output_path, dpi=150)
     plt.close(fig)
+    return output_path
 
 
 def main() -> None:
@@ -98,8 +100,8 @@ def main() -> None:
             f"폭염특보 {'있음' if values[4] else '없음'} "
             f"→ 위험점수 {score:.1f}, {risk_label(score)}"
         )
-    save_graphs(model)
-    print(f"그래프 저장: {output_dir / 'svr-risk-graphs.png'}")
+    output_path = save_graphs(model)
+    print(f"그래프 저장: {output_path}")
 
 
 if __name__ == "__main__":

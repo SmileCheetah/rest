@@ -61,13 +61,14 @@ export default function RealMap({ route, destination, onSpot, spots = [] }: Prop
       });
 
       const path = route?.path?.map((point) => [point.latitude, point.longitude] as [number, number]) ?? [];
-      const spotPoints = spots.map((spot) => [spot.latitude, spot.longitude] as [number, number]);
       if (path.length > 1) {
         L.polyline(path, { color: "#1766e8", weight: 6, opacity: 0.9 }).addTo(map);
-        map.fitBounds(L.latLngBounds([...path, ...spotPoints]), { padding: [36, 36] });
+        // 쉼터 전체를 bounds에 포함하면 지도가 지나치게 축소되므로
+        // 처음에는 이동 경로와 방문지 주변만 보이도록 한다.
+        map.fitBounds(L.latLngBounds(path), { padding: [36, 36], maxZoom: 17 });
       } else {
         L.polyline([[origin.latitude, origin.longitude], destinationPoint], { color: "#727b87", weight: 5, dashArray: "8 8" }).addTo(map);
-        map.fitBounds(L.latLngBounds([[origin.latitude, origin.longitude], destinationPoint, ...spotPoints]), { padding: [36, 36] });
+        map.fitBounds(L.latLngBounds([[origin.latitude, origin.longitude], destinationPoint]), { padding: [36, 36], maxZoom: 17 });
       }
     });
 
