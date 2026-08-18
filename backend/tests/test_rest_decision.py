@@ -12,6 +12,7 @@ from app.services.rest_need import calculate_rest_need, classify_rest_need
 from app.services.rest_weather import RestWeatherResult
 from app.schemas.asos import AsosHourlyObservation, AsosHourlyResponse
 from app.services.rest_weather import resolve_rest_weather
+from app.services.asos import AsosProviderError
 
 SEOUL_TZ = ZoneInfo("Asia/Seoul")
 client = TestClient(app)
@@ -114,6 +115,18 @@ class RestDecisionTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.source, "KMA_ASOS")
         self.assertEqual(result.request.temperature, 31.2)
         self.assertEqual(result.request.humidity, 72)
+
+    async def test_rest_weather_uses_request_weather_when_asos_is_unavailable(self):
+        request = _request(temperature=31, humidity=70, wbgt=None)
+        with patch(
+            "app.services.rest_weather.get_asos_hourly",
+            new=AsyncMock(side_effect=AsosProviderError("temporary failure")),
+        ):
+            result = await resolve_rest_weather(request)
+
+        self.assertEqual(result.source, "REQUEST_FALLBACK")
+        self.assertIsNotNone(result.wbgt)
+        self.assertGreater(result.wbgt, 0)
 
     def test_api_accepts_camel_case_and_returns_debug_details(self):
         with patch(

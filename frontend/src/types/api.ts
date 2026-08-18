@@ -188,6 +188,8 @@ export interface RestDecisionRequest {
   totalWalkingMinutes: number;
   minutesSinceLastRest: number;
   recentRestMinutes: number;
+  temperature?: number;
+  humidity?: number;
   observedAt: string;
   nextTravelMinutes: number;
   coolingSpotNearby: boolean;

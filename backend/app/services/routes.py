@@ -32,7 +32,7 @@ from app.services.weather import (
     get_current_weather,
     get_forecast_weather,
 )
-from app.time_utils import to_utc_naive, utc_naive_to_seoul
+from app.time_utils import to_utc_aware, to_utc_naive, utc_naive_to_seoul
 
 
 class RouteSegmentNotFoundError(Exception):
@@ -130,9 +130,10 @@ async def _get_model_weather(departure_time: datetime) -> dict[str, float | None
         return empty
     if not response.observations:
         return empty
+    target_time = to_utc_aware(departure_time)
     observation = min(
         response.observations,
-        key=lambda item: abs((item.observed_at - departure_time).total_seconds()),
+        key=lambda item: abs((to_utc_aware(item.observed_at) - target_time).total_seconds()),
     )
     return {
         "wind_speed": observation.wind_speed,

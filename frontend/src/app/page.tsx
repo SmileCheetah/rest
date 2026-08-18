@@ -153,6 +153,7 @@ function restDecisionRequest(
   spots: CoolingSpot[],
   continuousWalkingMinutes: number,
   nextTravelMinutes = walkingMinutes(visit.walk),
+  weather: CurrentWeather | null = null,
 ) {
   const distanceToCoolingSpotMeters = nearestCoolingSpotDistance(visit, spots);
   return {
@@ -160,6 +161,8 @@ function restDecisionRequest(
     totalWalkingMinutes: continuousWalkingMinutes + nextTravelMinutes,
     minutesSinceLastRest: continuousWalkingMinutes,
     recentRestMinutes: 0,
+    temperature: weather?.temperature,
+    humidity: weather?.humidity,
     observedAt: new Date().toISOString(),
     nextTravelMinutes,
     coolingSpotNearby: distanceToCoolingSpotMeters !== null && distanceToCoolingSpotMeters <= 500,
@@ -168,6 +171,10 @@ function restDecisionRequest(
 }
 
 async function applyAiRiskToVisits(visits: VisitCard[], spots: CoolingSpot[]): Promise<VisitCard[]> {
+  const weather = await getCurrentWeather(
+    DEFAULT_LOCATION.latitude,
+    DEFAULT_LOCATION.longitude,
+  ).catch(() => null);
   let accumulatedMinutes = 0;
   const requests = visits.map((visit) => {
     const nextTravelMinutes = walkingMinutes(visit.walk);
@@ -176,6 +183,7 @@ async function applyAiRiskToVisits(visits: VisitCard[], spots: CoolingSpot[]): P
       spots,
       accumulatedMinutes,
       nextTravelMinutes,
+      weather,
     ));
     accumulatedMinutes += nextTravelMinutes;
     return request;
@@ -405,6 +413,7 @@ export default function Home() {
         coolingSpots,
         exposureBeforeVisit(visits, visit.visitOrder),
         nextTravelMinutes,
+        currentWeather,
       ));
       setActiveRestDecision(decision);
     } catch {
