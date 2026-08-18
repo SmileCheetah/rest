@@ -13,3 +13,8 @@ thermofeel==2.3.0
 xarray==2026.7.0
 netCDF4==1.7.4
 earthkit-meteo==1.1.0
+pandas==2.3.2
+rapidfuzz==3.14.1
+openpyxl==3.1.5
+pyproj==3.7.2
+xgboost==2.1.4

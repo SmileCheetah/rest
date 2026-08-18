@@ -52,38 +52,40 @@ export default function RealMap({ route, normalRoute, safeRoute, compareRoutes =
         maxZoom: 19,
       }).addTo(map);
 
-      const currentIcon = L.divIcon({ className: "leaflet-current-marker", html: "<span></span>", iconSize: [18, 18], iconAnchor: [9, 9] });
-      const destinationIcon = L.divIcon({ className: "leaflet-destination-marker", html: "<span>방문지</span>", iconSize: [54, 28], iconAnchor: [10, 28] });
-      const spotIcon = (type: CoolingSpot["type"]) => L.divIcon({
-        className: `leaflet-spot-marker ${type === "PUBLIC" ? "public" : "company"}`,
-        html: `<span>${type === "PUBLIC" ? "공" : "기"}</span>`,
-        iconSize: [34, 34],
-        iconAnchor: [17, 34],
+      const currentIcon = L.divIcon({ className: "leaflet-current-marker", html: "<span></span>", iconSize: [30, 30], iconAnchor: [15, 15] });
+      const destinationIcon = L.divIcon({ className: "leaflet-destination-marker", html: "<span></span>", iconSize: [30, 36], iconAnchor: [15, 34] });
+      const spotIcon = () => L.divIcon({
+        className: "leaflet-spot-marker",
+        html: "<span>❄</span>",
+        iconSize: [27, 27],
+        iconAnchor: [14, 27],
       });
 
       L.marker([origin.latitude, origin.longitude], { icon: currentIcon }).addTo(map).bindTooltip("현재 위치");
       L.marker(destinationPoint, { icon: destinationIcon }).addTo(map).bindTooltip(destination.name);
 
       spots.forEach((spot) => {
-        const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon(spot.type) }).addTo(map!);
+        const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon() }).addTo(map!);
         marker.bindTooltip(spot.name, {
-          permanent: true,
+          permanent: false,
           direction: "top",
-          offset: [0, -28],
-          className: `cooling-spot-label ${spot.type === "PUBLIC" ? "public" : "company"}`,
+          offset: [0, -23],
+          className: "cooling-spot-label",
         });
-        marker.on("click", () => onSpotRef.current?.());
+        marker.on("click", () => {
+          marker.openTooltip();
+          onSpotRef.current?.();
+        });
       });
 
       const normalPath = (compareRoutes ? normalRoute?.path : route?.path)?.map((point) => [point.latitude, point.longitude] as [number, number]) ?? [];
       const safePath = (compareRoutes ? safeRoute?.path : route?.routeType === "SAFE" ? route.path : undefined)?.map((point) => [point.latitude, point.longitude] as [number, number]) ?? [];
       const paths = [normalPath, safePath].filter((path) => path.length > 1);
       if (paths.length) {
-        // 안전 경로를 먼저 그리고 일반 경로를 회색으로 위에 표시한다.
-        // 두 경로가 일부 겹쳐도 일반 경로가 사라지지 않고, 우회 구간만
-        // 파란색으로 남아 두 경로의 차이를 바로 확인할 수 있다.
+        // 일반 경로를 먼저 그린 뒤 안전 경로를 위에 표시한다. 겹치는
+        // 구간은 안전 경로(파란색)가 우선 보이고, 우회 전후 비교도 쉽다.
+        if (normalPath.length > 1) L.polyline(normalPath, { color: compareRoutes ? "#3f4854" : "#1766e8", weight: compareRoutes ? 5 : 6, opacity: 1, dashArray: compareRoutes ? "9 6" : undefined }).addTo(map);
         if (safePath.length > 1) L.polyline(safePath, { color: "#1766e8", weight: compareRoutes ? 6 : 6, opacity: 0.98 }).addTo(map);
-        if (normalPath.length > 1) L.polyline(normalPath, { color: compareRoutes ? "#5f6b7a" : "#1766e8", weight: compareRoutes ? 5 : 6, opacity: 1, dashArray: compareRoutes ? "9 6" : undefined }).addTo(map);
         // 쉼터 전체를 bounds에 포함하면 지도가 지나치게 축소되므로
         // 처음에는 이동 경로와 방문지 주변만 보이도록 한다.
         map.fitBounds(L.latLngBounds(paths.flat()), { padding: [36, 36], maxZoom: 17, animate: false });

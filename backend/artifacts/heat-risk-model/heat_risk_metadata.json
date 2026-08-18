@@ -1,0 +1,32 @@
+{
+  "model": "XGBRegressor",
+  "features": [
+    "wbgt",
+    "continuous_exposure_minutes",
+    "next_travel_minutes",
+    "time_since_rest_minutes",
+    "cooling_spot_distance_m"
+  ],
+  "target": "heat_risk_score",
+  "train_rows": 8000,
+  "test_rows": 2000,
+  "train": {
+    "mae": 1.9891,
+    "rmse": 2.4621,
+    "r2": 0.9869
+  },
+  "test": {
+    "mae": 2.2157,
+    "rmse": 2.7402,
+    "r2": 0.9836
+  },
+  "feature_importance": {
+    "wbgt": 0.791039,
+    "continuous_exposure_minutes": 0.150669,
+    "next_travel_minutes": 0.024906,
+    "time_since_rest_minutes": 0.025677,
+    "cooling_spot_distance_m": 0.007709
+  },
+  "trained_at": "2026-08-18T18:09:36.496884+00:00",
+  "synthetic_mvp_label_note": "Labels use an MVP 50/25/10/10/5 rule informed by heat-stress guidance; they are not an official NIOSH/OSHA 0-100 score."
+}

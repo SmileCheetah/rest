@@ -37,6 +37,7 @@ import RealMap from "@/components/RealMap";
 
 type Screen = "schedule" | "route" | "guidance" | "complete";
 type Modal = "add" | "menu" | "ai" | "warning" | "spot" | "skip" | null;
+const SKIP_REASONS = ["시간이 맞지 않아 이용 못함", "길이 불편해서 이용 못함", "기타"];
 
 type VisitCard = {
   scheduleId: number;
@@ -209,7 +210,7 @@ function SvgMap({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: 
 
 function Map({ moving = false, showSafeRoute = false, onSpot, route, normalRoute, safeRoute, spots = [] }: { moving?: boolean; showSafeRoute?: boolean; onSpot?: () => void; route?: RouteSegment | null; normalRoute?: RouteSegment | null; safeRoute?: RouteSegment | null; spots?: CoolingSpot[] }) {
   const destination = route?.destination ?? normalRoute?.destination ?? { ...DEFAULT_LOCATION, name: "방문지" };
-  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} normalRoute={normalRoute} safeRoute={safeRoute} compareRoutes={!moving && showSafeRoute} spots={spots} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} />{!moving && showSafeRoute && normalRoute?.path?.length && safeRoute?.path?.length ? <div className="map-legend"><span><i className="line-normal"/>일반 경로</span><span><i className="line-safe"/>안전 경로</span></div> : null}</div>;
+  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} normalRoute={normalRoute} safeRoute={safeRoute} compareRoutes={!moving && showSafeRoute} spots={spots} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} />{!moving && showSafeRoute && normalRoute && safeRoute ? <div className="map-legend"><span><i className="line-normal"/>일반 경로 <b>{normalRoute.walkingMinutes}분 ({formatDistance(normalRoute.distanceMeters)})</b></span><span><i className="line-safe"/>안전 경로 <b>{safeRoute.walkingMinutes}분 ({formatDistance(safeRoute.distanceMeters)})</b></span></div> : null}</div>;
 }
 
 export default function Home() {
@@ -235,6 +236,9 @@ export default function Home() {
   const [apiMessage, setApiMessage] = useState<string | null>(null);
   const [weatherMessage, setWeatherMessage] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+  const [skipReason, setSkipReason] = useState(SKIP_REASONS[0]);
+  const [skipReasonRecorded, setSkipReasonRecorded] = useState(false);
+  const [finishAfterSkipSurvey, setFinishAfterSkipSurvey] = useState(false);
 
   const filteredVisitTargets = visitTargets.filter((target) =>
     target.name.toLowerCase().includes(targetSearch.trim().toLowerCase()),
@@ -454,7 +458,7 @@ export default function Home() {
     }
   };
 
-  const handleGuidanceComplete = async () => {
+  const finishGuidance = async () => {
     if (activeScheduleId === null) return;
     setIsBusy(true);
     try {
@@ -516,6 +520,7 @@ export default function Home() {
     : null;
   const displayedRoute = selectedRoute === "safe" && safeRoute ? safeRoute : activeRoute;
   const isSafeRouteSelected = selectedRoute === "safe" && Boolean(safeRoute);
+  const hasRecommendedSafeRoute = Boolean(safeRoute);
   const risk = recommendedRoute?.risk;
   const recommendedSpot = recommendedRoute?.safeRoute?.coolingSpot ?? null;
   const recommendedRestCount = risk?.recommended_rest_count ?? 0;
@@ -537,11 +542,21 @@ export default function Home() {
     : heatLevel.tone;
 
   const startRoute = () => {
-    if (selectedRoute === "normal" && risk?.risk_level === "REST_REQUIRED") {
+    setSkipReasonRecorded(false);
+    if (selectedRoute === "normal" && hasRecommendedSafeRoute) {
       setModal("warning");
       return;
     }
     setScreen("guidance");
+  };
+
+  const handleGuidanceComplete = () => {
+    if (selectedRoute === "normal" && hasRecommendedSafeRoute && !skipReasonRecorded) {
+      setFinishAfterSkipSurvey(true);
+      setModal("skip");
+      return;
+    }
+    void finishGuidance();
   };
 
   return <main className="app-shell">
@@ -578,7 +593,7 @@ export default function Home() {
       {screen === "guidance" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("route")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>이동 중</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
         <div className="move-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary restCount={recommendedRestCount} onClick={() => setModal("ai")}/></div><Map moving route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
-        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{selectedRoute === "safe" && recommendedSpot && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedSpot.name}</strong><small>경로에 추가 시 약 {recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 소요</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row">{selectedRoute === "safe" && recommendedSpot && <button className="button secondary" onClick={() => setModal("skip")}>쉼터 건너뛰기</button>}<button className="button teal" disabled={isBusy} onClick={() => void handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
+        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{selectedRoute === "safe" && recommendedSpot && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedSpot.name}</strong><small>경로에 추가 시 약 {recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 소요</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row">{selectedRoute === "safe" && recommendedSpot && <button className="button secondary" onClick={() => {setSelectedRoute("normal"); setFinishAfterSkipSurvey(false); setModal("skip");}}>쉼터 건너뛰기</button>}<button className="button teal" disabled={isBusy} onClick={() => handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
       </>}
 
       {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 72}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 2}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 15}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>15분</strong><small>안전하게 이동했어요!</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2><p>창신동 주민센터</p><p>동부여성문화센터</p></section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}
@@ -588,7 +603,7 @@ export default function Home() {
       {modal === "ai" && <section className="dialog"><div className="dialog-icon"><Icon name="info"/></div><h2>AI 분석 근거</h2><p>{risk?.reason_message ?? "현재 이동구간의 기상과 이동 정보를 분석하고 있어요."}</p><ul><li>체감온도 {risk ? `${Math.round(risk.apparentTemperature)}°C` : "확인 중"}</li><li>예상 도보시간 {activeRoute ? `${activeRoute.walkingMinutes}분` : "확인 중"}</li><li>이동 완료 시 연속 야외노출 {activeRoute ? `${expectedExposureMinutes}분` : "확인 중"}</li></ul><button className="button primary" onClick={() => setModal(null)}>확인</button></section>}
       {modal === "warning" && <section className="dialog danger-dialog"><div className="dialog-icon danger"><Icon name="alert"/></div><h2>휴식이 필요한 구간이에요</h2><p>일반 경로는 휴식 없이 이동해야 해요. 그래도 일반 경로로 이동하시겠어요?</p><div className="button-row"><button className="button secondary" onClick={() => setModal(null)}>취소</button><button className="button danger-button" onClick={() => {setModal(null); setScreen("guidance");}}>일반 경로로 이동</button></div></section>}
       {modal === "spot" && <section className="bottom-sheet"><div className="handle"/><div className="sheet-header"><div><div className="sheet-title"><h2>{recommendedSpot?.name ?? "추천 쉼터"}</h2><span>추천 쉼터</span></div><p><span className="badge safe">운영 중</span> {recommendedSpot?.openTime?.slice(0, 5) ?? "상시"} ~ {recommendedSpot?.closeTime?.slice(0, 5) ?? "운영"}</p></div><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>{recommendedSpot?.address ?? "안전경로에서 이용할 수 있는 쉼터를 확인하고 있어요."}<br/>{recommendedRoute?.safeRoute ? `경로에 추가 시 약 ${recommendedRoute.safeRoute.additionalMinutes}분 더 소요` : "안전경로 추천 후 상세정보를 확인할 수 있어요."}</p>{facilityLabels.length > 0 && <div className="text-chips">{facilityLabels.map((facility) => <span key={facility}>{facility}</span>)}</div>}<button className="button teal" disabled={!recommendedSpot} onClick={() => {setSelectedRoute("safe"); setModal(null);}}>이곳을 경유하기</button></section>}
-      {modal === "skip" && <section className="bottom-sheet"><div className="handle"/><h2>쉼터를 이용하지 못했나요?</h2><p>다음 방문 구간 계획에 반영하기 위해 이유를 선택해주세요.</p><div className="radio-list">{["시간이 맞지 않아 이용 못함","길이 불편해서 이용 못함","기타"].map((r, i) => <label key={r}><input type="radio" name="reason" defaultChecked={i === 0}/>{r}</label>)}</div><button className="button teal" onClick={() => setModal(null)}>확인</button></section>}</>}
+      {modal === "skip" && <section className="bottom-sheet"><div className="handle"/><h2>쉼터를 이용하지 못했나요?</h2><p>다음 방문 구간 계획에 반영하기 위해 이유를 선택해주세요.</p><div className="radio-list">{SKIP_REASONS.map((reason) => <label key={reason}><input type="radio" name="reason" checked={skipReason === reason} onChange={() => setSkipReason(reason)}/>{reason}</label>)}</div><button className="button teal" disabled={isBusy} onClick={() => {setSkipReasonRecorded(true); setModal(null); if (finishAfterSkipSurvey) {setFinishAfterSkipSurvey(false); void finishGuidance();}}}>{isBusy ? "처리 중..." : "확인"}</button></section>}</>}
     </section>
   </main>;
 }
