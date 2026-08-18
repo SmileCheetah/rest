@@ -16,108 +16,108 @@
   "train_rows": 8000,
   "test_rows": 2000,
   "class_distribution": {
-    "REST_RECOMMENDED": 4173,
+    "MOVABLE": 4839,
     "REST_BEFORE_NEXT_VISIT": 3715,
-    "MOVABLE": 2112
+    "REST_RECOMMENDED": 1446
   },
   "train": {
-    "accuracy": 0.9619,
-    "macro_f1": 0.9621,
+    "accuracy": 0.9577,
+    "macro_f1": 0.9334,
     "classification_report": {
       "MOVABLE": {
-        "precision": 0.960969840331165,
-        "recall": 0.9615384615384616,
-        "f1-score": 0.961254066844129,
-        "support": 1690.0
+        "precision": 0.9741687979539642,
+        "recall": 0.9839834668044433,
+        "f1-score": 0.9790515357923146,
+        "support": 3871.0
       },
       "REST_RECOMMENDED": {
-        "precision": 0.9528217378321887,
-        "recall": 0.9559616536848412,
-        "f1-score": 0.9543891132047256,
-        "support": 3338.0
+        "precision": 0.8755718206770357,
+        "recall": 0.8271391529818496,
+        "f1-score": 0.8506666666666667,
+        "support": 1157.0
       },
       "REST_BEFORE_NEXT_VISIT": {
-        "precision": 0.9726351351351351,
-        "recall": 0.9687079407806191,
-        "f1-score": 0.9706675657451113,
+        "precision": 0.9662996329662996,
+        "recall": 0.9744279946164199,
+        "f1-score": 0.9703467917574133,
         "support": 2972.0
       },
-      "accuracy": 0.961875,
+      "accuracy": 0.95775,
       "macro avg": {
-        "precision": 0.9621422377661629,
-        "recall": 0.9620693520013073,
-        "f1-score": 0.9621035819313221,
+        "precision": 0.9386800838657665,
+        "recall": 0.928516871467571,
+        "f1-score": 0.9333549980721315,
         "support": 8000.0
       },
       "weighted avg": {
-        "precision": 0.9619037015831421,
-        "recall": 0.961875,
-        "f1-score": 0.9618867797798027,
+        "precision": 0.9569858153223709,
+        "recall": 0.95775,
+        "f1-score": 0.957250061686052,
         "support": 8000.0
       }
     }
   },
   "test": {
-    "accuracy": 0.92,
-    "macro_f1": 0.919,
+    "accuracy": 0.909,
+    "macro_f1": 0.8578,
     "classification_report": {
       "MOVABLE": {
-        "precision": 0.9305210918114144,
-        "recall": 0.8886255924170616,
-        "f1-score": 0.9090909090909091,
-        "support": 422.0
+        "precision": 0.9535603715170279,
+        "recall": 0.9545454545454546,
+        "f1-score": 0.9540526587506454,
+        "support": 968.0
       },
       "REST_RECOMMENDED": {
-        "precision": 0.895662368112544,
-        "recall": 0.9149700598802395,
-        "f1-score": 0.9052132701421801,
-        "support": 835.0
+        "precision": 0.6890459363957597,
+        "recall": 0.6747404844290658,
+        "f1-score": 0.6818181818181818,
+        "support": 289.0
       },
       "REST_BEFORE_NEXT_VISIT": {
-        "precision": 0.9422043010752689,
-        "recall": 0.9434724091520862,
-        "f1-score": 0.9428379287155346,
+        "precision": 0.9344919786096256,
+        "recall": 0.9407806191117093,
+        "f1-score": 0.937625754527163,
         "support": 743.0
       },
-      "accuracy": 0.92,
+      "accuracy": 0.909,
       "macro avg": {
-        "precision": 0.9227959203330758,
-        "recall": 0.9156893538164624,
-        "f1-score": 0.9190473693162079,
+        "precision": 0.8590327621741377,
+        "recall": 0.8566888526954098,
+        "f1-score": 0.8578321983653301,
         "support": 2000.0
       },
       "weighted avg": {
-        "precision": 0.920307886908658,
-        "recall": 0.92,
-        "f1-score": 0.9200090126203632,
+        "precision": 0.9082541276769046,
+        "recall": 0.909,
+        "f1-score": 0.9086121819148807,
         "support": 2000.0
       }
     }
   },
   "confusion_matrix": [
     [
-      375,
-      47,
+      924,
+      44,
       0
     ],
     [
-      28,
-      764,
-      43
+      45,
+      195,
+      49
     ],
     [
       0,
-      42,
-      701
+      44,
+      699
     ]
   ],
   "feature_importance": {
-    "wbgt": 0.573172,
-    "continuous_exposure_minutes": 0.234308,
-    "next_travel_minutes": 0.079269,
-    "time_since_rest_minutes": 0.073608,
-    "cooling_spot_distance_m": 0.039644
+    "wbgt": 0.621638,
+    "continuous_exposure_minutes": 0.191785,
+    "next_travel_minutes": 0.075572,
+    "time_since_rest_minutes": 0.071234,
+    "cooling_spot_distance_m": 0.039771
   },
-  "trained_at": "2026-08-18T18:38:10.408324+00:00",
-  "mvp_label_note": "The 50/25/10/10/5 score weights and 0-39/40-69/70-100 thresholds are synthetic MVP policy values, not official NIOSH/OSHA outputs."
+  "trained_at": "2026-08-18T20:39:20.850746+00:00",
+  "mvp_label_note": "The 50/25/10/10/5 score weights and 0-59/60-69/70-100 thresholds are synthetic MVP policy values, not official NIOSH/OSHA outputs."
 }

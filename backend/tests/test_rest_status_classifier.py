@@ -13,8 +13,8 @@ from app.ml.rest_status_classifier import (
 
 class RestStatusClassifierTest(unittest.TestCase):
     def test_status_boundaries(self):
-        self.assertEqual(assign_rest_status(39), "MOVABLE")
-        self.assertEqual(assign_rest_status(40), "REST_RECOMMENDED")
+        self.assertEqual(assign_rest_status(59), "MOVABLE")
+        self.assertEqual(assign_rest_status(60), "REST_RECOMMENDED")
         self.assertEqual(assign_rest_status(69), "REST_RECOMMENDED")
         self.assertEqual(assign_rest_status(70), "REST_BEFORE_NEXT_VISIT")
 
@@ -33,8 +33,8 @@ class RestStatusClassifierTest(unittest.TestCase):
         # 실제 4개 일정 계획과 같은 범위(12~21분 이동, 방문지 체류 후
         # 연속 노출 0분, 마지막 Cooling Spot 휴식 후 시간 누적)를 사용합니다.
         scenarios = [
-            ("MOVABLE", 27, 0, 12, 0, 350),
-            ("REST_RECOMMENDED", 28.17, 0, 12, 0, 350),
+            ("MOVABLE", 28.17, 0, 12, 0, 350),
+            ("REST_RECOMMENDED", 28.17, 0, 18, 60, 1000),
             ("REST_BEFORE_NEXT_VISIT", 28.17, 0, 21, 110, 350),
         ]
 

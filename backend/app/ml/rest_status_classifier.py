@@ -30,7 +30,9 @@ STATUS_LABELS = (
     "REST_BEFORE_NEXT_VISIT",
 )
 STATUS_MAX = {
-    "MOVABLE": 39,
+    # 짧은 첫 이동은 높은 WBGT만으로 곧바로 휴식 권유가 되지 않도록
+    # 초기 이동 가능 범위를 넓힌 MVP 운영 기준입니다.
+    "MOVABLE": 59,
     "REST_RECOMMENDED": 69,
 }
 
@@ -101,7 +103,7 @@ def train_rest_status_classifier(
         },
         "trained_at": datetime.now(UTC).isoformat(),
         "mvp_label_note": (
-            "The 50/25/10/10/5 score weights and 0-39/40-69/70-100 thresholds "
+            "The 50/25/10/10/5 score weights and 0-59/60-69/70-100 thresholds "
             "are synthetic MVP policy values, not official NIOSH/OSHA outputs."
         ),
     }
