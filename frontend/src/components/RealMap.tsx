@@ -39,15 +39,20 @@ export default function RealMap({ route, destination, onSpot, spots = [] }: Prop
 
       const currentIcon = L.divIcon({ className: "leaflet-current-marker", html: "<span></span>", iconSize: [18, 18], iconAnchor: [9, 9] });
       const destinationIcon = L.divIcon({ className: "leaflet-destination-marker", html: "<span>방문지</span>", iconSize: [54, 28], iconAnchor: [10, 28] });
-      const spotIcon = L.divIcon({ className: "leaflet-spot-marker", html: "<span>쉼</span>", iconSize: [30, 30], iconAnchor: [15, 30] });
+      const spotIcon = (type: CoolingSpot["type"]) => L.divIcon({
+        className: `leaflet-spot-marker ${type === "PUBLIC" ? "public" : "company"}`,
+        html: `<span>${type === "PUBLIC" ? "공" : "기"}</span>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+      });
 
       L.marker([origin.latitude, origin.longitude], { icon: currentIcon }).addTo(map).bindTooltip("현재 위치");
       L.marker(destinationPoint, { icon: destinationIcon }).addTo(map).bindTooltip(destination.name);
 
-      spots.forEach((spot, index) => {
-        const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon }).addTo(map!);
-        marker.bindTooltip(spot.name);
-        if (index === 0) marker.on("click", () => onSpotRef.current?.());
+      spots.forEach((spot) => {
+        const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon(spot.type) }).addTo(map!);
+        marker.bindTooltip(`${spot.type === "PUBLIC" ? "공공 무더위쉼터" : "기업 쿨링스팟"} · ${spot.name}`);
+        marker.on("click", () => onSpotRef.current?.());
       });
 
       const path = route?.path?.map((point) => [point.latitude, point.longitude] as [number, number]) ?? [];
