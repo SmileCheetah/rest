@@ -1,8 +1,12 @@
 import unittest
 from datetime import datetime
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from zoneinfo import ZoneInfo
 
+import joblib
 from fastapi.testclient import TestClient
+from sklearn.dummy import DummyClassifier
 
 from app.main import app
 from app.models.risk_assessment import RiskAssessment
@@ -108,6 +112,56 @@ class RiskAnalysisTest(unittest.TestCase):
         self.assertNotIn("riskScore", payload)
         self.assertEqual(payload["risk_level"], "REST_RECOMMENDED")
         self.assertEqual(payload["recommended_rest_count"], 1)
+
+    def test_uses_trained_classifier_when_all_model_inputs_are_available(self):
+        model = DummyClassifier(strategy="constant", constant="REST_REQUIRED")
+        model.fit([[0.0] * 8], ["REST_REQUIRED"])
+        with TemporaryDirectory() as directory:
+            model_path = Path(directory) / "risk_classifier.joblib"
+            joblib.dump(
+                {
+                    "artifact_format_version": 1,
+                    "model": model,
+                    "model_name": "test_classifier",
+                    "feature_names": (
+                        "temperature",
+                        "humidity",
+                        "wind_speed",
+                        "solar_radiation",
+                        "surface_pressure",
+                        "walking_minutes",
+                        "current_continuous_exposure_minutes",
+                        "expected_continuous_exposure_minutes",
+                    ),
+                    "risk_labels": (
+                        "MOVE_POSSIBLE",
+                        "REST_RECOMMENDED",
+                        "REST_REQUIRED",
+                    ),
+                    "label_policy_version": "test-policy-1",
+                    "training_data_source": "test_fixture",
+                },
+                model_path,
+            )
+            result = evaluate_risk(
+                RiskEvaluateRequest(
+                    route_option_id=4,
+                    temperature=25,
+                    humidity=50,
+                    observed_at=datetime(2026, 8, 18, 14, 0, tzinfo=SEOUL_TZ),
+                    wind_speed=2.0,
+                    solar_radiation=600.0,
+                    surface_pressure=1008.0,
+                    walking_minutes=10,
+                    current_continuous_exposure_minutes=0,
+                    expected_continuous_exposure_minutes=10,
+                ),
+                model_path=model_path,
+            )
+
+        self.assertEqual(result.risk_level, "REST_REQUIRED")
+        self.assertEqual(result.model_version, "test_classifier:test-policy-1")
+        self.assertIn("MODEL_DETECTED_HEAT_RISK", result.reason_codes)
 
     def test_persistence_model_excludes_risk_score(self):
         self.assertNotIn("risk_score", RiskAssessment.__table__.columns)

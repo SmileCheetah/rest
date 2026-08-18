@@ -1,9 +1,16 @@
+import logging
+from pathlib import Path
+
+from app.config import settings
+from app.ml.inference import RiskModelArtifactError, predict_risk
 from app.schemas.risk_analysis import (
     RiskEvaluateRequest,
     RiskEvaluateResponse,
     RiskLevel,
 )
 from app.services.weather import calculate_apparent_temperature
+
+logger = logging.getLogger(__name__)
 
 
 def classify_risk(
@@ -58,24 +65,56 @@ def build_reason_message(
     return f"{', '.join(facts)}입니다. {action}"
 
 
-def evaluate_risk(request: RiskEvaluateRequest) -> RiskEvaluateResponse:
+def evaluate_risk(
+    request: RiskEvaluateRequest,
+    *,
+    model_path: Path | None = None,
+) -> RiskEvaluateResponse:
     apparent_temperature = calculate_apparent_temperature(
         request.temperature,
         request.humidity,
         request.observed_at,
         request.wind_speed,
     )
-    level = classify_risk(
-        apparent_temperature=apparent_temperature,
-        walking_minutes=request.walking_minutes,
-        current_continuous_exposure_minutes=(
-            request.current_continuous_exposure_minutes
-        ),
-        expected_continuous_exposure_minutes=(
-            request.expected_continuous_exposure_minutes
-        ),
-        shelter_accessibility=request.shelter_accessibility,
-    )
+    artifact_path = settings.risk_model_path if model_path is None else model_path
+    try:
+        prediction = predict_risk(
+            {
+                "temperature": request.temperature,
+                "humidity": request.humidity,
+                "wind_speed": request.wind_speed,
+                "solar_radiation": request.solar_radiation,
+                "surface_pressure": request.surface_pressure,
+                "walking_minutes": request.walking_minutes,
+                "current_continuous_exposure_minutes": (
+                    request.current_continuous_exposure_minutes
+                ),
+                "expected_continuous_exposure_minutes": (
+                    request.expected_continuous_exposure_minutes
+                ),
+            },
+            artifact_path,
+        )
+    except RiskModelArtifactError:
+        logger.exception("Risk model artifact is invalid; using rule classifier")
+        prediction = None
+
+    if prediction is None:
+        level = classify_risk(
+            apparent_temperature=apparent_temperature,
+            walking_minutes=request.walking_minutes,
+            current_continuous_exposure_minutes=(
+                request.current_continuous_exposure_minutes
+            ),
+            expected_continuous_exposure_minutes=(
+                request.expected_continuous_exposure_minutes
+            ),
+            shelter_accessibility=request.shelter_accessibility,
+        )
+        model_version = "rule-classifier-mvp-1"
+    else:
+        level = prediction.risk_level
+        model_version = prediction.model_version
     rest_required = level == "REST_REQUIRED"
     reasons: list[str] = []
     if apparent_temperature >= 31:
@@ -97,7 +136,11 @@ def evaluate_risk(request: RiskEvaluateRequest) -> RiskEvaluateResponse:
     ):
         reasons.append("LOW_SHELTER_ACCESSIBILITY")
     if not reasons:
-        reasons.append("NO_MAJOR_RISK_FACTOR")
+        reasons.append(
+            "NO_MAJOR_RISK_FACTOR"
+            if level == "MOVE_POSSIBLE"
+            else "MODEL_DETECTED_HEAT_RISK"
+        )
     return RiskEvaluateResponse(
         route_option_id=request.route_option_id,
         apparent_temperature=apparent_temperature,
@@ -112,5 +155,5 @@ def evaluate_risk(request: RiskEvaluateRequest) -> RiskEvaluateResponse:
             ),
             risk_level=level,
         ),
-        model_version="rule-classifier-mvp-1",
+        model_version=model_version,
     )

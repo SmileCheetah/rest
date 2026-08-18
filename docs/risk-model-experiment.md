@@ -8,21 +8,38 @@
 
 ## 라벨 생성
 
-기상 입력으로 ECMWF `thermofeel`의 Liljegren WBGT 구현을 실행한다. 보통 걷기를 중간 강도 작업으로 가정하고, WBGT 구간별 작업 가능시간과 현재·예상 연속노출시간을 비교해 다음 라벨을 만든다.
+기상 입력으로 ECMWF `thermofeel`의 Liljegren WBGT 구현을 오프라인에서만 실행한다. 보통 걷기를 중간 강도 작업으로 가정하고, OSHA Technical Manual Table II:4-2의 중간 강도 작업/휴식 구간과 현재·예상 연속노출시간을 비교해 다음 라벨을 만든다.
 
 - `MOVE_POSSIBLE`
 - `REST_RECOMMENDED`
 - `REST_REQUIRED`
 
-WBGT 25℃ 미만은 보수적으로 연속노출 120분까지 허용하는 MVP 정책을 사용한다. 누적노출 120분 또는 240분 이상이고 휴식이 부족할 때 작업 가능시간을 각각 10분 또는 15분 줄이는 보정도 MVP 정책이다. 이 보정값은 NIOSH가 발표한 수치가 아니며 실제 지침 또는 실증 데이터가 확보되면 교체해야 한다.
+중간 강도 기준은 WBGT 26.7℃ 미만이면 이 표에 따른 휴식 제한을 적용하지 않고, 26.7/28.0/29.4/31.1℃ 구간에서 시간당 작업 가능시간을 각각 45/30/15/0분으로 변환한다. 현재 연속노출이 한계에 도달하면 `REST_REQUIRED`, 현재는 한계 전이지만 이동 후 예상 연속노출이 한계에 도달하면 `REST_RECOMMENDED`, 그 외에는 `MOVE_POSSIBLE`로 라벨링한다.
 
-합성 라벨은 정상 보행, 기본 작업복, 더위에 적응되지 않은 사용자를 보수적으로 가정한다. 개인 건강상태를 판단하지 않는다.
+일 누적노출과 일 누적휴식은 활동 상태 기록에는 유지하지만 근거 있는 보정식을 확보하지 못했으므로 학습 피처와 라벨 생성에서 제외한다. 이 모델은 WBGT와 연속노출에 대한 합성 라벨을 재현하며 열질환을 진단하지 않는다.
+
+OSHA 표는 건강하고 더위에 적응된 작업자가 가벼운 여름 작업복을 입고 수분과 염분을 충분히 섭취한다는 전제를 가진다. 현재 모델은 이 중간 강도 작업 기준을 일반 보행의 MVP 대리 기준으로 사용하므로, 실제 사용자 실증 데이터가 확보되면 라벨 경계를 다시 검증해야 한다. 개인 건강상태를 판단하지 않는다.
 
 참고 기준:
 
 - [ECMWF thermofeel Liljegren WBGT 구현](https://github.com/ecmwf/thermofeel)
 - [NIOSH Occupational Exposure to Heat and Hot Environments](https://www.cdc.gov/niosh/docs/2016-106/default.html)
 - [OSHA Technical Manual Table II:4-2](https://www.osha.gov/enforcement/directives/ted-115-ch-1)
+
+## ERA5 입력
+
+`app.ml.era5.load_era5_netcdf`는 ERA5 hourly single-level NetCDF의 한 격자점을 다음 단위로 변환한다.
+
+- `t2m`: K → ℃
+- `d2m`: `t2m`과 함께 상대습도(%) 산출
+- `u10`, `v10`: 10m 풍속(m/s) 합성
+- `sp`: Pa → hPa
+- `ssrd`, `fdir`: 시간 누적 J/m² → W/m², 이후 `fdir / ssrd`로 직접일사 비율 산출
+- 유효시각·위경도: 해당 1시간의 평균 태양천정각 코사인 산출
+
+ERA5 hourly reanalysis의 `ssrd`와 `fdir`는 기본적으로 유효시각 직전 1시간 누적값이므로 3,600초로 나눈다. 다른 처리 주기의 파일은 `--accumulation-seconds`를 명시해야 한다.
+
+학습 피처는 기온, 습도, 풍속, 일사량, 기압, 이동시간, 현재 연속노출시간, 이동 후 예상 연속노출시간이다. WBGT, 직접일사 비율, 태양천정각은 오프라인 정답 라벨 생성에만 쓰며 런타임 모델 입력에는 포함하지 않는다.
 
 ## 데이터 분할과 평가
 
@@ -41,4 +58,16 @@ cd backend
 .\.venv\Scripts\python.exe -m app.ml.compare_risk_models
 ```
 
-결과는 기본적으로 `backend/artifacts/risk-model/`에 저장되며 Git에는 포함되지 않는다.
+ERA5 NetCDF로 실행:
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m app.ml.compare_risk_models `
+  --era5-netcdf data/era5-seoul.nc `
+  --latitude 37.5665 `
+  --longitude 126.9780
+```
+
+결과는 기본적으로 `backend/artifacts/risk-model/`에 저장되며 Git에는 포함되지 않는다. 비교 보고서와 모델 아티팩트에는 `training_data_source`를 기록해 합성 기상 검증 모델과 ERA5 기반 모델을 구분한다.
+
+API 요청에 `wind_speed`, `solar_radiation`, `surface_pressure`가 있고 모델 파일이 유효하면 저장 모델을 사용한다. 필요한 값이나 모델이 없으면 `rule-classifier-mvp-1` 규칙 분류기로 폴백하며, 응답의 `model_version`으로 실제 사용 경로를 확인할 수 있다. `joblib` 파일은 코드 실행 권한을 가질 수 있으므로 신뢰할 수 있는 학습 파이프라인에서 생성한 파일만 배포한다.
