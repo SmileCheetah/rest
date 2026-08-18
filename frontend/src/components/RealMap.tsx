@@ -1,19 +1,20 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { RouteSegment } from "@/types/api";
+import type { CoolingSpot, RouteSegment } from "@/types/api";
 import "leaflet/dist/leaflet.css";
 
 type Props = {
   route?: RouteSegment | null;
   destination: { latitude: number; longitude: number; name: string };
   onSpot?: () => void;
+  spots?: CoolingSpot[];
 };
 
 const DEFAULT_LOCATION = { latitude: 37.5739, longitude: 127.0105 };
 
 /** 실제 타일 지도와 경로/마커를 그리는 클라이언트 전용 지도입니다. */
-export default function RealMap({ route, destination, onSpot }: Props) {
+export default function RealMap({ route, destination, onSpot, spots = [] }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onSpotRef = useRef(onSpot);
 
@@ -43,11 +44,6 @@ export default function RealMap({ route, destination, onSpot }: Props) {
       L.marker([origin.latitude, origin.longitude], { icon: currentIcon }).addTo(map).bindTooltip("현재 위치");
       L.marker(destinationPoint, { icon: destinationIcon }).addTo(map).bindTooltip(destination.name);
 
-      const spots = [
-        { latitude: destination.latitude + 0.0011, longitude: destination.longitude + 0.0007, name: "창신동 주민센터" },
-        { latitude: destination.latitude - 0.0008, longitude: destination.longitude + 0.0012, name: "기업 쿨링스팟" },
-        { latitude: destination.latitude + 0.0004, longitude: destination.longitude - 0.0013, name: "무더위쉼터" },
-      ];
       spots.forEach((spot, index) => {
         const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon }).addTo(map!);
         marker.bindTooltip(spot.name);
@@ -68,7 +64,7 @@ export default function RealMap({ route, destination, onSpot }: Props) {
       cancelled = true;
       map?.remove();
     };
-  }, [destination.latitude, destination.longitude, destination.name, route]);
+  }, [destination.latitude, destination.longitude, destination.name, route, spots]);
 
   return <div ref={containerRef} className="real-map" aria-label="현재 위치와 방문지 지도" />;
 }
