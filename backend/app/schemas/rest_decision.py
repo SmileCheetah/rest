@@ -15,8 +15,9 @@ class RestDecisionRequest(BaseModel):
     total_walking_minutes: int = Field(..., ge=0, alias="totalWalkingMinutes")
     minutes_since_last_rest: int = Field(..., ge=0, alias="minutesSinceLastRest")
     recent_rest_minutes: int = Field(..., ge=0, le=180, alias="recentRestMinutes")
-    temperature: float
-    humidity: float = Field(..., ge=0, le=100)
+    station_id: int = Field(default=108, ge=1, alias="stationId")
+    temperature: float | None = None
+    humidity: float | None = Field(default=None, ge=0, le=100)
     wind_speed: float | None = Field(default=None, ge=0, alias="windSpeed")
     observed_at: datetime = Field(..., alias="observedAt")
     next_travel_minutes: int = Field(..., ge=0, alias="nextTravelMinutes")
@@ -56,3 +57,6 @@ class RestDecisionResponse(BaseModel):
     details: RestScoreDetails
     decision: RestDecision
     decision_source: Literal["AI", "FALLBACK"] = Field(alias="decisionSource")
+    weather_source: Literal["KMA_ASOS", "REQUEST_FALLBACK"] = Field(
+        alias="weatherSource"
+    )

@@ -9,6 +9,9 @@ from app.main import app
 from app.schemas.rest_decision import RestDecision, RestDecisionRequest
 from app.services.rest_decision import RestDecisionService
 from app.services.rest_need import calculate_rest_need, classify_rest_need
+from app.services.rest_weather import RestWeatherResult
+from app.schemas.asos import AsosHourlyObservation, AsosHourlyResponse
+from app.services.rest_weather import resolve_rest_weather
 
 SEOUL_TZ = ZoneInfo("Asia/Seoul")
 client = TestClient(app)
@@ -85,22 +88,68 @@ class RestDecisionTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(source, "AI")
         self.assertTrue(decision.should_rest)
 
-    def test_api_accepts_camel_case_and_returns_debug_details(self):
-        response = client.post(
-            "/rest/decision",
-            json={
-                "continuousWalkingMinutes": 10,
-                "totalWalkingMinutes": 30,
-                "minutesSinceLastRest": 10,
-                "recentRestMinutes": 20,
-                "temperature": 24,
-                "humidity": 50,
-                "windSpeed": 2,
-                "observedAt": "2026-08-18T14:00:00+09:00",
-                "nextTravelMinutes": 5,
-                "coolingSpotNearby": False,
-            },
+    async def test_rest_weather_uses_kma_asos_observation(self):
+        request = _request(temperature=20, humidity=20)
+        observation = AsosHourlyObservation(
+            station_id=108,
+            station_name="서울",
+            observed_at=request.observed_at,
+            temperature=31.2,
+            humidity=72,
+            wind_speed=1.8,
         )
+        response = AsosHourlyResponse(
+            station_id=108,
+            station_name="서울",
+            start_at=request.observed_at,
+            end_at=request.observed_at,
+            observations=[observation],
+        )
+        with patch(
+            "app.services.rest_weather.get_asos_hourly",
+            new=AsyncMock(return_value=response),
+        ):
+            result = await resolve_rest_weather(request)
+
+        self.assertEqual(result.source, "KMA_ASOS")
+        self.assertEqual(result.request.temperature, 31.2)
+        self.assertEqual(result.request.humidity, 72)
+
+    def test_api_accepts_camel_case_and_returns_debug_details(self):
+        with patch(
+            "app.routers.rest_decision.resolve_rest_weather",
+            new=AsyncMock(
+                return_value=RestWeatherResult(
+                    request=_request(
+                        continuousWalkingMinutes=10,
+                        totalWalkingMinutes=30,
+                        minutesSinceLastRest=10,
+                        recentRestMinutes=20,
+                        temperature=24,
+                        humidity=50,
+                        windSpeed=2,
+                        nextTravelMinutes=5,
+                        coolingSpotNearby=False,
+                    ),
+                    source="KMA_ASOS",
+                )
+            ),
+        ):
+            response = client.post(
+                "/rest/decision",
+                json={
+                    "continuousWalkingMinutes": 10,
+                    "totalWalkingMinutes": 30,
+                    "minutesSinceLastRest": 10,
+                    "recentRestMinutes": 20,
+                    "temperature": 24,
+                    "humidity": 50,
+                    "windSpeed": 2,
+                    "observedAt": "2026-08-18T14:00:00+09:00",
+                    "nextTravelMinutes": 5,
+                    "coolingSpotNearby": False,
+                },
+            )
 
         self.assertEqual(response.status_code, 200)
         payload = response.json()
@@ -108,6 +157,7 @@ class RestDecisionTest(unittest.IsolatedAsyncioTestCase):
         self.assertIn("walkingScore", payload["details"])
         self.assertIn("shouldRest", payload["decision"])
         self.assertEqual(payload["decisionSource"], "FALLBACK")
+        self.assertEqual(payload["weatherSource"], "KMA_ASOS")
 
 
 if __name__ == "__main__":

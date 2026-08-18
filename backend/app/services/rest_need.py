@@ -27,6 +27,8 @@ class RestScore:
 
 
 def calculate_rest_need(request: RestDecisionRequest) -> RestScore:
+    if request.temperature is None or request.humidity is None:
+        raise ValueError("temperature and humidity are required after weather resolution")
     apparent_temperature = calculate_apparent_temperature(
         request.temperature,
         request.humidity,
