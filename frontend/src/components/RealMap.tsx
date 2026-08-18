@@ -51,7 +51,12 @@ export default function RealMap({ route, destination, onSpot, spots = [] }: Prop
 
       spots.forEach((spot) => {
         const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon(spot.type) }).addTo(map!);
-        marker.bindTooltip(`${spot.type === "PUBLIC" ? "공공 무더위쉼터" : "기업 쿨링스팟"} · ${spot.name}`);
+        marker.bindTooltip(spot.name, {
+          permanent: true,
+          direction: "top",
+          offset: [0, -28],
+          className: `cooling-spot-label ${spot.type === "PUBLIC" ? "public" : "company"}`,
+        });
         marker.on("click", () => onSpotRef.current?.());
       });
 
