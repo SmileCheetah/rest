@@ -2,7 +2,11 @@ import logging
 from pathlib import Path
 
 from app.config import settings
-from app.ml.inference import RiskModelArtifactError, predict_risk
+from app.ml.inference import (
+    RiskModelArtifactError,
+    predict_risk,
+    predict_work_limit,
+)
 from app.schemas.risk_analysis import (
     RiskEvaluateRequest,
     RiskEvaluateResponse,
@@ -77,42 +81,68 @@ def evaluate_risk(
         request.wind_speed,
     )
     artifact_path = settings.risk_model_path if model_path is None else model_path
-    try:
-        prediction = predict_risk(
-            {
-                "temperature": request.temperature,
-                "humidity": request.humidity,
-                "wind_speed": request.wind_speed,
-                "solar_radiation": request.solar_radiation,
-                "surface_pressure": request.surface_pressure,
-                "walking_minutes": request.walking_minutes,
-                "current_continuous_exposure_minutes": (
-                    request.current_continuous_exposure_minutes
-                ),
-                "expected_continuous_exposure_minutes": (
-                    request.expected_continuous_exposure_minutes
-                ),
-            },
-            artifact_path,
+    expected_exposure = max(
+        request.expected_continuous_exposure_minutes,
+        request.current_continuous_exposure_minutes + request.walking_minutes,
+    )
+    work_limit_prediction = None
+    if model_path is None:
+        try:
+            work_limit_prediction = predict_work_limit(
+                {
+                    "temperature": request.temperature,
+                    "humidity": request.humidity,
+                    "wind_speed": request.wind_speed,
+                    "solar_radiation": request.solar_radiation,
+                    "surface_pressure": request.surface_pressure,
+                },
+                settings.work_limit_model_path,
+            )
+        except RiskModelArtifactError:
+            logger.exception("Work limit model is invalid; using legacy risk classifier")
+
+    if work_limit_prediction is not None:
+        level = _classify_work_limit(
+            work_limit_prediction.work_limit_label,
+            expected_exposure,
         )
+        model_version = work_limit_prediction.model_version
+        prediction = None
+    else:
+        prediction = None
+    try:
+        if work_limit_prediction is None:
+            prediction = predict_risk(
+                {
+                    "temperature": request.temperature,
+                    "humidity": request.humidity,
+                    "wind_speed": request.wind_speed,
+                    "solar_radiation": request.solar_radiation,
+                    "surface_pressure": request.surface_pressure,
+                    "walking_minutes": request.walking_minutes,
+                    "current_continuous_exposure_minutes": (
+                        request.current_continuous_exposure_minutes
+                    ),
+                    "expected_continuous_exposure_minutes": expected_exposure,
+                },
+                artifact_path,
+            )
     except RiskModelArtifactError:
         logger.exception("Risk model artifact is invalid; using rule classifier")
         prediction = None
 
-    if prediction is None:
+    if work_limit_prediction is None and prediction is None:
         level = classify_risk(
             apparent_temperature=apparent_temperature,
             walking_minutes=request.walking_minutes,
             current_continuous_exposure_minutes=(
                 request.current_continuous_exposure_minutes
             ),
-            expected_continuous_exposure_minutes=(
-                request.expected_continuous_exposure_minutes
-            ),
+            expected_continuous_exposure_minutes=expected_exposure,
             shelter_accessibility=request.shelter_accessibility,
         )
         model_version = "rule-classifier-mvp-1"
-    else:
+    elif work_limit_prediction is None:
         level = prediction.risk_level
         model_version = prediction.model_version
     rest_required = level == "REST_REQUIRED"
@@ -121,11 +151,11 @@ def evaluate_risk(
         reasons.append("HIGH_APPARENT_TEMPERATURE")
     if request.current_continuous_exposure_minutes >= 120:
         reasons.append("CONTINUOUS_EXPOSURE_LIMIT_REACHED")
-    elif request.expected_continuous_exposure_minutes >= 120:
+    elif expected_exposure >= 120:
         reasons.append("EXPECTED_EXPOSURE_LIMIT_REACHED")
     elif (
         request.current_continuous_exposure_minutes >= 30
-        or request.expected_continuous_exposure_minutes >= 30
+        or expected_exposure >= 30
     ):
         reasons.append("LONG_CONTINUOUS_EXPOSURE")
     if request.walking_minutes >= 30:
@@ -157,3 +187,14 @@ def evaluate_risk(
         ),
         model_version=model_version,
     )
+
+
+def _classify_work_limit(work_limit_label: str, expected_exposure: int) -> RiskLevel:
+    if work_limit_label == "REST_REQUIRED":
+        return "REST_REQUIRED"
+    allowed_minutes = int(work_limit_label.removeprefix("WORK_"))
+    if expected_exposure > allowed_minutes:
+        return "REST_REQUIRED"
+    if expected_exposure > allowed_minutes * 0.8:
+        return "REST_RECOMMENDED"
+    return "MOVE_POSSIBLE"
