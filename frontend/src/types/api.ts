@@ -148,3 +148,35 @@ export interface RouteSegment {
     source: "KMA";
   } | null;
 }
+
+export interface RiskEvaluation {
+  route_option_id: number;
+  apparentTemperature: number;
+  risk_level: "MOVE_POSSIBLE" | "REST_RECOMMENDED" | "REST_REQUIRED";
+  rest_required: boolean;
+  recommended_rest_count: number;
+  reason_codes: string[];
+  reason_message: string;
+  model_version: string;
+}
+
+export interface SafeRoute {
+  routeSegmentId: number;
+  routeOptionId: number;
+  routeType: "SAFE";
+  coolingSpot: CoolingSpot;
+  distanceMeters: number;
+  walkingMinutes: number;
+  totalTravelMinutes: number;
+  additionalMinutes: number;
+  plannedRestMinutes: number;
+  estimatedArrivalTime: string;
+  path: RoutePathPoint[];
+}
+
+export interface RouteRecommendation {
+  risk: RiskEvaluation;
+  normalRoute: RouteSegment;
+  safeRoute: SafeRoute | null;
+  shelterRecommendationMessage: string | null;
+}
