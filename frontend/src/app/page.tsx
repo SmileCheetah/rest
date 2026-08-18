@@ -8,6 +8,7 @@ import {
   completeWorkSession,
   resetDemoWorkSession,
   createRouteSegment,
+  recommendRoute,
   createSchedule,
   deleteSchedule,
   getCurrentWeather,
@@ -26,6 +27,7 @@ import type {
   LivingWeatherIndex,
   RoutePathPoint,
   RouteSegment,
+  RouteRecommendation,
   CoolingSpot,
   Schedule,
   VisitTarget,
@@ -214,6 +216,7 @@ export default function Home() {
   const [activeScheduleId, setActiveScheduleId] = useState<number | null>(null);
   const [inProgressScheduleId, setInProgressScheduleId] = useState<number | null>(null);
   const [activeRoute, setActiveRoute] = useState<RouteSegment | null>(null);
+  const [recommendedRoute, setRecommendedRoute] = useState<RouteRecommendation | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<number | null>(null);
   const [scheduleTime, setScheduleTime] = useState("14:30");
@@ -309,6 +312,7 @@ export default function Home() {
       setActiveScheduleId(next.nextSchedule?.scheduleId ?? null);
       setApiMessage(null);
       setActiveRoute(null);
+      setRecommendedRoute(null);
       if (next.workCompleted || !next.nextSchedule) {
         setScreen("complete");
       } else {
@@ -327,6 +331,14 @@ export default function Home() {
             departureTime: new Date().toISOString(),
           });
           setActiveRoute(route);
+          try {
+            const recommendation = await recommendRoute(route.routeSegmentId);
+            setRecommendedRoute(recommendation);
+            setSelectedRoute(recommendation.safeRoute ? "safe" : "normal");
+          } catch (recommendationError) {
+            setSelectedRoute("normal");
+            setApiMessage(recommendationError instanceof Error ? recommendationError.message : "안전경로 추천에 실패했습니다.");
+          }
         } catch (routeError) {
           setApiMessage(routeError instanceof Error ? routeError.message : "경로 생성에 실패했습니다.");
         }
@@ -431,6 +443,21 @@ export default function Home() {
     visits[0] ??
     fallbackVisits[0];
   const heatLevel = getHeatLevel(currentWeather?.apparentTemperature);
+  const safeRoute: RouteSegment | null = activeRoute && recommendedRoute?.safeRoute
+    ? {
+        ...activeRoute,
+        routeOptionId: recommendedRoute.safeRoute.routeOptionId,
+        routeType: "SAFE" as const,
+        distanceMeters: recommendedRoute.safeRoute.distanceMeters,
+        walkingMinutes: recommendedRoute.safeRoute.walkingMinutes,
+        estimatedArrivalTime: recommendedRoute.safeRoute.estimatedArrivalTime,
+        path: recommendedRoute.safeRoute.path,
+      }
+    : null;
+  const displayedRoute = selectedRoute === "safe" && safeRoute ? safeRoute : activeRoute;
+  const risk = recommendedRoute?.risk;
+  const riskBadge = risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe";
+  const riskLabel = risk?.risk_level === "REST_REQUIRED" ? "휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권장" : "이동 가능";
   const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
   const displayedHeatTone = heatwaveImpact
     ? getHeatwaveTone(heatwaveImpact.level)
@@ -462,17 +489,17 @@ export default function Home() {
 
       {screen === "route" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("schedule")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>{activeVisit.visitOrder}번째 이동 구간</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
-        <Map route={activeRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
-        <section className="route-panel"><div className="route-summary"><span className="badge caution">휴식 권장</span><AiSummary onClick={() => setModal("ai")}/></div><p>체감온도가 높고 야외 활동이 길어지고 있어 휴식이 필요한 구간이에요.</p><div className="route-options">
+        <Map route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
+        <section className="route-panel"><div className="route-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary onClick={() => setModal("ai")}/></div><p>{risk?.reason_message ?? "경로와 날씨 정보를 분석하고 있습니다."}</p><div className="route-options">
           <button className={`route-card ${selectedRoute === "normal" ? "selected" : ""}`} onClick={() => setSelectedRoute("normal")}><span>일반 경로</span><strong>{activeRoute ? `${activeRoute.walkingMinutes}분` : "계산 전"}</strong><small>{activeRoute ? formatDistance(activeRoute.distanceMeters) : "TMAP 연결 확인 필요"}</small><b>휴식 없음</b></button>
-          <button className={`route-card ${selectedRoute === "safe" ? "selected" : ""}`} onClick={() => setSelectedRoute("safe")}><span>안전 경로 <em>추천</em></span><strong>22분</strong><small>1.4km</small><b>휴식 1회</b><i>추천 쉼터: 창신동 주민센터</i></button>
-        </div>{apiMessage && <p className="route-error">{apiMessage}</p>}<p className="route-delta">일반 경로보다 <strong>4분 더 걸리지만</strong> 이동 중 1회 쉴 수 있어요.</p><button className="button primary" onClick={startRoute}>{selectedRoute === "safe" ? "안전 경로로 안내 시작" : "일반 경로로 안내 시작"}</button></section>
+          {safeRoute && <button className={`route-card ${selectedRoute === "safe" ? "selected" : ""}`} onClick={() => setSelectedRoute("safe")}><span>안전 경로 <em>추천</em></span><strong>{recommendedRoute?.safeRoute ? `${recommendedRoute.safeRoute.walkingMinutes}분` : "계산 전"}</strong><small>{recommendedRoute?.safeRoute ? formatDistance(recommendedRoute.safeRoute.distanceMeters) : ""}</small><b>휴식 1회</b><i>추천 쉼터: {recommendedRoute?.safeRoute?.coolingSpot.name}</i></button>}
+        </div>{apiMessage && <p className="route-error">{apiMessage}</p>}{safeRoute && <p className="route-delta">일반 경로보다 <strong>{recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 걸리지만</strong> 이동 중 1회 쉴 수 있어요.</p>}{recommendedRoute?.shelterRecommendationMessage && <p className="route-delta">{recommendedRoute.shelterRecommendationMessage}</p>}<button className="button primary" onClick={startRoute}>{selectedRoute === "safe" && safeRoute ? "안전 경로로 안내 시작" : "일반 경로로 안내 시작"}</button></section>
       </>}
 
       {screen === "guidance" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("route")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>이동 중</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
-        <div className="move-summary"><span className="badge caution">휴식 권장</span><AiSummary onClick={() => setModal("ai")}/></div><Map moving route={activeRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
-        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{activeRoute ? `${activeRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{activeRoute ? formatDistance(activeRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button><article className="shelter-summary"><div><span>추천 쉼터</span><strong>창신동 주민센터</strong><small>경로상 약 10분 후 도착</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article><div className="button-row"><button className="button secondary" onClick={() => setModal("skip")}>쉼터 건너뛰기</button><button className="button teal" disabled={isBusy} onClick={() => void handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
+        <div className="move-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary onClick={() => setModal("ai")}/></div><Map moving route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
+        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{recommendedRoute?.safeRoute && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedRoute.safeRoute.coolingSpot.name}</strong><small>경로상 약 {Math.max(1, Math.round(recommendedRoute.safeRoute.walkingMinutes / 2))}분 후 도착</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row"><button className="button secondary" onClick={() => setModal("skip")}>쉼터 건너뛰기</button><button className="button teal" disabled={isBusy} onClick={() => void handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
       </>}
 
       {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 72}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 2}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 15}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>15분</strong><small>안전하게 이동했어요!</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2><p>창신동 주민센터</p><p>동부여성문화센터</p></section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}

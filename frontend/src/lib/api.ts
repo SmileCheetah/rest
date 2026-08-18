@@ -8,6 +8,7 @@ import type {
   NextScheduleResult,
   Schedule,
   RouteSegment,
+  RouteRecommendation,
   VisitTarget,
   WorkSession,
 } from "@/types/api";
@@ -135,5 +136,20 @@ export function createRouteSegment(
   return apiRequest("/route-segments", {
     method: "POST",
     body: JSON.stringify(request),
+  });
+}
+
+export function recommendRoute(
+  routeSegmentId: number,
+  currentContinuousExposureMinutes = 0,
+): Promise<RouteRecommendation> {
+  return apiRequest("/routes/recommendation", {
+    method: "POST",
+    body: JSON.stringify({
+      routeSegmentId,
+      currentContinuousExposureMinutes,
+      plannedRestMinutes: 10,
+      maxAdditionalMinutes: 5,
+    }),
   });
 }
