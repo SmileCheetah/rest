@@ -31,6 +31,14 @@ class Settings(BaseSettings):
     public_shelter_api_key: str | None = None
     public_shelter_api_url: str = "https://www.safetydata.go.kr/V2/api/DSSP-IF-10942"
     risk_model_path: Path | None = BACKEND_DIR / "artifacts/risk-model/risk_classifier.joblib"
+    work_limit_model_path: Path | None = (
+        BACKEND_DIR / "artifacts/risk-model-asos/work_limit_classifier.joblib"
+    )
+    rest_decision_ai_url: str | None = None
+    rest_decision_ai_api_key: str | None = None
+    rest_decision_ai_timeout_seconds: float = 10.0
+    rest_decision_high_score_threshold: int = 85
+    rest_decision_low_score_threshold: int = 20
     database_url: str
 
     model_config = SettingsConfigDict(

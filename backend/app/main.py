@@ -13,6 +13,7 @@ from app.routers.weather import router as weather_router
 from app.routers.work_sessions import router as work_sessions_router
 from app.routers.cooling_spots import router as cooling_spots_router
 from app.routers.risk import router as risk_router
+from app.routers.rest_decision import router as rest_decision_router
 
 app = FastAPI(
     title="폭염 이동 안전 지원 API",
@@ -37,6 +38,7 @@ app.include_router(routes_router)
 app.include_router(route_segments_router)
 app.include_router(cooling_spots_router)
 app.include_router(risk_router)
+app.include_router(rest_decision_router)
 
 
 @app.get("/health", tags=["system"])

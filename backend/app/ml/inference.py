@@ -16,6 +16,13 @@ SUPPORTED_RISK_LABELS = {
     "REST_RECOMMENDED",
     "REST_REQUIRED",
 }
+SUPPORTED_WORK_LIMIT_LABELS = {
+    "WORK_60",
+    "WORK_45",
+    "WORK_30",
+    "WORK_15",
+    "REST_REQUIRED",
+}
 
 
 class RiskModelArtifactError(RuntimeError):
@@ -25,6 +32,12 @@ class RiskModelArtifactError(RuntimeError):
 @dataclass(frozen=True)
 class ModelPrediction:
     risk_level: RiskLevel
+    model_version: str
+
+
+@dataclass(frozen=True)
+class WorkLimitPrediction:
+    work_limit_label: str
     model_version: str
 
 
@@ -60,6 +73,39 @@ def predict_risk(
         model_version=(
             f"{artifact['model_name']}:{artifact['label_policy_version']}"
         ),
+    )
+
+
+def predict_work_limit(
+    feature_values: Mapping[str, float | int | None],
+    model_path: Path | None,
+) -> WorkLimitPrediction | None:
+    """Predict the permitted work interval from weather-only features."""
+    if model_path is None or not model_path.is_file():
+        return None
+
+    resolved_path = model_path.resolve()
+    artifact = _load_artifact(str(resolved_path), resolved_path.stat().st_mtime_ns)
+    feature_names = artifact["feature_names"]
+    if any(feature_values.get(name) is None for name in feature_names):
+        return None
+    row = np.array(
+        [[float(feature_values[name]) for name in feature_names]],
+        dtype=float,
+    )
+    if not np.isfinite(row).all():
+        return None
+    try:
+        predicted = str(artifact["model"].predict(row)[0])
+    except Exception as exc:
+        raise RiskModelArtifactError("work limit model prediction failed") from exc
+    if predicted not in SUPPORTED_WORK_LIMIT_LABELS:
+        raise RiskModelArtifactError(
+            f"work limit model returned unsupported label {predicted!r}"
+        )
+    return WorkLimitPrediction(
+        work_limit_label=predicted,
+        model_version=f"{artifact['model_name']}:{artifact['label_policy_version']}",
     )
 
 
