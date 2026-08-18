@@ -1,12 +1,15 @@
 import unittest
 from datetime import datetime
+from decimal import Decimal
+from types import SimpleNamespace
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from app.schemas.route import Coordinate, RouteSegmentResponse
+from app.schemas.route import Coordinate, RoutePathPoint, RouteSegmentResponse
 from app.schemas.weather import ForecastWeatherResponse
 from app.services.rest_weather import RestWeatherResult
-from app.services.routes import _should_recommend_safe_route
+from app.services.routes import _find_shortest_safe_route, _should_recommend_safe_route
+from app.services.tmap import PedestrianRoute
 
 
 SEOUL_TZ = ZoneInfo("Asia/Seoul")
@@ -41,6 +44,48 @@ def _weather() -> ForecastWeatherResponse:
 
 
 class RouteAiRecommendationTest(unittest.IsolatedAsyncioTestCase):
+    async def test_shortest_actual_walking_route_wins_over_nearest_origin_spot(self):
+        origin = Coordinate(latitude=37.5739, longitude=127.0105, name="현재 위치")
+        destination = Coordinate(latitude=37.5736, longitude=127.0099, name="방문지")
+        near_origin = SimpleNamespace(
+            id=1,
+            name="출발지 가까운 쉼터",
+            latitude=Decimal("37.5738"),
+            longitude=Decimal("127.0104"),
+        )
+        shorter_total = SimpleNamespace(
+            id=2,
+            name="총 경로 최단 쉼터",
+            latitude=Decimal("37.5737"),
+            longitude=Decimal("127.0100"),
+        )
+
+        async def route_between(start, end):
+            minutes = {
+                ("현재 위치", "출발지 가까운 쉼터"): 1,
+                ("출발지 가까운 쉼터", "방문지"): 10,
+                ("현재 위치", "총 경로 최단 쉼터"): 4,
+                ("총 경로 최단 쉼터", "방문지"): 2,
+            }[(start.name, end.name)]
+            return PedestrianRoute(
+                distance_meters=minutes * 80,
+                walking_minutes=minutes,
+                path=[
+                    RoutePathPoint(latitude=start.latitude, longitude=start.longitude),
+                    RoutePathPoint(latitude=end.latitude, longitude=end.longitude),
+                ],
+            )
+
+        with patch("app.services.routes.get_pedestrian_route", new=route_between):
+            result = await _find_shortest_safe_route(
+                origin,
+                destination,
+                [near_origin, shorter_total],
+            )
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result[0].name, "총 경로 최단 쉼터")
+
     async def test_movable_ai_result_does_not_create_safe_route(self):
         async def resolve(request):
             return RestWeatherResult(request=request, source="REQUEST_FALLBACK", wbgt=25)

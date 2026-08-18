@@ -50,6 +50,11 @@ class SafeRouteNotFoundError(Exception):
     """조건에 맞는 쿨링스팟 안전경로를 찾을 수 없습니다."""
 
 
+# 모든 쉼터에 대해 두 번씩 TMAP을 호출하지 않도록, 직선거리로 가까운
+# 후보만 먼저 추린 뒤 실제 보행 경로를 비교한다.
+SAFE_ROUTE_COMPARISON_LIMIT = 5
+
+
 async def recommend_route(
     session: AsyncSession,
     *,
@@ -353,22 +358,12 @@ async def create_safe_route(
     if not candidates:
         raise SafeRouteNotFoundError("운영 중인 쿨링스팟이 없습니다")
 
-    best: tuple[CoolingSpot, PedestrianRoute, PedestrianRoute, int] | None = None
-    # 공공 쉼터와 기업 쿨링스팟을 구분하지 않고, 현재 위치에서 가장
-    # 가까운 후보 하나를 우선 경유지로 사용한다. 방문지까지의 거리까지
-    # 합산하면 출발지 바로 옆 쉼터보다 먼 후보가 선택될 수 있다.
-    for spot in candidates[:1]:
-        waypoint = Coordinate(latitude=float(spot.latitude), longitude=float(spot.longitude), name=spot.name)
-        to_spot = await get_pedestrian_route(origin, waypoint)
-        from_spot = await get_pedestrian_route(waypoint, destination)
-        walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
-        additional = max(0, walking_minutes - normal.walking_minutes)
-        if best is None or walking_minutes < best[3]:
-            best = (spot, to_spot, from_spot, walking_minutes)
+    best = await _find_shortest_safe_route(origin, destination, candidates)
     if best is None:
         raise SafeRouteNotFoundError(f"추가 이동 {max_additional_minutes}분 이내의 쿨링스팟이 없습니다")
 
-    spot, to_spot, from_spot, walking_minutes = best
+    spot, to_spot, from_spot = best
+    walking_minutes = to_spot.walking_minutes + from_spot.walking_minutes
     additional = max(0, walking_minutes - normal.walking_minutes)
     arrival_utc = (segment.departure_time or datetime.utcnow()) + timedelta(minutes=walking_minutes + planned_rest_minutes)
     spot_arrival_utc = (segment.departure_time or datetime.utcnow()) + timedelta(minutes=to_spot.walking_minutes)
@@ -442,6 +437,44 @@ def _approximate_route_distance(point: Coordinate, spot: CoolingSpot) -> float:
     latitude_delta = (point.latitude - float(spot.latitude)) * 111_000
     longitude_delta = (point.longitude - float(spot.longitude)) * 111_000 * cos(radians(point.latitude))
     return (latitude_delta**2 + longitude_delta**2) ** 0.5
+
+
+async def _find_shortest_safe_route(
+    origin: Coordinate,
+    destination: Coordinate,
+    candidates: list[CoolingSpot],
+) -> tuple[CoolingSpot, PedestrianRoute, PedestrianRoute] | None:
+    """실제 보행시간 합계가 가장 짧은 쿨링스팟 경유 경로를 선택합니다."""
+    shortlist = sorted(
+        candidates,
+        key=lambda spot: (
+            _approximate_route_distance(origin, spot)
+            + _approximate_route_distance(destination, spot)
+        ),
+    )[:SAFE_ROUTE_COMPARISON_LIMIT]
+    best: tuple[CoolingSpot, PedestrianRoute, PedestrianRoute] | None = None
+    for spot in shortlist:
+        waypoint = Coordinate(
+            latitude=float(spot.latitude),
+            longitude=float(spot.longitude),
+            name=spot.name,
+        )
+        to_spot = await get_pedestrian_route(origin, waypoint)
+        from_spot = await get_pedestrian_route(waypoint, destination)
+        candidate_key = (
+            to_spot.walking_minutes + from_spot.walking_minutes,
+            to_spot.distance_meters + from_spot.distance_meters,
+        )
+        if best is None:
+            best = (spot, to_spot, from_spot)
+            continue
+        best_key = (
+            best[1].walking_minutes + best[2].walking_minutes,
+            best[1].distance_meters + best[2].distance_meters,
+        )
+        if candidate_key < best_key:
+            best = (spot, to_spot, from_spot)
+    return best
 
 
 def _is_open(spot: CoolingSpot, at: time) -> bool:
