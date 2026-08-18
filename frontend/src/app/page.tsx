@@ -336,10 +336,6 @@ function restExposureBeforeVisit(
   return { continuousExposureMinutes, minutesSinceLastRest, totalWalkingMinutes };
 }
 
-function exposureBeforeVisit(visits: VisitCard[], visitOrder: number): number {
-  return restExposureBeforeVisit(visits, visitOrder).continuousExposureMinutes;
-}
-
 // 이전 SVG 지도 구현은 비교용으로 보존합니다.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function SvgMap({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
@@ -536,9 +532,12 @@ export default function Home() {
           const firstVisit = visits.find((visit) => visit.scheduleId === next.nextSchedule?.scheduleId);
           if (firstVisit) await loadActiveRestDecision(firstVisit, route.walkingMinutes);
           try {
+            const exposure = restExposureBeforeVisit(visits, next.nextSchedule.visitOrder);
             const recommendation = await recommendRoute(
               route.routeSegmentId,
-              exposureBeforeVisit(visits, next.nextSchedule.visitOrder),
+              exposure.continuousExposureMinutes,
+              exposure.totalWalkingMinutes,
+              exposure.minutesSinceLastRest,
             );
             setRecommendedRoute(recommendation);
             setSelectedRoute(recommendation.safeRoute ? "safe" : "normal");
@@ -587,9 +586,12 @@ export default function Home() {
         departureTime: new Date().toISOString(),
       });
       await loadActiveRestDecision(visit, route.walkingMinutes);
+      const exposure = restExposureBeforeVisit(visits, visit.visitOrder);
       const recommendation = await recommendRoute(
         route.routeSegmentId,
-        exposureBeforeVisit(visits, visit.visitOrder),
+        exposure.continuousExposureMinutes,
+        exposure.totalWalkingMinutes,
+        exposure.minutesSinceLastRest,
       );
       setWorkSession(session);
       setActiveRoute(route);

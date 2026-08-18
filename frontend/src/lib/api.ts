@@ -177,12 +177,16 @@ export function createRouteSegment(
 export function recommendRoute(
   routeSegmentId: number,
   currentContinuousExposureMinutes = 0,
+  currentTotalWalkingMinutes = currentContinuousExposureMinutes,
+  minutesSinceLastRest = currentContinuousExposureMinutes,
 ): Promise<RouteRecommendation> {
   return apiRequest("/routes/recommendation", {
     method: "POST",
     body: JSON.stringify({
       routeSegmentId,
       currentContinuousExposureMinutes,
+      currentTotalWalkingMinutes,
+      minutesSinceLastRest,
       plannedRestMinutes: 10,
       maxAdditionalMinutes: 5,
     }),
