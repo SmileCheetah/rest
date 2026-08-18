@@ -17,6 +17,7 @@ from app.schemas.route import (
 )
 from app.schemas.cooling_spot import CoolingSpotResponse
 from app.schemas.risk_analysis import RiskEvaluateRequest, RiskEvaluateResponse
+from app.schemas.rest_decision import RestDecisionRequest
 from app.schemas.weather import ForecastWeatherResponse
 from app.services.asos import (
     AsosConfigurationError,
@@ -27,6 +28,8 @@ from app.services.asos import (
 from app.services.tmap import PedestrianRoute, get_pedestrian_route
 from app.config import settings
 from app.services.risk_analysis import evaluate_risk
+from app.services.rest_decision import RestDecisionService
+from app.services.rest_weather import resolve_rest_weather
 from app.services.weather import (
     WeatherForecastNotFoundError,
     get_current_weather,
@@ -88,7 +91,29 @@ async def recommend_route(
             surface_pressure=model_weather["surface_pressure"],
         )
     )
-    if risk.risk_level == "MOVE_POSSIBLE":
+    origin = normal_route.origin
+    destination = normal_route.destination
+    departure = normal_route.departure_time
+    candidates = await _safe_route_candidates(
+        session,
+        cooling_spot_id=None,
+        at=departure.time(),
+        origin=origin,
+        destination=destination,
+    )
+    nearest_distance = (
+        int(round(_approximate_route_distance(origin, candidates[0])))
+        if candidates
+        else None
+    )
+    should_recommend_safe_route = await _should_recommend_safe_route(
+        normal_route=normal_route,
+        weather=weather,
+        model_weather=model_weather,
+        current_continuous_exposure_minutes=current_continuous_exposure_minutes,
+        nearest_cooling_spot_distance_meters=nearest_distance,
+    )
+    if not should_recommend_safe_route:
         return risk, normal_route, None, None
     try:
         safe_route = await create_safe_route(
@@ -101,6 +126,52 @@ async def recommend_route(
     except SafeRouteNotFoundError as exc:
         return risk, normal_route, None, str(exc)
     return risk, normal_route, safe_route, None
+
+
+async def _should_recommend_safe_route(
+    *,
+    normal_route: RouteSegmentResponse,
+    weather: ForecastWeatherResponse,
+    model_weather: dict[str, float | None],
+    current_continuous_exposure_minutes: int,
+    nearest_cooling_spot_distance_meters: int | None,
+) -> bool:
+    """동일한 XGBoost 휴식 판단으로 안전경로 생성 여부를 결정합니다."""
+    observed_at = (
+        weather.forecast_at
+        if hasattr(weather, "forecast_at")
+        else weather.observed_at
+    )
+    request = RestDecisionRequest(
+        continuousWalkingMinutes=current_continuous_exposure_minutes,
+        totalWalkingMinutes=(
+            current_continuous_exposure_minutes + normal_route.walking_minutes
+        ),
+        minutesSinceLastRest=current_continuous_exposure_minutes,
+        recentRestMinutes=0,
+        stationId=settings.kma_asos_station_id,
+        temperature=weather.temperature,
+        humidity=weather.humidity,
+        windSpeed=model_weather["wind_speed"],
+        observedAt=observed_at,
+        nextTravelMinutes=normal_route.walking_minutes,
+        coolingSpotNearby=(
+            nearest_cooling_spot_distance_meters is not None
+            and nearest_cooling_spot_distance_meters <= 500
+        ),
+        distanceToCoolingSpotMeters=nearest_cooling_spot_distance_meters,
+    )
+    resolved_weather = await resolve_rest_weather(request)
+    service = RestDecisionService()
+    prediction = service.predict_model_status(
+        resolved_weather.request,
+        resolved_weather.wbgt,
+    )
+    decision, _ = await service.decide(
+        resolved_weather.request,
+        model_prediction=prediction,
+    )
+    return decision.should_rest
 
 
 async def _get_model_weather(departure_time: datetime) -> dict[str, float | None]:
