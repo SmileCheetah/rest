@@ -2,6 +2,7 @@ import type {
   CreateScheduleRequest,
   CreateRouteSegmentRequest,
   CurrentWeather,
+  CoolingSpot,
   HeatwaveImpact,
   LivingWeatherIndex,
   NextScheduleResult,
@@ -60,6 +61,15 @@ export function getVisitTargets(): Promise<VisitTarget[]> {
   return apiRequest("/visit-targets");
 }
 
+export function getCoolingSpots(latitude?: number, longitude?: number): Promise<CoolingSpot[]> {
+  const params = new URLSearchParams();
+  if (latitude !== undefined && longitude !== undefined) {
+    params.set("latitude", String(latitude));
+    params.set("longitude", String(longitude));
+  }
+  return apiRequest(`/cooling-spots${params.size ? `?${params}` : ""}`);
+}
+
 export function getCurrentWorkSession(): Promise<WorkSession> {
   return apiRequest("/work-sessions/current");
 }
@@ -75,6 +85,10 @@ export function completeWorkSession(workSessionId: number): Promise<WorkSession>
   return apiRequest(`/work-sessions/${workSessionId}/complete`, {
     method: "PATCH",
   });
+}
+
+export function resetDemoWorkSession(): Promise<WorkSession> {
+  return apiRequest("/work-sessions/reset", { method: "POST" });
 }
 
 export function createSchedule(request: CreateScheduleRequest): Promise<Schedule> {

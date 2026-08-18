@@ -10,12 +10,23 @@ from app.services.work_sessions import (
     complete_work_session,
     find_work_session_by_date,
     start_work_session,
+    reset_demo_work_session,
 )
 from app.time_utils import seoul_today
 
 router = APIRouter(prefix="/work-sessions", tags=["work-sessions"])
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+@router.post("/reset", response_model=WorkSessionResponse, summary="개발용 데모 상태 초기화")
+async def reset_demo(session: DbSession) -> WorkSessionResponse:
+    async with session.begin():
+        work_session = await reset_demo_work_session(session, seoul_today())
+        if work_session is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="current work session not found")
+        response = await build_work_session_response(session, work_session)
+    return response
 
 
 @router.post(

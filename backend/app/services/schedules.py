@@ -1,10 +1,10 @@
 from datetime import date, time
 
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import ActivityLog, RouteSegment, Schedule, VisitTarget, WorkSession
+from app.models import ActivityLog, RiskAssessment, RouteOption, RouteSegment, Schedule, VisitTarget, WorkSession
 from app.models.base import utc_now
 from app.models.enums import ActivityType, ScheduleStatus, WorkSessionStatus
 
@@ -115,18 +115,14 @@ async def delete_schedule(
     schedule = await _get_schedule(session, schedule_id, for_update=True)
     if schedule is None:
         raise ScheduleNotFoundError("schedule not found")
-    await _ensure_schedule_editable(session, schedule)
-
-    route_count = await session.scalar(
-        select(func.count(RouteSegment.id)).where(
-            RouteSegment.schedule_id == schedule.id
-        )
-    )
-    if route_count:
-        raise ScheduleConflictError("schedule with route data cannot be deleted")
-
     work_session_id = schedule.work_session_id
     deleted_order = schedule.visit_order
+    segment_ids = select(RouteSegment.id).where(RouteSegment.schedule_id == schedule.id)
+    option_ids = select(RouteOption.id).where(RouteOption.route_segment_id.in_(segment_ids))
+    await session.execute(delete(ActivityLog).where(ActivityLog.schedule_id == schedule.id))
+    await session.execute(delete(RiskAssessment).where(RiskAssessment.route_option_id.in_(option_ids)))
+    await session.execute(delete(RouteOption).where(RouteOption.route_segment_id.in_(segment_ids)))
+    await session.execute(delete(RouteSegment).where(RouteSegment.schedule_id == schedule.id))
     await session.delete(schedule)
     await session.flush()
     await session.execute(
@@ -195,6 +191,27 @@ async def complete_schedule(
             occurred_at=schedule.completed_at,
         )
     )
+    await session.flush()
+    return schedule
+
+
+async def start_schedule(
+    session: AsyncSession,
+    schedule_id: int,
+) -> Schedule:
+    schedule = await _get_schedule(session, schedule_id, for_update=True)
+    if schedule is None:
+        raise ScheduleNotFoundError("schedule not found")
+    if schedule.status == ScheduleStatus.COMPLETED:
+        raise ScheduleConflictError("completed schedule cannot be started")
+    if schedule.status == ScheduleStatus.IN_PROGRESS:
+        return schedule
+    work_session = await session.get(WorkSession, schedule.work_session_id)
+    if work_session is None:
+        raise WorkSessionNotFoundError("work session not found")
+    if work_session.status != WorkSessionStatus.IN_PROGRESS:
+        raise ScheduleConflictError("work session is not in progress")
+    schedule.status = ScheduleStatus.IN_PROGRESS
     await session.flush()
     return schedule
 
