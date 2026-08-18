@@ -20,7 +20,11 @@ from app.schemas.risk_analysis import RiskEvaluateRequest, RiskEvaluateResponse
 from app.schemas.weather import ForecastWeatherResponse
 from app.services.tmap import PedestrianRoute, get_pedestrian_route
 from app.services.risk_analysis import evaluate_risk
-from app.services.weather import get_forecast_weather
+from app.services.weather import (
+    WeatherForecastNotFoundError,
+    get_current_weather,
+    get_forecast_weather,
+)
 from app.time_utils import to_utc_naive, utc_naive_to_seoul
 
 
@@ -48,18 +52,26 @@ async def recommend_route(
     normal_route = await get_route_segment(session, route_segment_id)
     if normal_route.departure_time is None:
         raise RouteSegmentNotFoundError("route segment departure time is missing")
-    weather = await get_forecast_weather(
-        normal_route.destination.latitude,
-        normal_route.destination.longitude,
-        normal_route.departure_time,
-    )
+    try:
+        weather = await get_forecast_weather(
+            normal_route.destination.latitude,
+            normal_route.destination.longitude,
+            normal_route.departure_time,
+        )
+    except WeatherForecastNotFoundError:
+        # 과거 일정 시각이나 예보 공백 구간에서도 데모 흐름이 멈추지 않도록
+        # 목적지의 현재 관측값으로 위험 판단을 계속한다.
+        weather = await get_current_weather(
+            normal_route.destination.latitude,
+            normal_route.destination.longitude,
+        )
     expected_exposure = current_continuous_exposure_minutes + normal_route.walking_minutes
     risk = evaluate_risk(
         RiskEvaluateRequest(
             route_option_id=normal_route.route_option_id,
             temperature=weather.temperature,
             humidity=weather.humidity,
-            observed_at=weather.forecast_at,
+            observed_at=weather.forecast_at if hasattr(weather, "forecast_at") else weather.observed_at,
             walking_minutes=normal_route.walking_minutes,
             current_continuous_exposure_minutes=current_continuous_exposure_minutes,
             expected_continuous_exposure_minutes=expected_exposure,
