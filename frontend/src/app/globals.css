@@ -15,3 +15,4 @@
 .cooling-spot-label{border:0!important;border-radius:6px!important;padding:2px 5px!important;background:#fff!important;box-shadow:0 1px 5px #1234!important;color:#087b76!important;font-size:8px!important;font-weight:800!important;white-space:nowrap}.cooling-spot-label:before{border-top-color:#fff!important}
 .visit-card.selected{border-color:#2f86ff;background:#f5f9ff}.visit-card.in-progress{border-color:#18a994;background:#f0fbf8}
 .route-change-button{width:100%;color:#1766e8;background:#eef6ff;border-color:#9ec9ff}
+.badge.completed{color:#66758a;background:#eef1f5}
