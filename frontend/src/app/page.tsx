@@ -207,9 +207,9 @@ function SvgMap({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: 
   </div>;
 }
 
-function Map({ moving = false, onSpot, route, spots = [] }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null; spots?: CoolingSpot[] }) {
-  const destination = route?.destination ?? { ...DEFAULT_LOCATION, name: "방문지" };
-  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} spots={spots} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} /></div>;
+function Map({ moving = false, onSpot, route, normalRoute, safeRoute, spots = [] }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null; normalRoute?: RouteSegment | null; safeRoute?: RouteSegment | null; spots?: CoolingSpot[] }) {
+  const destination = route?.destination ?? normalRoute?.destination ?? { ...DEFAULT_LOCATION, name: "방문지" };
+  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} normalRoute={normalRoute} safeRoute={safeRoute} compareRoutes={!moving} spots={spots} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} />{!moving && normalRoute?.path?.length && safeRoute?.path?.length ? <div className="map-legend"><span><i className="line-normal"/>일반 경로</span><span><i className="line-safe"/>안전 경로</span></div> : null}</div>;
 }
 
 export default function Home() {
@@ -567,7 +567,7 @@ export default function Home() {
 
       {screen === "route" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("schedule")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>{activeVisit.visitOrder}번째 이동 구간</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
-        <Map route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
+        <Map route={displayedRoute} normalRoute={activeRoute} safeRoute={safeRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
         <section className="route-panel"><div className="route-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary restCount={recommendedRestCount} onClick={() => setModal("ai")}/></div><p>{risk?.reason_message ?? "경로와 날씨 정보를 분석하고 있습니다."}</p><div className="route-options">
           <button className={`route-card ${selectedRoute === "normal" ? "selected" : ""}`} onClick={() => setSelectedRoute("normal")}><span>일반 경로</span><strong>{activeRoute ? `${activeRoute.walkingMinutes}분` : "계산 전"}</strong><small>{activeRoute ? formatDistance(activeRoute.distanceMeters) : "TMAP 연결 확인 필요"}</small><b>휴식 없음</b></button>
           <button className={`route-card ${selectedRoute === "safe" ? "selected" : ""} ${safeRoute ? "" : "unavailable"}`} disabled={!safeRoute} onClick={() => setSelectedRoute("safe")}><span>안전 경로 {safeRoute && <em>추천</em>}</span><strong>{safeRoute ? `${safeRoute.walkingMinutes}분` : "추천 없음"}</strong><small>{safeRoute ? formatDistance(safeRoute.distanceMeters) : "추천 조건 확인 중"}</small><b>{safeRoute ? "휴식 1회" : "일반 경로 이용"}</b><i>{safeRoute ? `추천 쉼터: ${recommendedRoute?.safeRoute?.coolingSpot.name}` : safeRouteUnavailableMessage}</i></button>
