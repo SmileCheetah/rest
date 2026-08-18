@@ -1,0 +1,614 @@
+{
+  "label_policy_version": "wbgt-osha-moderate-2",
+  "feature_names": [
+    "temperature",
+    "humidity",
+    "wind_speed",
+    "solar_radiation",
+    "surface_pressure",
+    "walking_minutes",
+    "current_continuous_exposure_minutes",
+    "expected_continuous_exposure_minutes"
+  ],
+  "selection_metric": "macro_f1, then REST_REQUIRED recall",
+  "best_baseline_ml_model": "hist_gradient_boosting",
+  "final_model": "hist_gradient_boosting_tuned",
+  "split": {
+    "strategy": "chronological weather-time group split",
+    "cutoff": "2024-09-20T11:00:00+09:00",
+    "train_rows": 3204,
+    "test_rows": 796
+  },
+  "dataset": {
+    "source": "synthetic_weather",
+    "rows": 4000,
+    "label_distribution": {
+      "MOVE_POSSIBLE": 2178,
+      "REST_RECOMMENDED": 538,
+      "REST_REQUIRED": 1284
+    },
+    "wbgt_min": 13.463,
+    "wbgt_max": 39.779,
+    "wbgt_mean": 26.639,
+    "limitation": "Synthetic-label agreement only; this is not validated heat-illness outcome accuracy."
+  },
+  "models": {
+    "rule_classifier": {
+      "accuracy": 0.173367,
+      "balanced_accuracy": 0.366305,
+      "macro_f1": 0.145043,
+      "rest_required_recall": 0.016667,
+      "confusion_matrix": [
+        [
+          57,
+          419,
+          0
+        ],
+        [
+          3,
+          77,
+          0
+        ],
+        [
+          0,
+          236,
+          4
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.95,
+          "recall": 0.119748,
+          "f1-score": 0.212687
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.105191,
+          "recall": 0.9625,
+          "f1-score": 0.189655
+        },
+        "REST_REQUIRED": {
+          "precision": 1.0,
+          "recall": 0.016667,
+          "f1-score": 0.032787
+        }
+      }
+    },
+    "random_forest": {
+      "accuracy": 0.89196,
+      "balanced_accuracy": 0.815126,
+      "macro_f1": 0.828095,
+      "rest_required_recall": 0.875,
+      "confusion_matrix": [
+        [
+          450,
+          10,
+          16
+        ],
+        [
+          16,
+          50,
+          14
+        ],
+        [
+          22,
+          8,
+          210
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.922131,
+          "recall": 0.945378,
+          "f1-score": 0.93361
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.735294,
+          "recall": 0.625,
+          "f1-score": 0.675676
+        },
+        "REST_REQUIRED": {
+          "precision": 0.875,
+          "recall": 0.875,
+          "f1-score": 0.875
+        }
+      }
+    },
+    "hist_gradient_boosting": {
+      "accuracy": 0.93593,
+      "balanced_accuracy": 0.879073,
+      "macro_f1": 0.886512,
+      "rest_required_recall": 0.945833,
+      "confusion_matrix": [
+        [
+          460,
+          9,
+          7
+        ],
+        [
+          12,
+          58,
+          10
+        ],
+        [
+          7,
+          6,
+          227
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.960334,
+          "recall": 0.966387,
+          "f1-score": 0.963351
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.794521,
+          "recall": 0.725,
+          "f1-score": 0.75817
+        },
+        "REST_REQUIRED": {
+          "precision": 0.930328,
+          "recall": 0.945833,
+          "f1-score": 0.938017
+        }
+      }
+    },
+    "hist_gradient_boosting_tuned": {
+      "accuracy": 0.940955,
+      "balanced_accuracy": 0.896429,
+      "macro_f1": 0.899086,
+      "rest_required_recall": 0.95,
+      "confusion_matrix": [
+        [
+          459,
+          10,
+          7
+        ],
+        [
+          9,
+          62,
+          9
+        ],
+        [
+          7,
+          5,
+          228
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.966316,
+          "recall": 0.964286,
+          "f1-score": 0.9653
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.805195,
+          "recall": 0.775,
+          "f1-score": 0.789809
+        },
+        "REST_REQUIRED": {
+          "precision": 0.934426,
+          "recall": 0.95,
+          "f1-score": 0.942149
+        }
+      }
+    }
+  },
+  "tuning": {
+    "model_family": "hist_gradient_boosting",
+    "strategy": "chronological inner train/validation split",
+    "validation_cutoff": "2024-05-18T10:00:00+09:00",
+    "train_rows": 2564,
+    "validation_rows": 640,
+    "selected_parameters": {
+      "learning_rate": 0.08,
+      "max_iter": 180,
+      "max_leaf_nodes": 15,
+      "min_samples_leaf": 15,
+      "l2_regularization": 0.5
+    },
+    "candidates": [
+      {
+        "parameters": {
+          "learning_rate": 0.08,
+          "max_iter": 150,
+          "max_leaf_nodes": 31,
+          "min_samples_leaf": 20,
+          "l2_regularization": 0.1
+        },
+        "validation_metrics": {
+          "accuracy": 0.882812,
+          "balanced_accuracy": 0.858786,
+          "macro_f1": 0.859822,
+          "rest_required_recall": 0.927711,
+          "confusion_matrix": [
+            [
+              239,
+              15,
+              8
+            ],
+            [
+              21,
+              95,
+              13
+            ],
+            [
+              2,
+              16,
+              231
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.912214,
+              "recall": 0.912214,
+              "f1-score": 0.912214
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.753968,
+              "recall": 0.736434,
+              "f1-score": 0.745098
+            },
+            "REST_REQUIRED": {
+              "precision": 0.916667,
+              "recall": 0.927711,
+              "f1-score": 0.922156
+            }
+          }
+        }
+      },
+      {
+        "parameters": {
+          "learning_rate": 0.05,
+          "max_iter": 200,
+          "max_leaf_nodes": 31,
+          "min_samples_leaf": 15,
+          "l2_regularization": 0.2
+        },
+        "validation_metrics": {
+          "accuracy": 0.878125,
+          "balanced_accuracy": 0.858705,
+          "macro_f1": 0.857062,
+          "rest_required_recall": 0.915663,
+          "confusion_matrix": [
+            [
+              236,
+              17,
+              9
+            ],
+            [
+              15,
+              98,
+              16
+            ],
+            [
+              3,
+              18,
+              228
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.929134,
+              "recall": 0.900763,
+              "f1-score": 0.914729
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.736842,
+              "recall": 0.75969,
+              "f1-score": 0.748092
+            },
+            "REST_REQUIRED": {
+              "precision": 0.901186,
+              "recall": 0.915663,
+              "f1-score": 0.908367
+            }
+          }
+        }
+      },
+      {
+        "parameters": {
+          "learning_rate": 0.08,
+          "max_iter": 180,
+          "max_leaf_nodes": 15,
+          "min_samples_leaf": 15,
+          "l2_regularization": 0.5
+        },
+        "validation_metrics": {
+          "accuracy": 0.89375,
+          "balanced_accuracy": 0.876941,
+          "macro_f1": 0.875518,
+          "rest_required_recall": 0.931727,
+          "confusion_matrix": [
+            [
+              238,
+              16,
+              8
+            ],
+            [
+              13,
+              102,
+              14
+            ],
+            [
+              3,
+              14,
+              232
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.937008,
+              "recall": 0.908397,
+              "f1-score": 0.922481
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.772727,
+              "recall": 0.790698,
+              "f1-score": 0.781609
+            },
+            "REST_REQUIRED": {
+              "precision": 0.913386,
+              "recall": 0.931727,
+              "f1-score": 0.922465
+            }
+          }
+        }
+      },
+      {
+        "parameters": {
+          "learning_rate": 0.06,
+          "max_iter": 200,
+          "max_leaf_nodes": 63,
+          "min_samples_leaf": 25,
+          "l2_regularization": 0.5
+        },
+        "validation_metrics": {
+          "accuracy": 0.890625,
+          "balanced_accuracy": 0.864102,
+          "macro_f1": 0.867703,
+          "rest_required_recall": 0.943775,
+          "confusion_matrix": [
+            [
+              241,
+              13,
+              8
+            ],
+            [
+              19,
+              94,
+              16
+            ],
+            [
+              2,
+              12,
+              235
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.919847,
+              "recall": 0.919847,
+              "f1-score": 0.919847
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.789916,
+              "recall": 0.728682,
+              "f1-score": 0.758065
+            },
+            "REST_REQUIRED": {
+              "precision": 0.907336,
+              "recall": 0.943775,
+              "f1-score": 0.925197
+            }
+          }
+        }
+      }
+    ],
+    "test_metrics": {
+      "accuracy": 0.940955,
+      "balanced_accuracy": 0.896429,
+      "macro_f1": 0.899086,
+      "rest_required_recall": 0.95,
+      "confusion_matrix": [
+        [
+          459,
+          10,
+          7
+        ],
+        [
+          9,
+          62,
+          9
+        ],
+        [
+          7,
+          5,
+          228
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.966316,
+          "recall": 0.964286,
+          "f1-score": 0.9653
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.805195,
+          "recall": 0.775,
+          "f1-score": 0.789809
+        },
+        "REST_REQUIRED": {
+          "precision": 0.934426,
+          "recall": 0.95,
+          "f1-score": 0.942149
+        }
+      }
+    },
+    "permutation_importance": [
+      {
+        "feature": "temperature",
+        "importance_mean": 0.496609,
+        "importance_std": 0.002453
+      },
+      {
+        "feature": "current_continuous_exposure_minutes",
+        "importance_mean": 0.189586,
+        "importance_std": 0.005193
+      },
+      {
+        "feature": "solar_radiation",
+        "importance_mean": 0.144063,
+        "importance_std": 0.003201
+      },
+      {
+        "feature": "humidity",
+        "importance_mean": 0.109648,
+        "importance_std": 0.008821
+      },
+      {
+        "feature": "wind_speed",
+        "importance_mean": 0.064222,
+        "importance_std": 0.001021
+      },
+      {
+        "feature": "expected_continuous_exposure_minutes",
+        "importance_mean": 0.053354,
+        "importance_std": 0.001035
+      },
+      {
+        "feature": "walking_minutes",
+        "importance_mean": 0.008061,
+        "importance_std": 0.001258
+      },
+      {
+        "feature": "surface_pressure",
+        "importance_mean": -0.005814,
+        "importance_std": 0.006808
+      }
+    ]
+  },
+  "feature_selection": {
+    "strategy": "chronological validation feature ablation",
+    "selection_rule": "smallest subset within 0.005 macro F1 of the best candidate",
+    "macro_f1_tolerance": 0.005,
+    "validation_cutoff": "2024-05-18T10:00:00+09:00",
+    "selected_features": [
+      "temperature",
+      "humidity",
+      "wind_speed",
+      "solar_radiation",
+      "surface_pressure",
+      "walking_minutes",
+      "current_continuous_exposure_minutes",
+      "expected_continuous_exposure_minutes"
+    ],
+    "candidates": [
+      {
+        "name": "all_features",
+        "features": [
+          "temperature",
+          "humidity",
+          "wind_speed",
+          "solar_radiation",
+          "surface_pressure",
+          "walking_minutes",
+          "current_continuous_exposure_minutes",
+          "expected_continuous_exposure_minutes"
+        ],
+        "validation_metrics": {
+          "accuracy": 0.89375,
+          "balanced_accuracy": 0.876941,
+          "macro_f1": 0.875518,
+          "rest_required_recall": 0.931727,
+          "confusion_matrix": [
+            [
+              238,
+              16,
+              8
+            ],
+            [
+              13,
+              102,
+              14
+            ],
+            [
+              3,
+              14,
+              232
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.937008,
+              "recall": 0.908397,
+              "f1-score": 0.922481
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.772727,
+              "recall": 0.790698,
+              "f1-score": 0.781609
+            },
+            "REST_REQUIRED": {
+              "precision": 0.913386,
+              "recall": 0.931727,
+              "f1-score": 0.922465
+            }
+          }
+        }
+      },
+      {
+        "name": "drop_redundant_walking",
+        "features": [
+          "temperature",
+          "humidity",
+          "wind_speed",
+          "solar_radiation",
+          "surface_pressure",
+          "current_continuous_exposure_minutes",
+          "expected_continuous_exposure_minutes"
+        ],
+        "validation_metrics": {
+          "accuracy": 0.8875,
+          "balanced_accuracy": 0.87303,
+          "macro_f1": 0.869223,
+          "rest_required_recall": 0.923695,
+          "confusion_matrix": [
+            [
+              235,
+              19,
+              8
+            ],
+            [
+              12,
+              103,
+              14
+            ],
+            [
+              3,
+              16,
+              230
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.94,
+              "recall": 0.896947,
+              "f1-score": 0.917969
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.746377,
+              "recall": 0.79845,
+              "f1-score": 0.771536
+            },
+            "REST_REQUIRED": {
+              "precision": 0.912698,
+              "recall": 0.923695,
+              "f1-score": 0.918164
+            }
+          }
+        }
+      }
+    ]
+  }
+}

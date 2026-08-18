@@ -1,0 +1,608 @@
+{
+  "label_policy_version": "wbgt-osha-moderate-2",
+  "feature_names": [
+    "temperature",
+    "humidity",
+    "wind_speed",
+    "solar_radiation",
+    "surface_pressure",
+    "walking_minutes",
+    "current_continuous_exposure_minutes",
+    "expected_continuous_exposure_minutes"
+  ],
+  "selection_metric": "macro_f1, then REST_REQUIRED recall",
+  "best_baseline_ml_model": "hist_gradient_boosting",
+  "final_model": "hist_gradient_boosting_tuned",
+  "split": {
+    "strategy": "chronological weather-time group split",
+    "cutoff": "2025-07-25T18:00:00+09:00",
+    "train_rows": 1488,
+    "test_rows": 372
+  },
+  "dataset": {
+    "source": "kma_asos_hourly_with_erbs_direct_radiation_estimate",
+    "rows": 1860,
+    "label_distribution": {
+      "MOVE_POSSIBLE": 769,
+      "REST_RECOMMENDED": 262,
+      "REST_REQUIRED": 829
+    },
+    "wbgt_min": 20.12,
+    "wbgt_max": 35.727,
+    "wbgt_mean": 28.175,
+    "limitation": "Synthetic-label agreement only; this is not validated heat-illness outcome accuracy."
+  },
+  "models": {
+    "rule_classifier": {
+      "accuracy": 0.134409,
+      "balanced_accuracy": 0.371429,
+      "macro_f1": 0.14245,
+      "rest_required_recall": 0.0,
+      "confusion_matrix": [
+        [
+          4,
+          31,
+          0
+        ],
+        [
+          0,
+          46,
+          0
+        ],
+        [
+          0,
+          291,
+          0
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 1.0,
+          "recall": 0.114286,
+          "f1-score": 0.205128
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.125,
+          "recall": 1.0,
+          "f1-score": 0.222222
+        },
+        "REST_REQUIRED": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0
+        }
+      }
+    },
+    "random_forest": {
+      "accuracy": 0.784946,
+      "balanced_accuracy": 0.751285,
+      "macro_f1": 0.641716,
+      "rest_required_recall": 0.810997,
+      "confusion_matrix": [
+        [
+          33,
+          2,
+          0
+        ],
+        [
+          22,
+          23,
+          1
+        ],
+        [
+          33,
+          22,
+          236
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.375,
+          "recall": 0.942857,
+          "f1-score": 0.536585
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.489362,
+          "recall": 0.5,
+          "f1-score": 0.494624
+        },
+        "REST_REQUIRED": {
+          "precision": 0.995781,
+          "recall": 0.810997,
+          "f1-score": 0.893939
+        }
+      }
+    },
+    "hist_gradient_boosting": {
+      "accuracy": 0.857527,
+      "balanced_accuracy": 0.798238,
+      "macro_f1": 0.726588,
+      "rest_required_recall": 0.893471,
+      "confusion_matrix": [
+        [
+          32,
+          3,
+          0
+        ],
+        [
+          16,
+          27,
+          3
+        ],
+        [
+          13,
+          18,
+          260
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.52459,
+          "recall": 0.914286,
+          "f1-score": 0.666667
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.5625,
+          "recall": 0.586957,
+          "f1-score": 0.574468
+        },
+        "REST_REQUIRED": {
+          "precision": 0.988593,
+          "recall": 0.893471,
+          "f1-score": 0.938628
+        }
+      }
+    },
+    "hist_gradient_boosting_tuned": {
+      "accuracy": 0.846774,
+      "balanced_accuracy": 0.805858,
+      "macro_f1": 0.723671,
+      "rest_required_recall": 0.872852,
+      "confusion_matrix": [
+        [
+          32,
+          3,
+          0
+        ],
+        [
+          15,
+          29,
+          2
+        ],
+        [
+          13,
+          24,
+          254
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.533333,
+          "recall": 0.914286,
+          "f1-score": 0.673684
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.517857,
+          "recall": 0.630435,
+          "f1-score": 0.568627
+        },
+        "REST_REQUIRED": {
+          "precision": 0.992188,
+          "recall": 0.872852,
+          "f1-score": 0.928702
+        }
+      }
+    }
+  },
+  "tuning": {
+    "model_family": "hist_gradient_boosting",
+    "strategy": "chronological inner train/validation split",
+    "validation_cutoff": "2025-07-20T18:00:00+09:00",
+    "train_rows": 1188,
+    "validation_rows": 300,
+    "selected_parameters": {
+      "learning_rate": 0.06,
+      "max_iter": 200,
+      "max_leaf_nodes": 63,
+      "min_samples_leaf": 25,
+      "l2_regularization": 0.5
+    },
+    "candidates": [
+      {
+        "parameters": {
+          "learning_rate": 0.08,
+          "max_iter": 150,
+          "max_leaf_nodes": 31,
+          "min_samples_leaf": 20,
+          "l2_regularization": 0.1
+        },
+        "validation_metrics": {
+          "accuracy": 0.873333,
+          "balanced_accuracy": 0.868687,
+          "macro_f1": 0.845777,
+          "rest_required_recall": 0.88,
+          "confusion_matrix": [
+            [
+              62,
+              0,
+              1
+            ],
+            [
+              12,
+              46,
+              4
+            ],
+            [
+              5,
+              16,
+              154
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.78481,
+              "recall": 0.984127,
+              "f1-score": 0.873239
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.741935,
+              "recall": 0.741935,
+              "f1-score": 0.741935
+            },
+            "REST_REQUIRED": {
+              "precision": 0.968553,
+              "recall": 0.88,
+              "f1-score": 0.922156
+            }
+          }
+        }
+      },
+      {
+        "parameters": {
+          "learning_rate": 0.05,
+          "max_iter": 200,
+          "max_leaf_nodes": 31,
+          "min_samples_leaf": 15,
+          "l2_regularization": 0.2
+        },
+        "validation_metrics": {
+          "accuracy": 0.88,
+          "balanced_accuracy": 0.876054,
+          "macro_f1": 0.852695,
+          "rest_required_recall": 0.885714,
+          "confusion_matrix": [
+            [
+              61,
+              1,
+              1
+            ],
+            [
+              12,
+              48,
+              2
+            ],
+            [
+              5,
+              15,
+              155
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.782051,
+              "recall": 0.968254,
+              "f1-score": 0.865248
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.75,
+              "recall": 0.774194,
+              "f1-score": 0.761905
+            },
+            "REST_REQUIRED": {
+              "precision": 0.981013,
+              "recall": 0.885714,
+              "f1-score": 0.930931
+            }
+          }
+        }
+      },
+      {
+        "parameters": {
+          "learning_rate": 0.08,
+          "max_iter": 180,
+          "max_leaf_nodes": 15,
+          "min_samples_leaf": 15,
+          "l2_regularization": 0.5
+        },
+        "validation_metrics": {
+          "accuracy": 0.876667,
+          "balanced_accuracy": 0.870678,
+          "macro_f1": 0.848464,
+          "rest_required_recall": 0.885714,
+          "confusion_matrix": [
+            [
+              61,
+              1,
+              1
+            ],
+            [
+              12,
+              47,
+              3
+            ],
+            [
+              5,
+              15,
+              155
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.782051,
+              "recall": 0.968254,
+              "f1-score": 0.865248
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.746032,
+              "recall": 0.758065,
+              "f1-score": 0.752
+            },
+            "REST_REQUIRED": {
+              "precision": 0.974843,
+              "recall": 0.885714,
+              "f1-score": 0.928144
+            }
+          }
+        }
+      },
+      {
+        "parameters": {
+          "learning_rate": 0.06,
+          "max_iter": 200,
+          "max_leaf_nodes": 63,
+          "min_samples_leaf": 25,
+          "l2_regularization": 0.5
+        },
+        "validation_metrics": {
+          "accuracy": 0.886667,
+          "balanced_accuracy": 0.883335,
+          "macro_f1": 0.859988,
+          "rest_required_recall": 0.891429,
+          "confusion_matrix": [
+            [
+              61,
+              1,
+              1
+            ],
+            [
+              12,
+              49,
+              1
+            ],
+            [
+              5,
+              14,
+              156
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.782051,
+              "recall": 0.968254,
+              "f1-score": 0.865248
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.765625,
+              "recall": 0.790323,
+              "f1-score": 0.777778
+            },
+            "REST_REQUIRED": {
+              "precision": 0.987342,
+              "recall": 0.891429,
+              "f1-score": 0.936937
+            }
+          }
+        }
+      }
+    ],
+    "test_metrics": {
+      "accuracy": 0.846774,
+      "balanced_accuracy": 0.805858,
+      "macro_f1": 0.723671,
+      "rest_required_recall": 0.872852,
+      "confusion_matrix": [
+        [
+          32,
+          3,
+          0
+        ],
+        [
+          15,
+          29,
+          2
+        ],
+        [
+          13,
+          24,
+          254
+        ]
+      ],
+      "per_class": {
+        "MOVE_POSSIBLE": {
+          "precision": 0.533333,
+          "recall": 0.914286,
+          "f1-score": 0.673684
+        },
+        "REST_RECOMMENDED": {
+          "precision": 0.517857,
+          "recall": 0.630435,
+          "f1-score": 0.568627
+        },
+        "REST_REQUIRED": {
+          "precision": 0.992188,
+          "recall": 0.872852,
+          "f1-score": 0.928702
+        }
+      }
+    },
+    "permutation_importance": [
+      {
+        "feature": "solar_radiation",
+        "importance_mean": 0.227492,
+        "importance_std": 0.016208
+      },
+      {
+        "feature": "temperature",
+        "importance_mean": 0.137251,
+        "importance_std": 0.006367
+      },
+      {
+        "feature": "current_continuous_exposure_minutes",
+        "importance_mean": 0.126174,
+        "importance_std": 0.001034
+      },
+      {
+        "feature": "expected_continuous_exposure_minutes",
+        "importance_mean": 0.090934,
+        "importance_std": 0.006426
+      },
+      {
+        "feature": "humidity",
+        "importance_mean": 0.03173,
+        "importance_std": 0.000719
+      },
+      {
+        "feature": "surface_pressure",
+        "importance_mean": 0.028067,
+        "importance_std": 0.006152
+      },
+      {
+        "feature": "wind_speed",
+        "importance_mean": 0.023729,
+        "importance_std": 0.003605
+      }
+    ]
+  },
+  "feature_selection": {
+    "strategy": "chronological validation feature ablation",
+    "selection_rule": "smallest subset within 0.005 macro F1 of the best candidate",
+    "macro_f1_tolerance": 0.005,
+    "validation_cutoff": "2025-07-20T18:00:00+09:00",
+    "selected_features": [
+      "temperature",
+      "humidity",
+      "wind_speed",
+      "solar_radiation",
+      "surface_pressure",
+      "current_continuous_exposure_minutes",
+      "expected_continuous_exposure_minutes"
+    ],
+    "candidates": [
+      {
+        "name": "all_features",
+        "features": [
+          "temperature",
+          "humidity",
+          "wind_speed",
+          "solar_radiation",
+          "surface_pressure",
+          "walking_minutes",
+          "current_continuous_exposure_minutes",
+          "expected_continuous_exposure_minutes"
+        ],
+        "validation_metrics": {
+          "accuracy": 0.886667,
+          "balanced_accuracy": 0.883335,
+          "macro_f1": 0.859988,
+          "rest_required_recall": 0.891429,
+          "confusion_matrix": [
+            [
+              61,
+              1,
+              1
+            ],
+            [
+              12,
+              49,
+              1
+            ],
+            [
+              5,
+              14,
+              156
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.782051,
+              "recall": 0.968254,
+              "f1-score": 0.865248
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.765625,
+              "recall": 0.790323,
+              "f1-score": 0.777778
+            },
+            "REST_REQUIRED": {
+              "precision": 0.987342,
+              "recall": 0.891429,
+              "f1-score": 0.936937
+            }
+          }
+        }
+      },
+      {
+        "name": "drop_redundant_walking",
+        "features": [
+          "temperature",
+          "humidity",
+          "wind_speed",
+          "solar_radiation",
+          "surface_pressure",
+          "current_continuous_exposure_minutes",
+          "expected_continuous_exposure_minutes"
+        ],
+        "validation_metrics": {
+          "accuracy": 0.896667,
+          "balanced_accuracy": 0.892436,
+          "macro_f1": 0.872219,
+          "rest_required_recall": 0.902857,
+          "confusion_matrix": [
+            [
+              62,
+              0,
+              1
+            ],
+            [
+              11,
+              49,
+              2
+            ],
+            [
+              5,
+              12,
+              158
+            ]
+          ],
+          "per_class": {
+            "MOVE_POSSIBLE": {
+              "precision": 0.794872,
+              "recall": 0.984127,
+              "f1-score": 0.879433
+            },
+            "REST_RECOMMENDED": {
+              "precision": 0.803279,
+              "recall": 0.790323,
+              "f1-score": 0.796748
+            },
+            "REST_REQUIRED": {
+              "precision": 0.981366,
+              "recall": 0.902857,
+              "f1-score": 0.940476
+            }
+          }
+        }
+      }
+    ]
+  }
+}
