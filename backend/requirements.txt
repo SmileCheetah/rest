@@ -5,3 +5,5 @@ alembic==1.19.1
 asyncmy==0.2.14
 pydantic-settings==2.15.0
 httpx==0.28.1
+scikit-learn==1.9.0
+thermofeel==2.3.0

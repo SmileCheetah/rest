@@ -121,7 +121,6 @@ erDiagram
         int current_continuous_exposure_minutes
         int expected_continuous_exposure_minutes
         decimal shelter_accessibility
-        decimal risk_score
         varchar risk_level
         tinyint rest_required
         int recommended_rest_count
@@ -315,8 +314,7 @@ risk_assessment → route_option → route_segment
 | `current_continuous_exposure_minutes` | `INTEGER` | X | 현재 연속 야외노출시간 |
 | `expected_continuous_exposure_minutes` | `INTEGER` | X | 이동 완료 후 예상 연속 노출시간 |
 | `shelter_accessibility` | `DECIMAL(6,3)` | O | 쉼터 접근성 입력값 |
-| `risk_score` | `DECIMAL(5,2)` | X | 위험점수(0~100) |
-| `risk_level` | `VARCHAR(20)` | X | `SAFE`, `CAUTION`, `REST_REQUIRED` |
+| `risk_level` | `VARCHAR(20)` | X | `MOVE_POSSIBLE`, `REST_RECOMMENDED`, `REST_REQUIRED` |
 | `rest_required` | `TINYINT(1)` | X | 휴식 필요 여부 |
 | `recommended_rest_count` | `INTEGER` | X | 권장 휴식횟수(0~1) |
 | `reason_codes` | `JSON` | O | 판단 근거 코드 배열 |
@@ -370,7 +368,7 @@ risk_assessment → route_option → route_segment
 | `work_sessions.status` | `READY`, `IN_PROGRESS`, `COMPLETED` |
 | `schedules.status` | `PENDING`, `COMPLETED` |
 | `route_options.route_type` | `NORMAL`, `SAFE` |
-| `risk_assessments.risk_level` | `SAFE`, `CAUTION`, `REST_REQUIRED` |
+| `risk_assessments.risk_level` | `MOVE_POSSIBLE`, `REST_RECOMMENDED`, `REST_REQUIRED` |
 | `cooling_spots.type` | `PUBLIC`, `COMPANY` |
 | `activity_logs.activity_type` | `WORK_STARTED`, `NORMAL_ROUTE_SELECTED`, `SAFE_ROUTE_SELECTED`, `REST_COMPLETED`, `REST_SKIPPED`, `VISIT_COMPLETED`, `WORK_COMPLETED` |
 
@@ -381,7 +379,6 @@ risk_assessment → route_option → route_segment
 ### 숫자 범위
 
 ```sql
-CHECK (risk_score BETWEEN 0 AND 100)
 CHECK (recommended_rest_count BETWEEN 0 AND 1)
 CHECK (walking_minutes >= 0)
 CHECK (total_travel_minutes >= 0)
@@ -525,7 +522,6 @@ shelter_accessibility
 ### 출력
 
 ```text
-risk_score
 risk_level
 rest_required
 recommended_rest_count

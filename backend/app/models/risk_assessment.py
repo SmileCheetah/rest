@@ -38,9 +38,9 @@ class RiskAssessment(Base):
             "expected_continuous_exposure_minutes >= 0",
             name="expected_exposure_nonnegative",
         ),
-        CheckConstraint("risk_score BETWEEN 0 AND 100", name="risk_score_range"),
         CheckConstraint(
-            "risk_level IN ('SAFE', 'CAUTION', 'REST_REQUIRED')",
+            "risk_level IN "
+            "('MOVE_POSSIBLE', 'REST_RECOMMENDED', 'REST_REQUIRED')",
             name="risk_level",
         ),
         CheckConstraint(
@@ -77,7 +77,6 @@ class RiskAssessment(Base):
         Numeric(6, 3),
         nullable=True,
     )
-    risk_score: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False)
     risk_level: Mapped[RiskLevel] = mapped_column(
         Enum(
             RiskLevel,
