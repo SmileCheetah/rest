@@ -87,6 +87,10 @@ export function completeWorkSession(workSessionId: number): Promise<WorkSession>
   });
 }
 
+export function resetDemoWorkSession(): Promise<WorkSession> {
+  return apiRequest("/work-sessions/reset", { method: "POST" });
+}
+
 export function createSchedule(request: CreateScheduleRequest): Promise<Schedule> {
   return apiRequest("/schedules", {
     method: "POST",
