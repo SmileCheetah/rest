@@ -643,6 +643,7 @@ export default function Home() {
       : "AI 분석 후 추천 경로를 표시합니다.");
   const riskBadge = aiRouteDisplay?.tone ?? (risk?.risk_level === "REST_REQUIRED" ? "danger" : risk?.risk_level === "REST_RECOMMENDED" ? "caution" : "safe");
   const riskLabel = aiRouteDisplay?.riskStatus ?? (risk?.risk_level === "REST_REQUIRED" ? "다음 방문 전 휴식 필요" : risk?.risk_level === "REST_RECOMMENDED" ? "휴식 권유" : "이동 가능");
+  const requiresRestBeforeNextVisit = riskLabel === "다음 방문 전 휴식 필요";
   const displayedHeatLevel = heatwaveImpact?.label ?? heatLevel.label;
   const displayedHeatTone = heatwaveImpact
     ? getHeatwaveTone(heatwaveImpact.level)
@@ -650,7 +651,7 @@ export default function Home() {
 
   const startRoute = () => {
     setSkipReasonRecorded(false);
-    if (selectedRoute === "normal" && hasRecommendedSafeRoute) {
+    if (selectedRoute === "normal" && hasRecommendedSafeRoute && requiresRestBeforeNextVisit) {
       setModal("warning");
       return;
     }
@@ -658,7 +659,7 @@ export default function Home() {
   };
 
   const handleGuidanceComplete = () => {
-    if (selectedRoute === "normal" && hasRecommendedSafeRoute && !skipReasonRecorded) {
+    if (selectedRoute === "normal" && hasRecommendedSafeRoute && requiresRestBeforeNextVisit && !skipReasonRecorded) {
       setFinishAfterSkipSurvey(true);
       setModal("skip");
       return;
@@ -700,7 +701,7 @@ export default function Home() {
       {screen === "guidance" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("route")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>이동 중</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
         <div className="move-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary restCount={recommendedRestCount} onClick={() => setModal("ai")}/></div><Map moving route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
-        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{selectedRoute === "safe" && recommendedSpot && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedSpot.name}</strong><small>경로에 추가 시 약 {recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 소요</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row">{selectedRoute === "safe" && recommendedSpot && <button className="button secondary" onClick={() => {setSelectedRoute("normal"); setFinishAfterSkipSurvey(false); setModal("skip");}}>쉼터 건너뛰기</button>}<button className="button teal" disabled={isBusy} onClick={() => handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
+        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{selectedRoute === "safe" && recommendedSpot && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedSpot.name}</strong><small>경로에 추가 시 약 {recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 소요</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row">{selectedRoute === "safe" && recommendedSpot && <button className="button secondary" onClick={() => {setSelectedRoute("normal"); setFinishAfterSkipSurvey(false); if (requiresRestBeforeNextVisit) setModal("skip");}}>쉼터 건너뛰기</button>}<button className="button teal" disabled={isBusy} onClick={() => handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
       </>}
 
       {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 0}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 0}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 0}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>{workSession?.heatExposureReductionMinutes ?? 0}분</strong><small>쿨링스팟에서 휴식한 시간이에요.</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2>{workSession?.usedCoolingSpotNames?.length ? workSession.usedCoolingSpotNames.map((name) => <p key={name}>{name}</p>) : <p>이용한 쿨링스팟이 없어요.</p>}</section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}
