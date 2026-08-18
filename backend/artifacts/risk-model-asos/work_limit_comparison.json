@@ -1,0 +1,172 @@
+{
+  "label_policy_version": "wbgt-osha-moderate-work-limit-1",
+  "feature_names": [
+    "temperature",
+    "humidity",
+    "wind_speed",
+    "solar_radiation",
+    "surface_pressure"
+  ],
+  "selection_metric": "macro_f1, then REST_REQUIRED recall",
+  "best_model": "hist_gradient_boosting",
+  "split": {
+    "strategy": "chronological weather-time group split",
+    "cutoff": "2025-07-25T18:00:00+09:00",
+    "train_rows": 1488,
+    "test_rows": 372
+  },
+  "dataset": {
+    "source": "kma_asos_hourly_with_erbs_direct_radiation_estimate",
+    "rows": 1860,
+    "label_distribution": {
+      "REST_REQUIRED": 448,
+      "WORK_15": 304,
+      "WORK_30": 240,
+      "WORK_45": 160,
+      "WORK_60": 708
+    },
+    "limitation": "Labels are generated from WBGT and the configured work/rest table; they are not observed heat-illness outcomes."
+  },
+  "models": {
+    "random_forest": {
+      "accuracy": 0.655914,
+      "balanced_accuracy": 0.538055,
+      "macro_f1": 0.426909,
+      "rest_required_recall": 0.90566,
+      "confusion_matrix": [
+        [
+          24,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          12,
+          8,
+          0,
+          0,
+          0
+        ],
+        [
+          16,
+          12,
+          20,
+          4,
+          0
+        ],
+        [
+          20,
+          12,
+          16,
+          0,
+          16
+        ],
+        [
+          4,
+          4,
+          0,
+          12,
+          192
+        ]
+      ],
+      "per_class": {
+        "WORK_60": {
+          "precision": 0.315789,
+          "recall": 1.0,
+          "f1-score": 0.48
+        },
+        "WORK_45": {
+          "precision": 0.222222,
+          "recall": 0.4,
+          "f1-score": 0.285714
+        },
+        "WORK_30": {
+          "precision": 0.555556,
+          "recall": 0.384615,
+          "f1-score": 0.454545
+        },
+        "WORK_15": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0
+        },
+        "REST_REQUIRED": {
+          "precision": 0.923077,
+          "recall": 0.90566,
+          "f1-score": 0.914286
+        }
+      }
+    },
+    "hist_gradient_boosting": {
+      "accuracy": 0.688172,
+      "balanced_accuracy": 0.603055,
+      "macro_f1": 0.513248,
+      "rest_required_recall": 0.90566,
+      "confusion_matrix": [
+        [
+          24,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          4,
+          12,
+          4,
+          0,
+          0
+        ],
+        [
+          8,
+          20,
+          20,
+          4,
+          0
+        ],
+        [
+          4,
+          28,
+          16,
+          8,
+          8
+        ],
+        [
+          0,
+          4,
+          4,
+          12,
+          192
+        ]
+      ],
+      "per_class": {
+        "WORK_60": {
+          "precision": 0.6,
+          "recall": 1.0,
+          "f1-score": 0.75
+        },
+        "WORK_45": {
+          "precision": 0.1875,
+          "recall": 0.6,
+          "f1-score": 0.285714
+        },
+        "WORK_30": {
+          "precision": 0.454545,
+          "recall": 0.384615,
+          "f1-score": 0.416667
+        },
+        "WORK_15": {
+          "precision": 0.333333,
+          "recall": 0.125,
+          "f1-score": 0.181818
+        },
+        "REST_REQUIRED": {
+          "precision": 0.96,
+          "recall": 0.90566,
+          "f1-score": 0.932039
+        }
+      }
+    }
+  }
+}
