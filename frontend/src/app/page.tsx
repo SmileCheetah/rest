@@ -13,6 +13,7 @@ import {
   getCurrentHeatwave,
   getLivingWeatherIndex,
   getCurrentWorkSession,
+  getCoolingSpots,
   getNextSchedule,
   getTodaySchedules,
   getVisitTargets,
@@ -24,6 +25,7 @@ import type {
   LivingWeatherIndex,
   RoutePathPoint,
   RouteSegment,
+  CoolingSpot,
   Schedule,
   VisitTarget,
   WorkSession,
@@ -191,9 +193,9 @@ function SvgMap({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: 
   </div>;
 }
 
-function Map({ moving = false, onSpot, route }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null }) {
+function Map({ moving = false, onSpot, route, spots = [] }: { moving?: boolean; onSpot?: () => void; route?: RouteSegment | null; spots?: CoolingSpot[] }) {
   const destination = route?.destination ?? { ...DEFAULT_LOCATION, name: "방문지" };
-  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} /></div>;
+  return <div className={`map-area ${moving ? "map-moving" : "map-compare"}`}><RealMap route={route} spots={spots} destination={{ latitude: destination.latitude, longitude: destination.longitude, name: destination.name ?? "방문지" }} onSpot={onSpot} /></div>;
 }
 
 export default function Home() {
@@ -202,6 +204,7 @@ export default function Home() {
   const [selectedRoute, setSelectedRoute] = useState<"safe" | "normal">("safe");
   const [visits, setVisits] = useState<VisitCard[]>(fallbackVisits);
   const [visitTargets, setVisitTargets] = useState<VisitTarget[]>([]);
+  const [coolingSpots, setCoolingSpots] = useState<CoolingSpot[]>([]);
   const [workSession, setWorkSession] = useState<WorkSession | null>(null);
   const [currentWeather, setCurrentWeather] = useState<CurrentWeather | null>(null);
   const [heatwaveImpact, setHeatwaveImpact] = useState<HeatwaveImpact | null>(null);
@@ -224,9 +227,10 @@ export default function Home() {
 
   const loadDashboard = useCallback(async () => {
     try {
-      const [schedules, targets] = await Promise.all([
+      const [schedules, targets, spots] = await Promise.all([
         getTodaySchedules(),
         getVisitTargets(),
+        getCoolingSpots(),
       ]);
       setVisits(toVisitCards(schedules));
       setCompleted(
@@ -235,6 +239,7 @@ export default function Home() {
           .map((schedule) => schedule.scheduleId),
       );
       setVisitTargets(targets);
+      setCoolingSpots(spots);
       setSelectedTargetId((current) => current ?? targets[0]?.visitTargetId ?? null);
       try {
         setWorkSession(await getCurrentWorkSession());
@@ -439,7 +444,7 @@ export default function Home() {
 
       {screen === "route" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("schedule")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>{activeVisit.visitOrder}번째 이동 구간</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
-        <Map route={activeRoute} onSpot={() => setModal("spot")}/>
+        <Map route={activeRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
         <section className="route-panel"><div className="route-summary"><span className="badge caution">휴식 권장</span><AiSummary onClick={() => setModal("ai")}/></div><p>체감온도가 높고 야외 활동이 길어지고 있어 휴식이 필요한 구간이에요.</p><div className="route-options">
           <button className={`route-card ${selectedRoute === "normal" ? "selected" : ""}`} onClick={() => setSelectedRoute("normal")}><span>일반 경로</span><strong>{activeRoute ? `${activeRoute.walkingMinutes}분` : "계산 전"}</strong><small>{activeRoute ? formatDistance(activeRoute.distanceMeters) : "TMAP 연결 확인 필요"}</small><b>휴식 없음</b></button>
           <button className={`route-card ${selectedRoute === "safe" ? "selected" : ""}`} onClick={() => setSelectedRoute("safe")}><span>안전 경로 <em>추천</em></span><strong>22분</strong><small>1.4km</small><b>휴식 1회</b><i>추천 쉼터: 창신동 주민센터</i></button>
@@ -448,7 +453,7 @@ export default function Home() {
 
       {screen === "guidance" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("route")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>이동 중</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
-        <div className="move-summary"><span className="badge caution">휴식 권장</span><AiSummary onClick={() => setModal("ai")}/></div><Map moving route={activeRoute} onSpot={() => setModal("spot")}/>
+        <div className="move-summary"><span className="badge caution">휴식 권장</span><AiSummary onClick={() => setModal("ai")}/></div><Map moving route={activeRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
         <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{activeRoute ? `${activeRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{activeRoute ? formatDistance(activeRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><article className="shelter-summary"><div><span>추천 쉼터</span><strong>창신동 주민센터</strong><small>경로상 약 10분 후 도착</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article><div className="button-row"><button className="button secondary" onClick={() => setModal("skip")}>쉼터 건너뛰기</button><button className="button teal" disabled={isBusy} onClick={() => void handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
       </>}
 

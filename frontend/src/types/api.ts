@@ -9,6 +9,19 @@ export interface VisitTarget {
   longitude: number;
 }
 
+export interface CoolingSpot {
+  id: number;
+  name: string;
+  type: "PUBLIC" | "COMPANY";
+  address: string;
+  latitude: number;
+  longitude: number;
+  openTime: string | null;
+  closeTime: string | null;
+  facilities: Record<string, boolean> | null;
+  source: string | null;
+}
+
 export interface Schedule {
   scheduleId: number;
   workSessionId: number;
