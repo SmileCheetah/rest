@@ -20,5 +20,8 @@ python svr_risk_test.py
 - 습도(%)
 - 연속 야외 노출시간(분)
 - 예상 도보시간(분)
+- 폭염특보 여부(0/1)
 
 출력 점수는 0~100으로 제한하고, 예시 화면을 위해 `SAFE`, `CAUTION`, `REST_REQUIRED` 3단계로 변환합니다.
+
+실행하면 `output/svr-risk-graphs.png`에 변수별 그래프와 폭염특보 비교 그래프가 생성됩니다.
