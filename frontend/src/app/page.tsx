@@ -146,8 +146,8 @@ function StatusBar() {
   return <div className="statusbar"><span>9:41</span><span className="status-icons">● ◔ ▰</span></div>;
 }
 
-function AiSummary({ onClick }: { onClick?: () => void }) {
-  return <button className="ai-rec" onClick={onClick}><strong>추천 휴식 1회</strong><span className="ai-label">AI 분석</span></button>;
+function AiSummary({ restCount = 0, onClick }: { restCount?: number; onClick?: () => void }) {
+  return <button className="ai-rec" onClick={onClick}><strong>추천 휴식 {restCount}회</strong><span className="ai-label">AI 분석</span></button>;
 }
 
 function routePathToSvg(path: RoutePathPoint[], height: number): string | null {
@@ -495,6 +495,14 @@ export default function Home() {
     : null;
   const displayedRoute = selectedRoute === "safe" && safeRoute ? safeRoute : activeRoute;
   const risk = recommendedRoute?.risk;
+  const recommendedSpot = recommendedRoute?.safeRoute?.coolingSpot ?? null;
+  const recommendedRestCount = risk?.recommended_rest_count ?? 0;
+  const expectedExposureMinutes = (workSession?.maxContinuousExposureMinutes ?? 0) + (activeRoute?.walkingMinutes ?? 0);
+  const facilityLabels = recommendedSpot?.facilities
+    ? Object.entries(recommendedSpot.facilities)
+        .filter(([, enabled]) => enabled)
+        .map(([name]) => name)
+    : [];
   const safeRouteUnavailableMessage = recommendedRoute?.shelterRecommendationMessage
     ?? (risk?.risk_level === "MOVE_POSSIBLE"
       ? "현재 구간은 휴식이 필요하지 않아요."
@@ -506,7 +514,13 @@ export default function Home() {
     ? getHeatwaveTone(heatwaveImpact.level)
     : heatLevel.tone;
 
-  const startRoute = () => selectedRoute === "normal" ? setModal("warning") : setScreen("guidance");
+  const startRoute = () => {
+    if (selectedRoute === "normal" && risk?.risk_level === "REST_REQUIRED") {
+      setModal("warning");
+      return;
+    }
+    setScreen("guidance");
+  };
 
   return <main className="app-shell">
     <section className={`phone ${screen === "complete" ? "completion" : ""}`}>
@@ -533,7 +547,7 @@ export default function Home() {
       {screen === "route" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("schedule")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>{activeVisit.visitOrder}번째 이동 구간</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
         <Map route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
-        <section className="route-panel"><div className="route-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary onClick={() => setModal("ai")}/></div><p>{risk?.reason_message ?? "경로와 날씨 정보를 분석하고 있습니다."}</p><div className="route-options">
+        <section className="route-panel"><div className="route-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary restCount={recommendedRestCount} onClick={() => setModal("ai")}/></div><p>{risk?.reason_message ?? "경로와 날씨 정보를 분석하고 있습니다."}</p><div className="route-options">
           <button className={`route-card ${selectedRoute === "normal" ? "selected" : ""}`} onClick={() => setSelectedRoute("normal")}><span>일반 경로</span><strong>{activeRoute ? `${activeRoute.walkingMinutes}분` : "계산 전"}</strong><small>{activeRoute ? formatDistance(activeRoute.distanceMeters) : "TMAP 연결 확인 필요"}</small><b>휴식 없음</b></button>
           <button className={`route-card ${selectedRoute === "safe" ? "selected" : ""} ${safeRoute ? "" : "unavailable"}`} disabled={!safeRoute} onClick={() => setSelectedRoute("safe")}><span>안전 경로 {safeRoute && <em>추천</em>}</span><strong>{safeRoute ? `${safeRoute.walkingMinutes}분` : "추천 없음"}</strong><small>{safeRoute ? formatDistance(safeRoute.distanceMeters) : "추천 조건 확인 중"}</small><b>{safeRoute ? "휴식 1회" : "일반 경로 이용"}</b><i>{safeRoute ? `추천 쉼터: ${recommendedRoute?.safeRoute?.coolingSpot.name}` : safeRouteUnavailableMessage}</i></button>
         </div>{apiMessage && <p className="route-error">{apiMessage}</p>}{safeRoute && <p className="route-delta">일반 경로보다 <strong>{recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 걸리지만</strong> 이동 중 1회 쉴 수 있어요.</p>}{recommendedRoute?.shelterRecommendationMessage && <p className="route-delta">{recommendedRoute.shelterRecommendationMessage}</p>}<button className="button primary" onClick={startRoute}>{selectedRoute === "safe" && safeRoute ? "안전 경로로 안내 시작" : "일반 경로로 안내 시작"}</button></section>
@@ -541,17 +555,17 @@ export default function Home() {
 
       {screen === "guidance" && <>
         <header className="appbar"><button className="icon-btn" onClick={() => setScreen("route")} aria-label="뒤로"><Icon name="back"/></button><div className="appbar-center"><h1>{activeVisit.name}님 댁</h1><span>이동 중</span></div><button className="icon-btn" onClick={() => setModal("ai")} aria-label="AI 분석 근거"><Icon name="info"/></button></header>
-        <div className="move-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary onClick={() => setModal("ai")}/></div><Map moving route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
-        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{recommendedRoute?.safeRoute && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedRoute.safeRoute.coolingSpot.name}</strong><small>경로상 약 {Math.max(1, Math.round(recommendedRoute.safeRoute.walkingMinutes / 2))}분 후 도착</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row"><button className="button secondary" onClick={() => setModal("skip")}>쉼터 건너뛰기</button><button className="button teal" disabled={isBusy} onClick={() => void handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
+        <div className="move-summary"><span className={`badge ${riskBadge}`}>{riskLabel}</span><AiSummary restCount={recommendedRestCount} onClick={() => setModal("ai")}/></div><Map moving route={displayedRoute} spots={coolingSpots} onSpot={() => setModal("spot")}/>
+        <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{selectedRoute === "safe" && recommendedSpot && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedSpot.name}</strong><small>경로에 추가 시 약 {recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 소요</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row">{selectedRoute === "safe" && recommendedSpot && <button className="button secondary" onClick={() => setModal("skip")}>쉼터 건너뛰기</button>}<button className="button teal" disabled={isBusy} onClick={() => void handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
       </>}
 
       {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 72}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 2}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 15}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>15분</strong><small>안전하게 이동했어요!</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2><p>창신동 주민센터</p><p>동부여성문화센터</p></section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}
 
       {modal && <><div className="dim" onClick={() => setModal(null)}/>{modal === "add" && <section className="bottom-sheet tall"><div className="handle"/><div className="sheet-header"><h2>대상자 추가</h2><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>오늘 방문할 대상자를 선택해주세요.</p><label className="search-box"><Icon name="search"/><input placeholder="이름 검색" value={targetSearch} onChange={(event) => setTargetSearch(event.target.value)} /></label><div className="chip-grid">{filteredVisitTargets.map(target => <button key={target.visitTargetId} onClick={() => setSelectedTargetId(target.visitTargetId)} className={selectedTargetId === target.visitTargetId ? "active" : ""}>{target.name}</button>)}</div>{filteredVisitTargets.length === 0 && <p className="empty-state">검색 결과가 없습니다.</p>}<label className="form-label" htmlFor="schedule-time">방문 예정 시간</label><div className="time-input"><input id="schedule-time" type="time" value={scheduleTime} onChange={(event) => setScheduleTime(event.target.value)} required/></div><button className="button primary" disabled={isBusy || selectedTargetId === null || !scheduleTime} onClick={() => void handleAddSchedule()}>일정에 추가</button></section>}
       {modal === "menu" && <div className="context-menu"><button disabled={isBusy} onClick={() => void handleDeleteSchedule()}>일정에서 삭제</button></div>}
-      {modal === "ai" && <section className="dialog"><div className="dialog-icon"><Icon name="info"/></div><h2>AI 분석 근거</h2><p>다음 기준으로 휴식이 필요하다고 판단했어요.</p><ul><li>체감온도 36°C로 높음</li><li>연속 야외 이동시간이 길어지고 있음</li><li>다음 구간까지 이동거리 1.4km</li></ul><button className="button primary" onClick={() => setModal(null)}>확인</button></section>}
+      {modal === "ai" && <section className="dialog"><div className="dialog-icon"><Icon name="info"/></div><h2>AI 분석 근거</h2><p>{risk?.reason_message ?? "현재 이동구간의 기상과 이동 정보를 분석하고 있어요."}</p><ul><li>체감온도 {risk ? `${Math.round(risk.apparentTemperature)}°C` : "확인 중"}</li><li>예상 도보시간 {activeRoute ? `${activeRoute.walkingMinutes}분` : "확인 중"}</li><li>이동 완료 시 연속 야외노출 {activeRoute ? `${expectedExposureMinutes}분` : "확인 중"}</li></ul><button className="button primary" onClick={() => setModal(null)}>확인</button></section>}
       {modal === "warning" && <section className="dialog danger-dialog"><div className="dialog-icon danger"><Icon name="alert"/></div><h2>휴식이 필요한 구간이에요</h2><p>일반 경로는 휴식 없이 이동해야 해요. 그래도 일반 경로로 이동하시겠어요?</p><div className="button-row"><button className="button secondary" onClick={() => setModal(null)}>취소</button><button className="button danger-button" onClick={() => {setModal(null); setScreen("guidance");}}>일반 경로로 이동</button></div></section>}
-      {modal === "spot" && <section className="bottom-sheet"><div className="handle"/><div className="sheet-header"><div><div className="sheet-title"><h2>창신동 주민센터</h2><span>무더위쉼터</span></div><p><span className="badge safe">운영 중</span> 09:00 ~ 18:00</p></div><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>현재 위치에서 경로상 약 10분 후 도착<br/>경로에 추가 시 약 3분 더 소요</p><div className="text-chips"><span>냉방</span><span>좌석</span><span>화장실</span><span>식수</span></div><button className="button teal" onClick={() => setModal(null)}>이곳을 경유하기</button></section>}
+      {modal === "spot" && <section className="bottom-sheet"><div className="handle"/><div className="sheet-header"><div><div className="sheet-title"><h2>{recommendedSpot?.name ?? "추천 쿨링스팟"}</h2><span>{recommendedSpot?.type === "COMPANY" ? "기업 쿨링스팟" : "무더위쉼터"}</span></div><p><span className="badge safe">운영 중</span> {recommendedSpot?.openTime?.slice(0, 5) ?? "상시"} ~ {recommendedSpot?.closeTime?.slice(0, 5) ?? "운영"}</p></div><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>{recommendedSpot?.address ?? "안전경로에서 이용할 수 있는 쉼터를 확인하고 있어요."}<br/>{recommendedRoute?.safeRoute ? `경로에 추가 시 약 ${recommendedRoute.safeRoute.additionalMinutes}분 더 소요` : "안전경로 추천 후 상세정보를 확인할 수 있어요."}</p>{facilityLabels.length > 0 && <div className="text-chips">{facilityLabels.map((facility) => <span key={facility}>{facility}</span>)}</div>}<button className="button teal" disabled={!recommendedSpot} onClick={() => {setSelectedRoute("safe"); setModal(null);}}>이곳을 경유하기</button></section>}
       {modal === "skip" && <section className="bottom-sheet"><div className="handle"/><h2>쉼터를 이용하지 못했나요?</h2><p>다음 방문 구간 계획에 반영하기 위해 이유를 선택해주세요.</p><div className="radio-list">{["시간이 맞지 않아 이용 못함","길이 불편해서 이용 못함","기타"].map((r, i) => <label key={r}><input type="radio" name="reason" defaultChecked={i === 0}/>{r}</label>)}</div><button className="button teal" onClick={() => setModal(null)}>확인</button></section>}</>}
     </section>
   </main>;
