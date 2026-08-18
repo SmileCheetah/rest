@@ -1,9 +1,9 @@
 from datetime import date
 
-from sqlalchemy import case, func, select
+from sqlalchemy import case, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import ActivityLog, Schedule, WorkSession
+from app.models import ActivityLog, RiskAssessment, RouteOption, RouteSegment, Schedule, WorkSession
 from app.models.base import utc_now
 from app.models.enums import ActivityType, ScheduleStatus, WorkSessionStatus
 from app.schemas.work_session import WorkSessionResponse
@@ -151,3 +151,33 @@ async def build_work_session_response(
         rest_count=work_session.rest_count,
     )
 
+
+async def reset_demo_work_session(
+    session: AsyncSession,
+    work_date: date,
+) -> WorkSession | None:
+    """개발/데모용으로 오늘 업무 상태와 관련 기록을 초기화합니다."""
+    work_session = await find_work_session_by_date(session, work_date, for_update=True)
+    if work_session is None:
+        return None
+    schedule_ids = select(Schedule.id).where(Schedule.work_session_id == work_session.id)
+    segment_ids = select(RouteSegment.id).where(RouteSegment.schedule_id.in_(schedule_ids))
+    option_ids = select(RouteOption.id).where(RouteOption.route_segment_id.in_(segment_ids))
+    await session.execute(delete(ActivityLog).where(ActivityLog.work_session_id == work_session.id))
+    await session.execute(delete(RiskAssessment).where(RiskAssessment.route_option_id.in_(option_ids)))
+    await session.execute(delete(RouteOption).where(RouteOption.route_segment_id.in_(segment_ids)))
+    await session.execute(delete(RouteSegment).where(RouteSegment.schedule_id.in_(schedule_ids)))
+    await session.execute(
+        Schedule.__table__.update()
+        .where(Schedule.work_session_id == work_session.id)
+        .values(status=ScheduleStatus.PENDING, completed_at=None)
+    )
+    work_session.status = WorkSessionStatus.READY
+    work_session.started_at = None
+    work_session.completed_at = None
+    work_session.total_exposure_minutes = 0
+    work_session.max_continuous_exposure_minutes = 0
+    work_session.total_rest_minutes = 0
+    work_session.rest_count = 0
+    await session.flush()
+    return work_session
