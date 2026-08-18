@@ -51,17 +51,23 @@ export default function RealMap({ route, destination, onSpot, spots = [] }: Prop
 
       spots.forEach((spot) => {
         const marker = L.marker([spot.latitude, spot.longitude], { icon: spotIcon(spot.type) }).addTo(map!);
-        marker.bindTooltip(`${spot.type === "PUBLIC" ? "공공 무더위쉼터" : "기업 쿨링스팟"} · ${spot.name}`);
+        marker.bindTooltip(spot.name, {
+          permanent: true,
+          direction: "top",
+          offset: [0, -28],
+          className: `cooling-spot-label ${spot.type === "PUBLIC" ? "public" : "company"}`,
+        });
         marker.on("click", () => onSpotRef.current?.());
       });
 
       const path = route?.path?.map((point) => [point.latitude, point.longitude] as [number, number]) ?? [];
+      const spotPoints = spots.map((spot) => [spot.latitude, spot.longitude] as [number, number]);
       if (path.length > 1) {
         L.polyline(path, { color: "#1766e8", weight: 6, opacity: 0.9 }).addTo(map);
-        map.fitBounds(L.latLngBounds(path), { padding: [36, 36] });
+        map.fitBounds(L.latLngBounds([...path, ...spotPoints]), { padding: [36, 36] });
       } else {
         L.polyline([[origin.latitude, origin.longitude], destinationPoint], { color: "#727b87", weight: 5, dashArray: "8 8" }).addTo(map);
-        map.fitBounds(L.latLngBounds([[origin.latitude, origin.longitude], destinationPoint]), { padding: [36, 36] });
+        map.fitBounds(L.latLngBounds([[origin.latitude, origin.longitude], destinationPoint, ...spotPoints]), { padding: [36, 36] });
       }
     });
 

@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     )
     map_api_key: str | None = None
     tmap_api_base_url: str = "https://apis.openapi.sk.com/tmap"
+    public_shelter_api_key: str | None = None
+    public_shelter_api_url: str = "https://www.safetydata.go.kr/V2/api/DSSP-IF-10942"
     database_url: str
 
     model_config = SettingsConfigDict(

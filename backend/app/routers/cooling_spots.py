@@ -1,16 +1,28 @@
 from math import cos, radians
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db_session
 from app.models import CoolingSpot
 from app.schemas.cooling_spot import CoolingSpotResponse
+from app.services.public_shelters import sync_public_shelters
 
 router = APIRouter(prefix="/cooling-spots", tags=["cooling-spots"])
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+@router.post("/sync-public", summary="공공 무더위쉼터 API 동기화")
+async def sync_public(session: DbSession) -> dict[str, int]:
+    try:
+        async with session.begin():
+            count = await sync_public_shelters(session)
+    except (RuntimeError, httpx.HTTPError) as exc:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
+    return {"synced": count}
 
 
 @router.get("", response_model=list[CoolingSpotResponse], summary="주변 쿨링스팟 조회")
