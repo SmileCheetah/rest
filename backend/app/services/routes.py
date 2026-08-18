@@ -66,6 +66,7 @@ async def recommend_route(
     current_continuous_exposure_minutes: int,
     current_total_walking_minutes: int | None,
     minutes_since_last_rest: int | None,
+    rest_required_before_next_visit: bool,
     planned_rest_minutes: int,
     max_additional_minutes: int,
 ) -> tuple[RiskEvaluateResponse, RouteSegmentResponse, SafeRouteResponse | None, str | None]:
@@ -124,6 +125,7 @@ async def recommend_route(
         current_continuous_exposure_minutes=current_continuous_exposure_minutes,
         current_total_walking_minutes=current_total_walking_minutes,
         minutes_since_last_rest=minutes_since_last_rest,
+        rest_required_before_next_visit=rest_required_before_next_visit,
         nearest_cooling_spot_distance_meters=nearest_distance,
     )
     if not should_recommend_safe_route:
@@ -150,8 +152,13 @@ async def _should_recommend_safe_route(
     nearest_cooling_spot_distance_meters: int | None,
     current_total_walking_minutes: int | None = None,
     minutes_since_last_rest: int | None = None,
+    rest_required_before_next_visit: bool = False,
 ) -> bool:
     """동일한 XGBoost 휴식 판단으로 안전경로 생성 여부를 결정합니다."""
+    # 일정 카드에서 이미 최고 위험 단계가 확정된 구간은 경로 화면에서
+    # 다른 시각의 날씨를 다시 조회하더라도 안전경로 추천을 낮추지 않는다.
+    if rest_required_before_next_visit:
+        return True
     observed_at = (
         weather.forecast_at
         if hasattr(weather, "forecast_at")

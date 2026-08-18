@@ -44,6 +44,18 @@ def _weather() -> ForecastWeatherResponse:
 
 
 class RouteAiRecommendationTest(unittest.IsolatedAsyncioTestCase):
+    async def test_required_schedule_status_always_creates_safe_route(self):
+        result = await _should_recommend_safe_route(
+            normal_route=_normal_route(),
+            weather=_weather(),
+            model_weather={"wind_speed": None, "solar_radiation": None, "surface_pressure": None},
+            current_continuous_exposure_minutes=0,
+            nearest_cooling_spot_distance_meters=180,
+            rest_required_before_next_visit=True,
+        )
+
+        self.assertTrue(result)
+
     async def test_route_ai_receives_full_accumulated_exposure_context(self):
         captured = {}
 

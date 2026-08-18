@@ -179,6 +179,7 @@ export function recommendRoute(
   currentContinuousExposureMinutes = 0,
   currentTotalWalkingMinutes = currentContinuousExposureMinutes,
   minutesSinceLastRest = currentContinuousExposureMinutes,
+  restRequiredBeforeNextVisit = false,
 ): Promise<RouteRecommendation> {
   return apiRequest("/routes/recommendation", {
     method: "POST",
@@ -187,6 +188,7 @@ export function recommendRoute(
       currentContinuousExposureMinutes,
       currentTotalWalkingMinutes,
       minutesSinceLastRest,
+      restRequiredBeforeNextVisit,
       plannedRestMinutes: 10,
       maxAdditionalMinutes: 5,
     }),
