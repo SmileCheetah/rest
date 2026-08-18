@@ -199,6 +199,27 @@ async def complete_schedule(
     return schedule
 
 
+async def start_schedule(
+    session: AsyncSession,
+    schedule_id: int,
+) -> Schedule:
+    schedule = await _get_schedule(session, schedule_id, for_update=True)
+    if schedule is None:
+        raise ScheduleNotFoundError("schedule not found")
+    if schedule.status == ScheduleStatus.COMPLETED:
+        raise ScheduleConflictError("completed schedule cannot be started")
+    if schedule.status == ScheduleStatus.IN_PROGRESS:
+        return schedule
+    work_session = await session.get(WorkSession, schedule.work_session_id)
+    if work_session is None:
+        raise WorkSessionNotFoundError("work session not found")
+    if work_session.status != WorkSessionStatus.IN_PROGRESS:
+        raise ScheduleConflictError("work session is not in progress")
+    schedule.status = ScheduleStatus.IN_PROGRESS
+    await session.flush()
+    return schedule
+
+
 async def _get_or_create_work_session(
     session: AsyncSession,
     work_date: date,

@@ -22,12 +22,29 @@ from app.services.schedules import (
     get_next_schedule,
     get_schedules_by_work_date,
     update_schedule,
+    start_schedule,
 )
 from app.time_utils import seoul_today
 
 router = APIRouter(prefix="/schedules", tags=["schedules"])
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+@router.patch(
+    "/{schedule_id}/start",
+    response_model=ScheduleResponse,
+    summary="방문 이동 시작",
+)
+async def mark_schedule_started(schedule_id: int, session: DbSession) -> Schedule:
+    try:
+        async with session.begin():
+            schedule = await start_schedule(session, schedule_id)
+    except ScheduleNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except (ScheduleConflictError, WorkSessionNotFoundError) as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    return schedule
 
 
 @router.get(
