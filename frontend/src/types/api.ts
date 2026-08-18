@@ -51,6 +51,8 @@ export interface WorkSession {
   maxContinuousExposureMinutes: number;
   totalRestMinutes: number;
   restCount: number;
+  heatExposureReductionMinutes: number;
+  usedCoolingSpotNames: string[];
 }
 
 export interface CreateScheduleRequest {

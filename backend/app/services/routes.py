@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 from decimal import Decimal
 from math import cos, radians
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -48,6 +48,10 @@ class RouteSegmentConflictError(Exception):
 
 class SafeRouteNotFoundError(Exception):
     """조건에 맞는 쿨링스팟 안전경로를 찾을 수 없습니다."""
+
+
+class RouteOptionNotFoundError(Exception):
+    """선택할 경로를 찾을 수 없습니다."""
 
 
 # 모든 쉼터에 대해 두 번씩 TMAP을 호출하지 않도록, 직선거리로 가까운
@@ -235,6 +239,30 @@ async def calculate_normal_route(
         estimated_arrival_time=estimated_arrival_time,
         path=route.path,
     )
+
+
+async def select_route_option(
+    session: AsyncSession,
+    route_option_id: int,
+) -> RouteOption:
+    """한 이동구간에서 실제로 이용한 경로 하나를 선택 상태로 기록합니다."""
+    route_option = (
+        await session.execute(
+            select(RouteOption)
+            .where(RouteOption.id == route_option_id)
+            .with_for_update()
+        )
+    ).scalar_one_or_none()
+    if route_option is None:
+        raise RouteOptionNotFoundError("route option not found")
+    await session.execute(
+        update(RouteOption)
+        .where(RouteOption.route_segment_id == route_option.route_segment_id)
+        .values(selected=False)
+    )
+    route_option.selected = True
+    await session.flush()
+    return route_option
 
 
 async def create_route_segment(

@@ -100,6 +100,13 @@ class SafeRouteResponse(BaseModel):
     path: list[RoutePathPoint]
 
 
+class RouteOptionSelectionResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    route_option_id: int = Field(serialization_alias="routeOptionId")
+    selected: bool
+
+
 class RouteRecommendationRequest(BaseModel):
     """위험 판단부터 쿨링스팟 경유 안전경로 추천까지 한 번에 실행합니다."""
 

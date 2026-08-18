@@ -30,6 +30,13 @@ class WorkSessionResponse(BaseModel):
     )
     total_rest_minutes: int = Field(serialization_alias="totalRestMinutes")
     rest_count: int = Field(serialization_alias="restCount")
+    heat_exposure_reduction_minutes: int = Field(
+        serialization_alias="heatExposureReductionMinutes"
+    )
+    used_cooling_spot_names: list[str] = Field(
+        default_factory=list,
+        serialization_alias="usedCoolingSpotNames",
+    )
 
     @field_serializer("started_at", "completed_at", when_used="json")
     def serialize_datetime(self, value: datetime | None) -> datetime | None:

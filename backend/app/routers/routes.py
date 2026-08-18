@@ -7,6 +7,7 @@ from app.database import get_db_session
 from app.schemas.route import (
     NormalRouteRequest,
     NormalRouteResponse,
+    RouteOptionSelectionResponse,
     RouteSegmentCreateRequest,
     RouteSegmentResponse,
     RouteRecommendationRequest,
@@ -17,12 +18,14 @@ from app.schemas.route import (
 from app.services.routes import (
     RouteSegmentConflictError,
     RouteSegmentNotFoundError,
+    RouteOptionNotFoundError,
     SafeRouteNotFoundError,
     calculate_normal_route,
     create_safe_route,
     create_route_segment,
     get_route_segment,
     recommend_route,
+    select_route_option,
 )
 from app.services.tmap import TmapConfigurationError, TmapProviderError
 from app.services.weather import (
@@ -112,6 +115,26 @@ async def route_recommendation(
     except (TmapProviderError, WeatherProviderError) as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
     except WeatherForecastNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+
+@routes_router.patch(
+    "/options/{route_option_id}/select",
+    response_model=RouteOptionSelectionResponse,
+    summary="실제 이용 경로 선택",
+)
+async def select_used_route(
+    route_option_id: int,
+    session: DbSession,
+) -> RouteOptionSelectionResponse:
+    try:
+        async with session.begin():
+            route_option = await select_route_option(session, route_option_id)
+        return RouteOptionSelectionResponse(
+            route_option_id=route_option.id,
+            selected=route_option.selected,
+        )
+    except RouteOptionNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
 

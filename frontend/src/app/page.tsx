@@ -7,6 +7,7 @@ import {
   completeSchedule,
   completeWorkSession,
   resetDemoWorkSession,
+  selectRouteOption,
   createRouteSegment,
   recommendRoute,
   createSchedule,
@@ -564,6 +565,9 @@ export default function Home() {
     if (activeScheduleId === null) return;
     setIsBusy(true);
     try {
+      if (displayedRoute) {
+        await selectRouteOption(displayedRoute.routeOptionId);
+      }
       await completeSchedule(activeScheduleId);
       setInProgressScheduleId(null);
       const next = await getNextSchedule();
@@ -699,7 +703,7 @@ export default function Home() {
         <section className="guidance-sheet"><div className="handle"/><div className="guidance-main"><strong>{displayedRoute ? `${displayedRoute.walkingMinutes}분` : activeVisit.walk}</strong><span>•</span><span>{displayedRoute ? formatDistance(displayedRoute.distanceMeters) : activeVisit.distance}</span></div><p>{activeVisit.name}님 댁까지</p><button className="small-button route-change-button" onClick={() => setScreen("route")}>경로 변경</button>{selectedRoute === "safe" && recommendedSpot && <article className="shelter-summary"><div><span>추천 쉼터</span><strong>{recommendedSpot.name}</strong><small>경로에 추가 시 약 {recommendedRoute?.safeRoute?.additionalMinutes ?? 0}분 더 소요</small></div><button className="small-button" onClick={() => setModal("spot")}>자세히 보기</button></article>}<div className="button-row">{selectedRoute === "safe" && recommendedSpot && <button className="button secondary" onClick={() => {setSelectedRoute("normal"); setFinishAfterSkipSurvey(false); setModal("skip");}}>쉼터 건너뛰기</button>}<button className="button teal" disabled={isBusy} onClick={() => handleGuidanceComplete()}>{isBusy ? "처리 중..." : "길 안내 종료"}</button></div></section>
       </>}
 
-      {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 72}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 2}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 15}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>15분</strong><small>안전하게 이동했어요!</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2><p>창신동 주민센터</p><p>동부여성문화센터</p></section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}
+      {screen === "complete" && <div className="completion-content"><div className="completion-mark"><Icon name="check"/></div><h1>오늘의 방문을<br/>모두 완료했어요!</h1><div className="completion-count"><strong>{workSession?.completedVisitCount ?? completed.length} / {workSession?.totalVisitCount ?? visits.length}</strong><span>방문 완료</span></div><div className="stats-row"><article><span>총 야외 이동시간</span><strong>{workSession?.totalExposureMinutes ?? 0}분</strong></article><article><span>총 휴식 횟수</span><strong>{workSession?.restCount ?? 0}회</strong></article><article><span>총 휴식 시간</span><strong>{workSession?.totalRestMinutes ?? 0}분</strong></article></div><article className="hero-stat"><span>폭염 노출 감소</span><strong>{workSession?.heatExposureReductionMinutes ?? 0}분</strong><small>쿨링스팟에서 휴식한 시간이에요.</small></article><section className="used-shelters"><h2>이용한 쿨링스팟</h2>{workSession?.usedCoolingSpotNames?.length ? workSession.usedCoolingSpotNames.map((name) => <p key={name}>{name}</p>) : <p>이용한 쿨링스팟이 없어요.</p>}</section><button className="button teal" disabled={isBusy} onClick={() => void handleCompletionConfirm()}>{isBusy ? "초기화 중..." : "확인"}</button></div>}
 
       {modal && <><div className="dim" onClick={() => setModal(null)}/>{modal === "add" && <section className="bottom-sheet tall"><div className="handle"/><div className="sheet-header"><h2>대상자 추가</h2><button className="icon-btn" onClick={() => setModal(null)}><Icon name="close"/></button></div><p>오늘 방문할 대상자를 선택해주세요.</p><label className="search-box"><Icon name="search"/><input placeholder="이름 검색" value={targetSearch} onChange={(event) => setTargetSearch(event.target.value)} /></label><div className="chip-grid">{filteredVisitTargets.map(target => <button key={target.visitTargetId} onClick={() => setSelectedTargetId(target.visitTargetId)} className={selectedTargetId === target.visitTargetId ? "active" : ""}>{target.name}</button>)}</div>{filteredVisitTargets.length === 0 && <p className="empty-state">검색 결과가 없습니다.</p>}<label className="form-label" htmlFor="schedule-time">방문 예정 시간</label><div className="time-input"><input id="schedule-time" type="time" value={scheduleTime} onChange={(event) => setScheduleTime(event.target.value)} required/></div><button className="button primary" disabled={isBusy || selectedTargetId === null || !scheduleTime} onClick={() => void handleAddSchedule()}>일정에 추가</button></section>}
       {modal === "menu" && <div className="context-menu"><button disabled={isBusy} onClick={() => void handleDeleteSchedule()}>일정에서 삭제</button></div>}

@@ -104,6 +104,12 @@ export function completeWorkSession(workSessionId: number): Promise<WorkSession>
   });
 }
 
+export function selectRouteOption(routeOptionId: number): Promise<{ routeOptionId: number; selected: boolean }> {
+  return apiRequest(`/routes/options/${routeOptionId}/select`, {
+    method: "PATCH",
+  });
+}
+
 export function resetDemoWorkSession(): Promise<WorkSession> {
   return apiRequest("/work-sessions/reset", { method: "POST" });
 }
