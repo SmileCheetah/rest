@@ -61,7 +61,7 @@ export function getVisitTargets(): Promise<VisitTarget[]> {
   return apiRequest("/visit-targets");
 }
 
-export function getCoolingSpots(latitude?: number, longitude?: number, radius = 20_000): Promise<CoolingSpot[]> {
+export function getCoolingSpots(latitude?: number, longitude?: number, radius = 2_000): Promise<CoolingSpot[]> {
   const params = new URLSearchParams();
   if (latitude !== undefined && longitude !== undefined) {
     params.set("latitude", String(latitude));
