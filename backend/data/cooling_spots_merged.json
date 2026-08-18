@@ -1,0 +1,4042 @@
+[
+  {
+    "name":"남대문로5가점",
+    "address":"중구 세종대로 8-1, (남대문로5가)",
+    "latitude":37.5575679377,
+    "longitude":126.973395436,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"경희당점",
+    "address":"종로구 경희궁길 36 (신문로2가)",
+    "latitude":37.5728826627,
+    "longitude":126.970031938,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동숭아트점",
+    "address":"종로구 동숭길 114 (동숭동) 1층 CU",
+    "latitude":37.5831897207,
+    "longitude":127.003833308,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동묘토성점",
+    "address":"종로구 지봉로4길 21",
+    "latitude":37.5713231247,
+    "longitude":127.016986272,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"행당삼부소월점",
+    "address":"성동구 왕십리로 284 (행당동) 1층 CU",
+    "latitude":37.5597192327,
+    "longitude":127.036888545,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"자양차이나점",
+    "address":"광진구 뚝섬로23가길 17 1층 CU",
+    "latitude":37.5380344236,
+    "longitude":127.065402409,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"전농우성점",
+    "address":"동대문구 사가정로 190, 상가(전농동, 전농우성아파트) 2층",
+    "latitude":37.5780751037,
+    "longitude":127.066384896,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"장안관광호텔점",
+    "address":"동대문구 천호대로 377, (장안동)",
+    "latitude":37.5623342637,
+    "longitude":127.060988638,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"군자초교점",
+    "address":"동대문구 천호대로77길 22 1층 CU",
+    "latitude":37.5631275787,
+    "longitude":127.06139116,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"답십리점",
+    "address":"동대문구 답십리동 서울시립대로2길 60 (답십리동) 1층 CU",
+    "latitude":37.5725357357,
+    "longitude":127.048952907,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"CU중랑동부점",
+    "address":"중랑구 중랑천로10길 48, (면목동)",
+    "latitude":37.5921013147,
+    "longitude":127.07569547,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"망우경남점",
+    "address":"중랑구 양원역로 37 경남아파트 1층 1동 1호 1층 CU",
+    "latitude":37.6042576777,
+    "longitude":127.106442026,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"CU안암센트럴점",
+    "address":"성북구 고려대로28길 16 안암랜드빌딩 (안암동5가)",
+    "latitude":37.5855607287,
+    "longitude":127.030601946,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동선대로점",
+    "address":"성북구 동소문로27길 1 (동선동4가) 1층 CU",
+    "latitude":37.5946486027,
+    "longitude":127.018823135,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"창동그랜드점",
+    "address":"도봉구 해등로 119 (창동)",
+    "latitude":37.6542028038,
+    "longitude":127.040580583,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"도봉무수골점",
+    "address":"도봉구 도봉로173길 40 (도봉동)",
+    "latitude":37.6796517928,
+    "longitude":127.041531931,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"방학삼익점",
+    "address":"도봉구 도당로 36 1층 CU",
+    "latitude":37.6612188078,
+    "longitude":127.035008128,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"상계불암점",
+    "address":"노원구 덕릉로94길 21 상계불암대림아파트 1층 CU",
+    "latitude":37.6635487178,
+    "longitude":127.076631156,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"중계주공3&4단지점",
+    "address":"노원구 한글비석로 325 1층 CU",
+    "latitude":37.6564347078,
+    "longitude":127.0777209,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서대문센트럴점",
+    "address":"서대문구 이화여대8길 62 (북아현동) 두산아파트 B1층 상가동 05호",
+    "latitude":37.5596507687,
+    "longitude":126.949897587,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신촌르메이에르점",
+    "address":"서대문구 신촌로 127, 메이에르타 (창천동)",
+    "latitude":37.5564640177,
+    "longitude":126.939992451,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마포아이비점",
+    "address":"마포구 서강로 136 (노고산동, 아이비타워) 지하1층 B101호",
+    "latitude":37.5541068887,
+    "longitude":126.93580123,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마포센트럴점",
+    "address":"마포구 대흥로24길 7 (대흥동) NK빌딩 1층",
+    "latitude":37.5544678217,
+    "longitude":126.946449858,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"홍대상상점",
+    "address":"마포구 잔다리로 25 (서교동) 1층 1동 101호",
+    "latitude":37.5508455817,
+    "longitude":126.920069552,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신목동점",
+    "address":"양천구 신목로5길 13 1층 CU",
+    "latitude":37.5176234146,
+    "longitude":126.872477122,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"방화리치점",
+    "address":"강서구 방화동로 107 (방화동) 1층 CU",
+    "latitude":37.5699628187,
+    "longitude":126.812611951,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"관악푸른점",
+    "address":"관악구 낙성대역길 61 (봉천동, 킹스빌리지) 킹스빌리지 1층",
+    "latitude":37.4752458836,
+    "longitude":126.962490315,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"관악우체국점",
+    "address":"관악구 남부순환로187길 9 (신림동) 1층 CU",
+    "latitude":37.4852662656,
+    "longitude":126.933367304,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"관악인헌길점",
+    "address":"관악구 인헌12길 42 태양빌라 1층 CU",
+    "latitude":37.4707688926,
+    "longitude":126.96503721,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"CU상도삼호점",
+    "address":"동작구 상도로 407-5 삼호아파트 상가동 지하1층 101호",
+    "latitude":37.4932594266,
+    "longitude":126.956629891,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"방배롯데캐슬점",
+    "address":"서초구 방배중앙로29길 25 (방배동) 1층 CU",
+    "latitude":37.4964007876,
+    "longitude":126.984033938,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서초센트럴점",
+    "address":"서초구 반포대로18길 36 (서초동) 서초센트럴아이파크 상가 1층 CU",
+    "latitude":37.4872133566,
+    "longitude":127.011492784,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"역삼점",
+    "address":"강남구 테헤란로51길 10, (역삼동)",
+    "latitude":37.5047872346,
+    "longitude":127.046993802,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"BGF사옥점",
+    "address":"강남구 테헤란로63길 9",
+    "latitude":37.5057876656,
+    "longitude":127.050111255,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"논현역드림점",
+    "address":"강남구 강남대로 570, (논현동)",
+    "latitude":37.5128442216,
+    "longitude":127.02095523,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"타워팰리스점",
+    "address":"강남구 언주로30길 56, 상가시설내 104(도곡동, 타워팰리스)",
+    "latitude":37.4886253286,
+    "longitude":127.054081882,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"문정훼밀리점",
+    "address":"송파구 중대로 60-6 (문정동)",
+    "latitude":37.4912490326,
+    "longitude":127.115652467,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마천중앙점",
+    "address":"송파구 마천로43길 32-1",
+    "latitude":37.4993041706,
+    "longitude":127.150219018,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마천파크점",
+    "address":"송파구 성내천로47길 23 경진빌딩 (마천동) 경진빌딩",
+    "latitude":37.4951401076,
+    "longitude":127.157790451,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"성내시네마점",
+    "address":"강동구 올림픽로62길 23 1층 CU",
+    "latitude":37.5365577947,
+    "longitude":127.124149626,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25건국점",
+    "address":"서울 광진구 광나루로24길 14",
+    "latitude":37.5456459707,
+    "longitude":127.076248436,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25월계성북역점",
+    "address":"노원구 석계로 103(월계1동 410-7)",
+    "latitude":37.6228756627,
+    "longitude":127.060719026,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25홍은중앙로점",
+    "address":"서대문구 홍은중앙로 115, 1층 (홍은동 9-307)",
+    "latitude":37.6007315567,
+    "longitude":126.94875858,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25목동대일점",
+    "address":"양천구 목동중앙남로11길 26, 1층 (목3동 719-27)",
+    "latitude":37.5393720287,
+    "longitude":126.864520923,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25발산행복점",
+    "address":"강서구 강서로50길 16, 1층 (내발산동 665)",
+    "latitude":37.5551557487,
+    "longitude":126.838144843,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25발산사랑점",
+    "address":"강서구 우장산로2길 21, 1층 (내발산동 670-50)",
+    "latitude":37.5538041697,
+    "longitude":126.83766483,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25염창행복점",
+    "address":"강서구 공항대로81길 35, 1층 103호 (염창동 262, 염창투웨니퍼스트)",
+    "latitude":37.5487624387,
+    "longitude":126.875980759,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25강서퍼스트점",
+    "address":"강서구 마곡중앙2로 35, 상가 105호, 106호 (마곡동 800-15)",
+    "latitude":37.5579890917,
+    "longitude":126.830623623,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25고척사랑점",
+    "address":"구로구 경인로47다길 8, 1층 101호 (고척1동 46-21)",
+    "latitude":37.5034068986,
+    "longitude":126.864150856,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25당산스타점",
+    "address":"영등포구 영신로 219, 106호(당산동4가 1-2, 코오롱스타폴리스)",
+    "latitude":37.5273887576,
+    "longitude":126.902843376,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25대림그랜드점",
+    "address":"영등포구 대림로 198, 101호 (대림동 689-1, 대경빌딩)",
+    "latitude":37.4985026016,
+    "longitude":126.898626438,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25더관악점",
+    "address":"관악구 남부순환로 1599-3, 1층 (신림동 1433-51)",
+    "latitude":37.4845160706,
+    "longitude":126.928259255,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25개포럭키점",
+    "address":"강남구 개포로20길 12(개포4동 1232)",
+    "latitude":37.4779356856,
+    "longitude":127.047261252,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25도곡신호점",
+    "address":"강남구 도곡로 184, 1층 101호 (도곡1동 544, 신호빌딩)",
+    "latitude":37.4917084436,
+    "longitude":127.039737274,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25DXLAB점",
+    "address":"강남구 테헤란로 223, 1층 101호 (역삼동 677-25, 큰길타워빌딩)",
+    "latitude":37.5024177436,
+    "longitude":127.040665854,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25역삼홍인점",
+    "address":"강남구 봉은사로30길 43, 지하1층 (역삼동 666-15)",
+    "latitude":37.5047538936,
+    "longitude":127.036240621,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25파르나스타워점",
+    "address":"강남구 테헤란로 521, 1층 (T1) (삼성동 159-8)",
+    "latitude":37.5091745166,
+    "longitude":127.060625246,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS25강남동원점",
+    "address":"강남구 테헤란로77길 7(삼성2동 143-28, 동원빌딩)",
+    "latitude":37.5069261936,
+    "longitude":127.054495838,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"압구정갤러리아",
+    "address":"서울 강남구 압구정로 344(신사동)",
+    "latitude":37.5277012186,
+    "longitude":127.039850325,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신한은행(신사동)",
+    "address":"서울특별시 강남구 강남대로 606",
+    "latitude":37.5158301976,
+    "longitude":127.020146982,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"압구정역",
+    "address":"서울특별시 강남구 압구정로 152",
+    "latitude":37.5256071876,
+    "longitude":127.026106379,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"압구정중앙",
+    "address":"서울특별시 강남구 압구정로 220",
+    "latitude":37.5283158396,
+    "longitude":127.031541164,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"학동",
+    "address":"서울특별시 강남구 도산대로 221",
+    "latitude":37.5210364206,
+    "longitude":127.030902204,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"영동",
+    "address":"서울특별시 강남구 언주로 709,(송암빌딩)",
+    "latitude":37.5167915256,
+    "longitude":127.034922771,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"도산대로",
+    "address":"서울특별시 강남구 도산대로 318",
+    "latitude":37.5218419236,
+    "longitude":127.036895112,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"청담동",
+    "address":"서울 강남구 도산대로 506",
+    "latitude":37.5239382176,
+    "longitude":127.048244396,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강남구청역",
+    "address":"서울특별시 강남구 학동로 402",
+    "latitude":37.5169759456,
+    "longitude":127.041789031,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"무역센터금융센터",
+    "address":"서울 강남구 영동대로 513(삼성동)",
+    "latitude":37.5120183486,
+    "longitude":127.059037019,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"삼성역",
+    "address":"서울특별시 강남구 테헤란로 516",
+    "latitude":37.5074128126,
+    "longitude":127.060079255,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"봉은사로",
+    "address":"서울특별시 강남구 봉은사로 609",
+    "latitude":37.5147442836,
+    "longitude":127.061488328,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"테헤란로금융센터",
+    "address":"서울특별시 강남구 테헤란로 429,(원방빌딩)",
+    "latitude":37.5064437236,
+    "longitude":127.053937384,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"선릉",
+    "address":"서울특별시 강남구 테헤란로 329,(삼흥빌딩)",
+    "latitude":37.5045328126,
+    "longitude":127.047693868,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"선릉중앙",
+    "address":"서울특별시 강남구 테헤란로 410,(금강타워)",
+    "latitude":37.5045556976,
+    "longitude":127.050729387,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"논현동",
+    "address":"서울특별시 강남구 강남대로 468",
+    "latitude":37.5041557576,
+    "longitude":127.025145497,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강남중앙",
+    "address":"서울특별시 강남구 테헤란로 146",
+    "latitude":37.5000168656,
+    "longitude":127.035470998,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"GS타워",
+    "address":"서울특별시 강남구 논현로 508,(GS강남타워)",
+    "latitude":37.5020017806,
+    "longitude":127.03747601,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"대치동",
+    "address":"서울특별시 강남구 삼성로 238",
+    "latitude":37.4986108916,
+    "longitude":127.061406231,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"대치역",
+    "address":"서울특별시 강남구 삼성로 150(대치동)",
+    "latitude":37.4942304156,
+    "longitude":127.070425643,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"일원역",
+    "address":"서울특별시 강남구 일원로 120,(극동,현대아파트단지상가)",
+    "latitude":37.4848178656,
+    "longitude":127.083165665,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"삼성서울병원",
+    "address":"서울 강남구 일원로 81",
+    "latitude":37.4885215066,
+    "longitude":127.086671259,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"도곡",
+    "address":"서울특별시 강남구 역삼로 310,(한솔필리아)",
+    "latitude":37.4992163846,
+    "longitude":127.048435922,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"개포동",
+    "address":"서울특별시 강남구 개포로 307,(우성아파트단지상가)",
+    "latitude":37.4838610116,
+    "longitude":127.056977016,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"도곡역",
+    "address":"서울특별시 강남구 남부순환로 2912",
+    "latitude":37.4907161796,
+    "longitude":127.056125033,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"군인공제회관",
+    "address":"서울특별시 강남구 남부순환로 2806,(군인공제회관)",
+    "latitude":37.4891129416,
+    "longitude":127.052933792,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"반포남금융센터",
+    "address":"서울특별시 서초구 서초중앙로 238",
+    "latitude":37.5027921816,
+    "longitude":127.011978496,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"반포중앙",
+    "address":"서울 서초구 잠원로3길 40(잠원동)",
+    "latitude":37.5082543796,
+    "longitude":127.003644252,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"잠원동",
+    "address":"서울특별시 서초구 잠원로14길 29,(롯데복지센터빌딩)",
+    "latitude":37.5178557226,
+    "longitude":127.015462425,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"반포서래",
+    "address":"서울특별시 서초구 서래로 23",
+    "latitude":37.4971190906,
+    "longitude":126.998082108,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"반포래미안",
+    "address":"서울특별시 서초구 반포대로 287,(래미안퍼스티지중심상가)",
+    "latitude":37.5043280246,
+    "longitude":127.001088355,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서초중앙",
+    "address":"서울특별시 서초구 효령로 285",
+    "latitude":37.4851464256,
+    "longitude":127.015358799,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서초동",
+    "address":"서울특별시 서초구 반포대로 101",
+    "latitude":37.4893149666,
+    "longitude":127.008552245,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"교대역",
+    "address":"서울특별시 서초구 서초대로 314",
+    "latitude":37.4938920356,
+    "longitude":127.016076635,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강남역금융센터",
+    "address":"서울특별시 서초구 서초대로 398",
+    "latitude":37.4966360576,
+    "longitude":127.025104495,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"역삼동",
+    "address":"서울특별시 강남구 강남대로 314,(서우빌딩)",
+    "latitude":37.4913334916,
+    "longitude":127.031711746,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강남대로",
+    "address":"서울 서초구 강남대로 327(대륭서초타워)",
+    "latitude":37.4920640316,
+    "longitude":127.029795851,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"양재역금융센터",
+    "address":"서울특별시 강남구 강남대로 240,(SK허브프리모)",
+    "latitude":37.4852764196,
+    "longitude":127.034385507,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"양재동",
+    "address":"서울특별시 서초구 논현로 87,(삼호물산빌딩)",
+    "latitude":37.4775626846,
+    "longitude":127.044214402,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"현대모터타운",
+    "address":"서울특별시 서초구 헌릉로 12,(현대기아자동차빌딩)",
+    "latitude":37.4636734896,
+    "longitude":127.042042669,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"방배",
+    "address":"서울특별시 서초구 방배로 148",
+    "latitude":37.4872058016,
+    "longitude":126.994289296,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이수역",
+    "address":"서울특별시 서초구 서초대로 6",
+    "latitude":37.4851955306,
+    "longitude":126.982992021,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"사당",
+    "address":"서울특별시 동작구 동작대로 35",
+    "latitude":37.4796184136,
+    "longitude":126.981357022,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동부법원",
+    "address":"서울 송파구 법원로 101(문정동)",
+    "latitude":37.4842442946,
+    "longitude":127.120129045,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"남부법원",
+    "address":"서울특별시 양천구 신월로 386",
+    "latitude":37.5216449026,
+    "longitude":126.863608529,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"법조타운",
+    "address":"서울특별시 서초구 법원로 15,(정곡빌딩)",
+    "latitude":37.4941606746,
+    "longitude":127.010000436,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서부법원",
+    "address":"서울특별시 마포구 마포대로 174,(서울서부지원)",
+    "latitude":37.5491142767,
+    "longitude":126.955587865,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"상봉역금융센터",
+    "address":"서울특별시 중랑구 면목로 460",
+    "latitude":37.5930408577,
+    "longitude":127.086609453,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"장한평역금융센터",
+    "address":"서울특별시 동대문구 천호대로 425",
+    "latitude":37.5618159427,
+    "longitude":127.066468581,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"답십리",
+    "address":"서울특별시 동대문구 전농로 22",
+    "latitude":37.5667107897,
+    "longitude":127.056738882,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"장안동",
+    "address":"서울 동대문구 장한로 119(장안동,장안삼성쉐르빌)",
+    "latitude":37.5714378377,
+    "longitude":127.070128439,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"사가정역",
+    "address":"서울특별시 중랑구 면목로 342",
+    "latitude":37.5824007907,
+    "longitude":127.088791342,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"중화역",
+    "address":"서울특별시 중랑구 동일로 796",
+    "latitude":37.6014862237,
+    "longitude":127.079983226,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"뚝섬역금융센터",
+    "address":"서울 성동구 아차산로 33",
+    "latitude":37.5472133777,
+    "longitude":127.048328811,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"행당동",
+    "address":"서울특별시 성동구 고산자로 202",
+    "latitude":37.5582463057,
+    "longitude":127.034407144,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"성수동",
+    "address":"서울특별시 성동구 아차산로7길 21",
+    "latitude":37.5471378177,
+    "longitude":127.054797181,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"성동",
+    "address":"서울특별시 중구 왕십리로 407",
+    "latitude":37.5647462987,
+    "longitude":127.025144235,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"한양대학교",
+    "address":"서울특별시 성동구 마조로 22-2,(한양대학교 동문회관)",
+    "latitude":37.5594921667,
+    "longitude":127.041340865,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"스타시티금융센터",
+    "address":"서울특별시 광진구 아차산로 272,(스타시티)",
+    "latitude":37.5384131737,
+    "longitude":127.073194189,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"군자역",
+    "address":"서울특별시 광진구 천호대로 553",
+    "latitude":37.5574125807,
+    "longitude":127.07992049,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"테크노마트",
+    "address":"서울특별시 광진구 광나루로56길 85,(테크노마트)",
+    "latitude":37.5356524486,
+    "longitude":127.095740603,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"자양동",
+    "address":"서울특별시 광진구 자양로 95",
+    "latitude":37.5362358456,
+    "longitude":127.083198308,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"광장동",
+    "address":"서울특별시 광진구 아차산로 506",
+    "latitude":37.5414900076,
+    "longitude":127.097725564,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"건국대학교",
+    "address":"서울특별시 광진구 능동로 120,(건국대학교)",
+    "latitude":37.5434166207,
+    "longitude":127.078189131,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"잠실금융센터",
+    "address":"서울특별시 송파구 올림픽로 319,(새마을교통회관)",
+    "latitude":37.5156310656,
+    "longitude":127.105601028,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서잠실",
+    "address":"서울특별시 송파구 올림픽로 106,(상록빌딩)",
+    "latitude":37.5113736986,
+    "longitude":127.082562985,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"잠실나루역",
+    "address":"서울특별시 송파구 올림픽로 435,(파크리오아파트)",
+    "latitude":37.5191496326,
+    "longitude":127.105237293,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"잠실롯데캐슬",
+    "address":"서울특별시 송파구 올림픽로 269,(롯데캐슬프라자)",
+    "latitude":37.5144572266,
+    "longitude":127.100572843,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"갤러리아팰리스",
+    "address":"서울특별시 송파구 올림픽로 212,(갤러리아팰리스단지상가)",
+    "latitude":37.5113910866,
+    "longitude":127.09355468,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"가락동금융센터",
+    "address":"서울 송파구 송파대로 268(가락동)",
+    "latitude":37.4937206536,
+    "longitude":127.118346207,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"잠실남",
+    "address":"서울특별시 송파구 석촌호수로 133,(레이크팰리스단지상가)",
+    "latitude":37.5076521026,
+    "longitude":127.091787462,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"오금동",
+    "address":"서울특별시 송파구 오금로35길 17,(현대아파트)",
+    "latitude":37.5040064036,
+    "longitude":127.125698681,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"송파",
+    "address":"서울특별시 송파구 송파대로 345(가락동)",
+    "latitude":37.4976078406,
+    "longitude":127.102494595,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강동금융센터",
+    "address":"서울특별시 강동구 올림픽로 674,(로석빌딩)",
+    "latitude":37.5414636517,
+    "longitude":127.124794973,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"길동",
+    "address":"서울특별시 강동구 양재대로 1464",
+    "latitude":37.5365202446,
+    "longitude":127.139787308,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"풍납동",
+    "address":"서울특별시 송파구 토성로 58",
+    "latitude":37.5290206456,
+    "longitude":127.11607447,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"둔촌동",
+    "address":"서울특별시 강동구 양재대로 1315",
+    "latitude":37.5238376446,
+    "longitude":127.134293279,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"고덕동",
+    "address":"서울 강동구 고덕로 353(고덕동)",
+    "latitude":37.5572361027,
+    "longitude":127.164683042,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"명일역",
+    "address":"서울특별시 강동구 구천면로 427",
+    "latitude":37.5505175387,
+    "longitude":127.14612168,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"굽은다리역",
+    "address":"서울 강동구 양재대로 1568(명일동)",
+    "latitude":37.5453933207,
+    "longitude":127.14320754,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"문정역금융센터",
+    "address":"서울 송파구 송파대로 167",
+    "latitude":37.4846668506,
+    "longitude":127.120865833,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올림픽선수촌",
+    "address":"서울 송파구 양재대로 1222(방이동\/중심상가,A상가)",
+    "latitude":37.5157763236,
+    "longitude":127.131486244,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"개롱역",
+    "address":"서울특별시 송파구 오금로 396,(에스케이허브파크)",
+    "latitude":37.4979543696,
+    "longitude":127.134224005,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신내동",
+    "address":"서울특별시 중랑구 봉화산로 194,(신아타운)",
+    "latitude":37.6064394237,
+    "longitude":127.094676997,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"한남동금융센터",
+    "address":"서울특별시 용산구 한남대로 59,(남한빌딩)",
+    "latitude":37.5340066206,
+    "longitude":127.006701127,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"용산전자",
+    "address":"서울특별시 용산구 원효로 153",
+    "latitude":37.5349671316,
+    "longitude":126.959927523,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이태원",
+    "address":"서울특별시 용산구 이태원로 179,(헤밀톤호텔)",
+    "latitude":37.5347261076,
+    "longitude":126.994167403,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동부이촌동",
+    "address":"서울특별시 용산구 이촌로 293",
+    "latitude":37.5184806836,
+    "longitude":126.979419926,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"용산",
+    "address":"서울 용산구 한강대로 95",
+    "latitude":37.5288489846,
+    "longitude":126.966628623,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"공덕금융센터",
+    "address":"서울 마포구 백범로 192,(S-OIL본사 사옥2층)",
+    "latitude":37.5432367247,
+    "longitude":126.951605597,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마포",
+    "address":"서울특별시 마포구 마포대로 136,(지방재정공제회관)",
+    "latitude":37.5463827037,
+    "longitude":126.953259058,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"대흥역",
+    "address":"서울특별시 마포구 백범로 88",
+    "latitude":37.5479461277,
+    "longitude":126.941111551,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마포중앙",
+    "address":"서울특별시 마포구 마포대로 68,(마포아크로타워,신한은행마포중앙)",
+    "latitude":37.5413422257,
+    "longitude":126.948897481,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"숙명여자대학교",
+    "address":"서울특별시 용산구 청파로47가길 6",
+    "latitude":37.5446309747,
+    "longitude":126.966713474,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"광화문",
+    "address":"서울특별시 중구 세종대로 135-5",
+    "latitude":37.5686122627,
+    "longitude":126.976454367,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"효자동",
+    "address":"서울특별시 종로구 자하문로 61",
+    "latitude":37.5813323777,
+    "longitude":126.970610061,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"경희궁",
+    "address":"서울특별시 종로구 새문안로3길 23,(경희궁의아침4단지4단지교보문고사옥)",
+    "latitude":37.5726307677,
+    "longitude":126.972440865,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"상암동금융센터",
+    "address":"서울특별시 마포구 월드컵북로 361,(DMC이안상암2단지)",
+    "latitude":37.5771062527,
+    "longitude":126.891406382,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서교동",
+    "address":"서울특별시 마포구 양화로 111",
+    "latitude":37.5537926387,
+    "longitude":126.919109727,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"합정역",
+    "address":"서울 마포구 월드컵로3길 14(합정동)",
+    "latitude":37.5510359247,
+    "longitude":126.912343687,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"홍익대학교",
+    "address":"서울 마포구 와우산로 94(상수동)",
+    "latitude":37.5495351737,
+    "longitude":126.924722273,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"구파발역금융센터",
+    "address":"서울 은평구 진관2로 15-8",
+    "latitude":37.6354080598,
+    "longitude":126.919567613,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"남가좌동",
+    "address":"서울 서대문구 수색로 56",
+    "latitude":37.5709115637,
+    "longitude":126.912245781,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연신내",
+    "address":"서울특별시 은평구 통일로 845",
+    "latitude":37.6185668867,
+    "longitude":126.921054987,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"응암동",
+    "address":"서울특별시 은평구 은평로 136,(은경빌딩)",
+    "latitude":37.6002754127,
+    "longitude":126.923042833,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"불광동",
+    "address":"서울 은평구 통일로 730",
+    "latitude":37.6108439427,
+    "longitude":126.930104749,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"충정로금융센터",
+    "address":"서울특별시 서대문구 충정로 8,(종근당빌딩)",
+    "latitude":37.5596742017,
+    "longitude":126.963202374,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서대문역",
+    "address":"서울특별시 서대문구 충정로 77",
+    "latitude":37.5655425367,
+    "longitude":126.965983291,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이대역",
+    "address":"서울특별시 서대문구 신촌로 183",
+    "latitude":37.5570635247,
+    "longitude":126.946307128,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신촌",
+    "address":"서울특별시 마포구 신촌로 94",
+    "latitude":37.5549953077,
+    "longitude":126.936002094,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"홍제동",
+    "address":"서울특별시 서대문구 통일로 433,(조이빌딩)",
+    "latitude":37.5875803537,
+    "longitude":126.94508137,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이화여자대학교",
+    "address":"서울특별시 서대문구 이화여대길 52,(ECC관)",
+    "latitude":37.5634243677,
+    "longitude":126.947587778,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"역촌동",
+    "address":"서울특별시 은평구 연서로 73,(금현빌딩)",
+    "latitude":37.6055981497,
+    "longitude":126.915092955,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"보라매역금융센터",
+    "address":"서울특별시 동작구 상도로 1",
+    "latitude":37.5002378096,
+    "longitude":126.920749642,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서울대역센터",
+    "address":"서울특별시 관악구 남부순환로 1778",
+    "latitude":37.4815287806,
+    "longitude":126.947497706,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"상도역",
+    "address":"서울특별시 동작구 상도로 241",
+    "latitude":37.5053361196,
+    "longitude":126.945575092,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"노량진역",
+    "address":"서울특별시 동작구 만양로 105,(한교고시학원)",
+    "latitude":37.5129189756,
+    "longitude":126.943999176,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"보라매",
+    "address":"서울특별시 동작구 보라매로5가길 24,(보라매나산스위트)",
+    "latitude":37.4904181836,
+    "longitude":126.923914141,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서울대학교",
+    "address":"서울특별시 관악구 관악로 1,(서울대학교 학생회관)",
+    "latitude":37.4591410626,
+    "longitude":126.950687063,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"독산동금융센터",
+    "address":"서울특별시 금천구 시흥대로 446",
+    "latitude":37.4732787046,
+    "longitude":126.898784973,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"구로디지털금융센터",
+    "address":"서울특별시 구로구 디지털로 272,(한신아이티타워ITTOWER)",
+    "latitude":37.4825083536,
+    "longitude":126.894434435,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"대림동",
+    "address":"서울특별시 영등포구 시흥대로 617",
+    "latitude":37.4876489836,
+    "longitude":126.904848771,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"시흥동",
+    "address":"서울특별시 금천구 시흥대로 230",
+    "latitude":37.4544282756,
+    "longitude":126.901249434,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"구로역금융센터",
+    "address":"서울 구로구 경인로 557(구로동)",
+    "latitude":37.5031170306,
+    "longitude":126.879016574,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"개봉동",
+    "address":"서울특별시 구로구 경인로 323",
+    "latitude":37.4976493376,
+    "longitude":126.8561653,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"중앙유통단지",
+    "address":"서울특별시 구로구 경인로53길 15,(중앙유통단지업무)",
+    "latitude":37.5020322276,
+    "longitude":126.876117129,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"디지털중앙",
+    "address":"서울특별시 금천구 가산디지털1로 186,(제이플라츠)",
+    "latitude":37.4819151796,
+    "longitude":126.881596617,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"여의도중앙",
+    "address":"서울특별시 영등포구 여의나루로 57,(신송센터빌딩)",
+    "latitude":37.5230468506,
+    "longitude":126.925614651,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"여의도",
+    "address":"서울특별시 영등포구 국제금융로8길 25,(주택건설회관빌딩)",
+    "latitude":37.5203279416,
+    "longitude":126.928477742,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"KBS",
+    "address":"서울특별시 영등포구 여의공원로 13",
+    "latitude":37.5263233886,
+    "longitude":126.915679317,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서여의도",
+    "address":"서울특별시 영등포구 국회대로70길 19,(대하빌딩)",
+    "latitude":37.5292136786,
+    "longitude":126.920841737,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"당산역금융센터",
+    "address":"서울 영등포구 당산로41길 11",
+    "latitude":37.5308321746,
+    "longitude":126.898095205,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"영등포",
+    "address":"서울특별시 영등포구 영중로 27",
+    "latitude":37.5187721096,
+    "longitude":126.905036947,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"당산동",
+    "address":"서울특별시 영등포구 영등포로 109",
+    "latitude":37.5223905696,
+    "longitude":126.893923269,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"선유도역",
+    "address":"서울특별시 영등포구 양평로 99",
+    "latitude":37.5364867046,
+    "longitude":126.896081923,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"목동현대금융센터",
+    "address":"서울특별시 양천구 목동동로 293",
+    "latitude":37.5281705726,
+    "longitude":126.87575425,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신월동",
+    "address":"서울특별시 양천구 신월로 163",
+    "latitude":37.5181425546,
+    "longitude":126.841480789,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"목동역",
+    "address":"서울특별시 양천구 목동로 212목동7단지아파트 A상가 1층",
+    "latitude":37.5278255246,
+    "longitude":126.868493614,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"목동중앙",
+    "address":"서울특별시 양천구 목동동로 411,(부영그린타워3차)",
+    "latitude":37.5367248306,
+    "longitude":126.882213915,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"목동",
+    "address":"서울특별시 양천구 목동서로 349(신정동,센트럴프라자 2층)",
+    "latitude":37.5174063776,
+    "longitude":126.865307825,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"화곡역",
+    "address":"서울특별시 강서구 강서로 173,(터보빌딩)",
+    "latitude":37.5419237567,
+    "longitude":126.839625652,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"등촌역",
+    "address":"서울특별시 강서구 등촌로 229",
+    "latitude":37.5502242587,
+    "longitude":126.863458524,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"가양역",
+    "address":"서울특별시 강서구 화곡로 416",
+    "latitude":37.5600217187,
+    "longitude":126.855379732,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마곡역금융센터",
+    "address":"서울 강서구 공항대로 195(마곡동)",
+    "latitude":37.5599240217,
+    "longitude":126.829135936,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"공항동",
+    "address":"서울특별시 강서구 공항대로 17",
+    "latitude":37.5618393347,
+    "longitude":126.809371682,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"양천향교역",
+    "address":"서울 강서구 양천로 344",
+    "latitude":37.5683181607,
+    "longitude":126.840266116,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"방화역",
+    "address":"서울특별시 강서구 금낭화로 135,(금강프라자)",
+    "latitude":37.5775175497,
+    "longitude":126.812467637,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"김포공항",
+    "address":"서울특별시 강서구 하늘길 177",
+    "latitude":37.5568691197,
+    "longitude":126.808872696,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이대서울병원",
+    "address":"서울 강서구 공항대로 260(마곡동)",
+    "latitude":37.5572393987,
+    "longitude":126.836266369,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"난곡",
+    "address":"서울특별시 관악구 난우길 2",
+    "latitude":37.4731885176,
+    "longitude":126.919157678,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신림동",
+    "address":"서울특별시 관악구 신원로 26,(신림동부아파트단지상가)",
+    "latitude":37.4802472736,
+    "longitude":126.929653577,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"오류동",
+    "address":"서울특별시 구로구 경인로 212",
+    "latitude":37.4960624826,
+    "longitude":126.844527925,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"대학로금융센터",
+    "address":"서울특별시 종로구 대학로 146",
+    "latitude":37.5842573427,
+    "longitude":127.002028664,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"보문동",
+    "address":"서울특별시 성북구 보문로 121",
+    "latitude":37.5857968357,
+    "longitude":127.018798119,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"길음동",
+    "address":"서울특별시 성북구 동소문로 229",
+    "latitude":37.6027007147,
+    "longitude":127.022225046,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"돈암동",
+    "address":"서울 성북구 동소문로 89(동소문동6가)",
+    "latitude":37.5926402487,
+    "longitude":127.01520021,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서울대학교병원",
+    "address":"서울 종로구 대학로 101,서울대학교병원 대한외래 지하1층 (연건동)",
+    "latitude":37.5790022137,
+    "longitude":126.997437743,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강북금융센터",
+    "address":"서울특별시 강북구 도봉로 364",
+    "latitude":37.6396151958,
+    "longitude":127.027861298,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"미아동",
+    "address":"서울특별시 강북구 도봉로 151",
+    "latitude":37.6223348797,
+    "longitude":127.027400282,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"방학동",
+    "address":"서울특별시 도봉구 방학로 136",
+    "latitude":37.6632330978,
+    "longitude":127.037066551,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"쌍문역",
+    "address":"서울특별시 도봉구 도봉로 468",
+    "latitude":37.6473011638,
+    "longitude":127.034308169,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"돌곶이역",
+    "address":"서울특별시 성북구 화랑로 254",
+    "latitude":37.6108274307,
+    "longitude":127.057612357,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"노원역",
+    "address":"서울특별시 노원구 동일로 1404",
+    "latitude":37.6539957498,
+    "longitude":127.061051057,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"마들역",
+    "address":"서울특별시 노원구 동일로 1546",
+    "latitude":37.6664944158,
+    "longitude":127.057686954,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"수락산역",
+    "address":"서울특별시 노원구 동일로 1673",
+    "latitude":37.6778972418,
+    "longitude":127.054942042,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"중계동",
+    "address":"서울특별시 노원구 한글비석로 254,(대명프라자)",
+    "latitude":37.6503863108,
+    "longitude":127.077102855,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"태릉역",
+    "address":"서울특별시 노원구 동일로 1018",
+    "latitude":37.6209879337,
+    "longitude":127.074855575,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"영업부",
+    "address":"서울특별시 중구 세종대로9길 20,(대경빌딩)",
+    "latitude":37.5611204467,
+    "longitude":126.974572791,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"남대문",
+    "address":"서울 중구 소월로 3-0대한화재빌딩",
+    "latitude":37.5593718977,
+    "longitude":126.976202522,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"명동",
+    "address":"서울특별시 중구 명동길 43",
+    "latitude":37.5640256627,
+    "longitude":126.984759857,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"소공동",
+    "address":"서울특별시 중구 세종대로18길 16,(우성빌딩)",
+    "latitude":37.5635462807,
+    "longitude":126.978014737,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"종로중앙",
+    "address":"서울 종로구 돈화문로 26(묘동)",
+    "latitude":37.5710607097,
+    "longitude":126.992513044,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"종각역",
+    "address":"서울특별시 종로구 종로 33",
+    "latitude":37.5710142197,
+    "longitude":126.981435735,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"종로",
+    "address":"서울특별시 종로구 우정국로 48",
+    "latitude":37.5733515967,
+    "longitude":126.983300093,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"현대계동",
+    "address":"서울특별시 종로구 율곡로 75,(현대빌딩)",
+    "latitude":37.5777686617,
+    "longitude":126.987519036,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연지동",
+    "address":"서울특별시 종로구 김상옥로 30,(기독교연합회관)",
+    "latitude":37.5729011067,
+    "longitude":127.000920458,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"제기동역",
+    "address":"서울특별시 동대문구 왕산로 137",
+    "latitude":37.5785680117,
+    "longitude":127.038726295,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동대문",
+    "address":"서울특별시 중구 마장로 11",
+    "latitude":37.5684229017,
+    "longitude":127.011138518,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동대문종합시장",
+    "address":"서울시 종로구 종로 272동대문종합시장 신관 2층",
+    "latitude":37.5708268157,
+    "longitude":127.008094114,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"창신동",
+    "address":"서울특별시 종로구 지봉로 29,(금호팔레스빌딩)",
+    "latitude":37.5724908347,
+    "longitude":127.015293334,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"을지로5가",
+    "address":"서울특별시 중구 을지로 213",
+    "latitude":37.5671083947,
+    "longitude":127.001806597,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"충무로역",
+    "address":"서울특별시 중구 퇴계로 216",
+    "latitude":37.5613712707,
+    "longitude":126.995801048,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"신당동",
+    "address":"서울특별시 중구 다산로 220",
+    "latitude":37.5626515627,
+    "longitude":127.015485841,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"충무로",
+    "address":"서울 중구 퇴계로 173(충무로3가,극동빌딩)",
+    "latitude":37.5618241187,
+    "longitude":126.991058511,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"동국대학교",
+    "address":"서울특별시 중구 필동로1길 30,(동국대학교)",
+    "latitude":37.5573456307,
+    "longitude":127.002558949,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"광교영업부",
+    "address":"서울 중구 청계천로 54",
+    "latitude":37.5683846767,
+    "longitude":126.983369267,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서울롯데",
+    "address":"서울특별시 중구 을지로 30,(롯데호텔)",
+    "latitude":37.5653404637,
+    "longitude":126.981029338,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"을지로",
+    "address":"서울특별시 중구 을지로 109",
+    "latitude":37.5664856857,
+    "longitude":126.990094648,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"파이낸스센터",
+    "address":"서울특별시 중구 세종대로 136,(파이낸스빌딩)",
+    "latitude":37.5684150427,
+    "longitude":126.978283977,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서울시청금융센터",
+    "address":"서울 중구 세종대로 110(태평로1가)",
+    "latitude":37.5667010077,
+    "longitude":126.97834678,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"구로구청",
+    "address":"서울특별시 구로구 가마산로 245",
+    "latitude":37.4954591696,
+    "longitude":126.88751142,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강남구청",
+    "address":"서울 강남구 학동로 426(삼성동)",
+    "latitude":37.5173222226,
+    "longitude":127.047387532,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"은평구청",
+    "address":"서울특별시 은평구 은평로 195",
+    "latitude":37.6022155517,
+    "longitude":126.929810841,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"성동구청",
+    "address":"서울 성동구 고산자로 270(행당동)",
+    "latitude":37.5634280527,
+    "longitude":127.036908072,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"강북구청",
+    "address":"서울 강북구 도봉로89길 13(수유동)",
+    "latitude":37.6396876538,
+    "longitude":127.025704521,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"서초구청",
+    "address":"서울 서초구 남부순환로 2584(서초동)",
+    "latitude":37.4835968646,
+    "longitude":127.032595021,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하계동",
+    "address":"서울특별시 노원구 섬밭로 209,(벽산아파트단지상가)",
+    "latitude":37.6349633888,
+    "longitude":127.065668916,
+    "operating_hours":"09~16시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"친절텔레콤 신도림점",
+    "address":"서울 구로구 경인로 661 107호 (신도림동, 신도림1차푸르지오)",
+    "latitude":37.5096620326,
+    "longitude":126.887986414,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"친절텔레콤 대림삼거리점",
+    "address":"서울 동작구 시흥대로 658 102호 (신대방동)",
+    "latitude":37.4903736516,
+    "longitude":126.908076094,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이루리_신정점",
+    "address":"서울 양천구 중앙로 235 (신정동)",
+    "latitude":37.5173727056,
+    "longitude":126.853818145,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이루리_구로점",
+    "address":"서울 구로구 가마산로 285 101호 (구로동, 비즈트위트레드)",
+    "latitude":37.4970992266,
+    "longitude":126.891686696,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"이루리 신월점 ",
+    "address":"서울 양천구 지양로 77 (신월동)",
+    "latitude":37.5223212936,
+    "longitude":126.833201377,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"영웅앤제이 가양역점",
+    "address":"서울 강서구 화곡로 402 1층 가양역 홈플러스옆 (등촌동)",
+    "latitude":37.5591335287,
+    "longitude":126.854362607,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"씨엔에프텔레콤 등촌점",
+    "address":"서울 강서구 공항대로41길 65 그랜드종합 상가 1층 (등촌동)",
+    "latitude":37.5607291507,
+    "longitude":126.846070871,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"주식회사 케이비 등촌역점",
+    "address":"서울 양천구 목동중앙북로7길 13 1층 105호 KT매장 (목동, 남강빌딩)",
+    "latitude":37.5487487787,
+    "longitude":126.867264449,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"케이비_염창역점",
+    "address":"서울 양천구 목동중앙본로 123 101호 102호 (목동)",
+    "latitude":37.5465562867,
+    "longitude":126.871481104,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"와이씨 녹두미림점",
+    "address":"서울 관악구 대학길 16 1층 KT매장 (신림동, 녹두빌딩)",
+    "latitude":37.4700376316,
+    "longitude":126.937900224,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"홍익텔레콤_신대방삼거리점",
+    "address":"서울 동작구 상도로 82 101호 (대방동)",
+    "latitude":37.4994474856,
+    "longitude":126.929707127,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"홍익텔레콤_이수점",
+    "address":"서울 동작구 동작대로 107 덕산건물 1층 (사당동)",
+    "latitude":37.4860892066,
+    "longitude":126.98182464,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"인성피플스_노량진역점",
+    "address":"서울 동작구 노량진로 150 1층 (노량진동, 삼영빌딩)",
+    "latitude":37.5134914296,
+    "longitude":126.942590248,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"인성피플스_신림역점",
+    "address":"서울 관악구 남부순환로 1604 1층 (신림동)",
+    "latitude":37.4839262506,
+    "longitude":126.928933694,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"다움 시흥사거리점",
+    "address":"서울 금천구 시흥대로 236 와이즈플레이스 1동 101호 (시흥동)",
+    "latitude":37.4549859976,
+    "longitude":126.900999352,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"한백이동통신 공항시장역점",
+    "address":"서울 강서구 방화동로 35 (방화동)",
+    "latitude":37.5640431507,
+    "longitude":126.810673961,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"한백이동통신 본동시장점",
+    "address":"서울 강서구 화곡로 206 김대근한의원 1층 3호 (화곡동)",
+    "latitude":37.5437614137,
+    "longitude":126.843654333,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"한백이동통신_송정역점",
+    "address":"서울 강서구 공항대로 24 1층 송정역 4번출구 50 M (공항동)",
+    "latitude":37.5611731897,
+    "longitude":126.809958348,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"한백이동통신 발산파크점",
+    "address":"서울 강서구 공항대로 261 (마곡동)",
+    "latitude":37.5591362037,
+    "longitude":126.836503896,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"한백이동통신 마곡점",
+    "address":"서울 강서구 공항대로 168 747 110 (마곡동, 타워)",
+    "latitude":37.5592496267,
+    "longitude":126.826139145,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"솔트네트워크_오류동역점",
+    "address":"서울 구로구 경인로20길 10 1층 KT매장 (오류동)",
+    "latitude":37.4953148786,
+    "longitude":126.843692945,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"솔트네트워크_개봉역프라자점",
+    "address":"서울 구로구 경인로40길 47 105-106호 (개봉동, 개봉역프라자)",
+    "latitude":37.4945223796,
+    "longitude":126.859120873,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"솔트네트워크_화곡중앙점",
+    "address":"서울 강서구 가로공원로76길 56 1층 KT (화곡동)",
+    "latitude":37.5345373306,
+    "longitude":126.837817754,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"화이트정보통신_파리공원점",
+    "address":"서울 양천구 목동서로 61 우리은행건물 1층 107호 (목동, 부영그린타운1차앞)",
+    "latitude":37.5363765117,
+    "longitude":126.87950271,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연세컴퍼니_목동사거리점",
+    "address":"서울 강서구 등촌로 25 (화곡동)",
+    "latitude":37.5321894366,
+    "longitude":126.863537794,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연세컴퍼니_문래역점",
+    "address":"서울 영등포구 선유로 63 108호 문래역 (문래동6가, EEU동신타워)",
+    "latitude":37.5195865206,
+    "longitude":126.889062036,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연세컴퍼니_우장산역점",
+    "address":"서울 강서구 강서로45길 9 1층 우장산역 (화곡동, 경신빌딩)",
+    "latitude":37.5477374917,
+    "longitude":126.83563108,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연세컴퍼니_신정네거리역점",
+    "address":"서울 양천구 중앙로 263 (신정동)",
+    "latitude":37.5197496186,
+    "longitude":126.852761892,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연세컴퍼니_방화역점",
+    "address":"서울 강서구 금낭화로 135 1층 107호 108호 (방화동, 금강프라자빌딩)",
+    "latitude":37.5775175497,
+    "longitude":126.812467637,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"연세컴퍼니_당산역점",
+    "address":"서울 영등포구 양평로 18 (당산동6가)",
+    "latitude":37.5330143516,
+    "longitude":126.904249724,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"화이트정보통신_가산역점",
+    "address":"서울 금천구 벚꽃로 298 1층 108호 KT (가산동, 대륭포스트타워6차)",
+    "latitude":37.4814045326,
+    "longitude":126.883887256,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"화이트정보통신_사당점",
+    "address":"서울 동작구 남부순환로 2061 KT매장 (사당동)",
+    "latitude":37.4768903466,
+    "longitude":126.977810011,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"화이트정보통신_구로시장점",
+    "address":"서울 구로구 도림로 69 1층 코너매장 (구로동)",
+    "latitude":37.4896284906,
+    "longitude":126.891054927,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)예스모바일_구로디지털단지역점",
+    "address":"서울 구로구 시흥대로 577 (구로동)",
+    "latitude":37.4843912006,
+    "longitude":126.902274872,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)예스모바일_ 독산씨티렉스",
+    "address":"서울 금천구 시흥대로 399 (독산동)",
+    "latitude":37.4694059066,
+    "longitude":126.896869022,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)삼윈_까치산역점",
+    "address":"서울 강서구 강서로16길 1 (화곡동)",
+    "latitude":37.5326950566,
+    "longitude":126.846501536,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)삼윈_여의도점",
+    "address":"서울 영등포구 여의나루로 42 여의도종합 상가 117호 (여의도동)",
+    "latitude":37.5213650316,
+    "longitude":126.925020782,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"일등텔레콤 화곡역점",
+    "address":"서울 강서구 화곡로 157 103호 일부 (화곡동)",
+    "latitude":37.5415786307,
+    "longitude":126.83910795,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"대명텔레콤 청담점",
+    "address":"서울 강남구 선릉로 812 1층 2층 (청담동)",
+    "latitude":37.5243054456,
+    "longitude":127.039724931,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"가온텔레콤_교대역점",
+    "address":"서울 서초구 반포대로22길 104 1층 (서초동, 크라운빌딩)",
+    "latitude":37.4912255536,
+    "longitude":127.013838718,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)만리장성_고속터미널역점",
+    "address":"서울 서초구 신반포로 189 1층 (잠원동)",
+    "latitude":37.5065952466,
+    "longitude":127.004941089,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"300텔레콤_대치역점",
+    "address":"서울 강남구 남부순환로 2927 대치클래시아 106호 (대치동)",
+    "latitude":37.4936381366,
+    "longitude":127.060376636,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올포원텔레콤_잠실새내역점",
+    "address":"서울 송파구 석촌호수로 64 1층 (잠실동, 잠실빌딩)",
+    "latitude":37.5105795776,
+    "longitude":127.085603837,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)투유텔레콤_명일역점",
+    "address":"서울 강동구 양재대로 1624 1층 (명일동)",
+    "latitude":37.5504012447,
+    "longitude":127.144122337,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"대박통신_암사역점",
+    "address":"서울 강동구 올림픽로 780 1층 (암사동, 예지빌딩)",
+    "latitude":37.5506105507,
+    "longitude":127.127984347,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"모바일세상_개롱역점",
+    "address":"서울 송파구 오금로 404 1층 KT대리점 (가락동, 원일빌딩)",
+    "latitude":37.4976244576,
+    "longitude":127.135111721,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"더킹컴퍼니_강일리버파크점",
+    "address":"서울 강동구 아리수로93길 9 106, 107호 (강일동, 골드프라자)",
+    "latitude":37.5652482837,
+    "longitude":127.174378067,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"300텔레콤_상일역점",
+    "address":"서울 강동구 고덕로 385 4상가 (고덕동, 고덕그라시움)",
+    "latitude":37.5573662857,
+    "longitude":127.168427695,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"L&C 컴퍼니_광장점",
+    "address":"서울 광진구 아차산로 537-17 11호 (광장동, 광장힐스테이트)",
+    "latitude":37.5431599237,
+    "longitude":127.100222173,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)세븐업_신내점",
+    "address":"서울 중랑구 신내로 71 (신내동)",
+    "latitude":37.6055251737,
+    "longitude":127.095104574,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)세븐업 망우점",
+    "address":"서울 중랑구 망우로 346 110호 (상봉동, 한일써너스빌)",
+    "latitude":37.5973324787,
+    "longitude":127.090855377,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)세븐업 면목역점",
+    "address":"서울 중랑구 겸재로 180 안민병원 1층 (면목동)",
+    "latitude":37.5882046887,
+    "longitude":127.087937209,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)세븐업 우림시장점",
+    "address":"서울 중랑구 망우로 410 1층 (망우동, 삼부빌딩)",
+    "latitude":37.5989670977,
+    "longitude":127.097595656,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"디액션(구리) 동부시장점",
+    "address":"서울 중랑구 망우로 212 (상봉동)",
+    "latitude":37.5937294357,
+    "longitude":127.076205147,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"디액션(구리) 사가정6호점",
+    "address":"서울 중랑구 면목로 306 1층 KT (면목동)",
+    "latitude":37.5794126847,
+    "longitude":127.087733257,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)단결_사가정역점",
+    "address":"서울 중랑구 면목로 337 1층 KT매장 (면목동)",
+    "latitude":37.5820605077,
+    "longitude":127.08851317,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)애니킹_석계역점",
+    "address":"서울 노원구 화랑로 353 푸른치과의원건물 1층 (월계동)",
+    "latitude":37.6154808067,
+    "longitude":127.067017478,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 미아사거리점",
+    "address":"서울 강북구 숭인로 75 1층 KT (미아동)",
+    "latitude":37.6124190397,
+    "longitude":127.029894769,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 쌍문1호점",
+    "address":"서울 도봉구 해등로 190 제116 117호 (쌍문동, 신원프라자)",
+    "latitude":37.6585019178,
+    "longitude":127.036011625,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 노원역점",
+    "address":"서울 노원구 노해로 495 1층 KT (상계동, 삼성빌딩)",
+    "latitude":37.6551264938,
+    "longitude":127.063098987,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 쌍문역점",
+    "address":"서울 도봉구 도봉로 476 쉐르빌퍼스티 1층 104호 KT (창동)",
+    "latitude":37.6478768278,
+    "longitude":127.034762506,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 중화역점",
+    "address":"서울 중랑구 동일로 795 1층 KT대리점 (중화동)",
+    "latitude":37.6014059317,
+    "longitude":127.079130027,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 수유역점",
+    "address":"서울 강북구 도봉로 334 1층 (번동, 영광빌딩)",
+    "latitude":37.6375501998,
+    "longitude":127.025541611,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 쌍문2호점",
+    "address":"서울 도봉구 해등로 198 1층 KT (쌍문동)",
+    "latitude":37.6583548378,
+    "longitude":127.034910749,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)피앤월드 노원2호점",
+    "address":"서울 노원구 상계로 69 1층 KT (상계동)",
+    "latitude":37.6564422188,
+    "longitude":127.062669892,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"아너스컨설팅_노원역점",
+    "address":"서울 노원구 노해로83길 21 1층 103호 (상계동, 화용빌딩)",
+    "latitude":37.6562039828,
+    "longitude":127.064029891,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)영진랜드 수유역점",
+    "address":"서울 강북구 도봉로89길 1 1층 (수유동)",
+    "latitude":37.6389073068,
+    "longitude":127.026100833,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 수유시장점",
+    "address":"서울 강북구 도봉로 251 (수유동)",
+    "latitude":37.6309077727,
+    "longitude":127.024000567,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 수락산역점",
+    "address":"서울 노원구 동일로 1673 (상계동)",
+    "latitude":37.6778972418,
+    "longitude":127.054942042,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 광운대역점",
+    "address":"서울 노원구 광운로 66 1층 101 (월계동)",
+    "latitude":37.6231254547,
+    "longitude":127.060313174,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 마들역점",
+    "address":"서울 노원구 동일로 1538 상계12단지종합 상가 105호 (상계동)",
+    "latitude":37.6662397068,
+    "longitude":127.057851077,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 미아사거리역점",
+    "address":"서울 강북구 도봉로 53 1층 KT (미아동, 금성빌딩)",
+    "latitude":37.6138175857,
+    "longitude":127.029605091,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 쌍문역점",
+    "address":"서울 도봉구 도봉로 475-1 (쌍문동)",
+    "latitude":37.6483051818,
+    "longitude":127.034133169,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 솔샘점",
+    "address":"서울 강북구 솔샘로 233 1층 KT매장 (미아동, 동북프라자)",
+    "latitude":37.6204190017,
+    "longitude":127.019100422,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 석계역점",
+    "address":"서울 노원구 화랑로 335 1층 102호 (월계동)",
+    "latitude":37.6150995387,
+    "longitude":127.064984583,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)지오컴퍼니 방학점",
+    "address":"서울 도봉구 도봉로153길 29 (방학동)",
+    "latitude":37.6698815918,
+    "longitude":127.041759165,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"XCIX 은행사거리본점",
+    "address":"서울 노원구 한글비석로 245 1층 (중계동, 두타빌)",
+    "latitude":37.6492648678,
+    "longitude":127.076360943,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"혜성아이앤씨 공릉점",
+    "address":"서울 노원구 공릉로 192 (공릉동)",
+    "latitude":37.6270537487,
+    "longitude":127.079110222,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"진서정보통신_방학도깨비시장점",
+    "address":"서울 도봉구 도당로13길 9 (방학동)",
+    "latitude":37.6651378908,
+    "longitude":127.035581722,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"디액션_노원역점",
+    "address":"서울 노원구 동일로 1401 103호 (상계동, 상아빌딩)",
+    "latitude":37.6535549868,
+    "longitude":127.060392722,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"디액션_신창시장점",
+    "address":"서울 도봉구 덕릉로 239 1층 1호 (창동)",
+    "latitude":37.6391598048,
+    "longitude":127.038253145,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에이치커넥션 미아역1호점",
+    "address":"서울 강북구 도봉로 187 101호 KT (미아동, 태근빌딩)",
+    "latitude":37.6254188157,
+    "longitude":127.026226562,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에이치커넥션 미아역점",
+    "address":"서울 강북구 도봉로 178 1층 KT (미아동)",
+    "latitude":37.6247189337,
+    "longitude":127.027156256,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에이치커넥션 창동역점",
+    "address":"서울 도봉구 마들로11길 71 1층 103호 104호 (창동, 신한빌딩)",
+    "latitude":37.6533357968,
+    "longitude":127.049329372,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에이치커넥션 창동본점",
+    "address":"서울 도봉구 노해로63길 84 (창동)",
+    "latitude":37.6527655178,
+    "longitude":127.046576128,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에이치커넥션 먹골역점",
+    "address":"서울 중랑구 공릉로2길 8-4 칼튼테라스 105호 (묵동)",
+    "latitude":37.6118069487,
+    "longitude":127.078237945,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에이치커넥션 방학역점",
+    "address":"서울 도봉구 도봉로 689 (방학동)",
+    "latitude":37.6659989608,
+    "longitude":127.042631164,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)세븐업_경기북부_노원역점",
+    "address":"서울 노원구 노해로 488 102호 KT 매장 (상계동, 일서빌딩)",
+    "latitude":37.6543356028,
+    "longitude":127.062169177,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)세븐업_경기북부_공릉역점",
+    "address":"서울 노원구 동일로 1077 1층 (공릉동, 스테이션빌딩)",
+    "latitude":37.6260516337,
+    "longitude":127.072437472,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)세븐업_경기북부_수유역점",
+    "address":"서울 강북구 도봉로 339 1층 (수유동)",
+    "latitude":37.6382536498,
+    "longitude":127.025489464,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"도다텔_은평뉴타운점",
+    "address":"서울 은평구 진관3로 21 101동 116호 (진관동, 은평뉴타운엘크루)",
+    "latitude":37.6396062198,
+    "longitude":126.919006841,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_구산역점",
+    "address":"서울 은평구 서오릉로 139 1층 KT (역촌동, 주영빌딩)",
+    "latitude":37.6108456647,
+    "longitude":126.917492704,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_홍대센트럴점",
+    "address":"서울 마포구 홍익로 25 KT매장 (서교동)",
+    "latitude":37.5543946607,
+    "longitude":126.921983611,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_연신내센트럴점",
+    "address":"서울 은평구 통일로 855-13 1층 KT (갈현동)",
+    "latitude":37.6191852757,
+    "longitude":126.919885201,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_역촌역점",
+    "address":"서울 은평구 진흥로 105 1층 KT (역촌동)",
+    "latitude":37.6063018597,
+    "longitude":126.922539844,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_응암시장점",
+    "address":"서울 은평구 응암로 247 1층 KT대리점 (응암동)",
+    "latitude":37.5941954657,
+    "longitude":126.917852305,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_범서점",
+    "address":"서울 은평구 통일로 842 1층 (불광동, 범서빌딩)",
+    "latitude":37.6186969037,
+    "longitude":126.922059551,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_망원시장점",
+    "address":"서울 마포구 망원로 81 (망원동)",
+    "latitude":37.5576727057,
+    "longitude":126.905826612,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_연신내스퀘어점",
+    "address":"서울 은평구 연서로 216 아트캐슬주상복합 1층 106호 KT (대조동)",
+    "latitude":37.6178011617,
+    "longitude":126.920116885,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"하이팀_응암역점",
+    "address":"서울 은평구 은평로 82 126 1층 127호 (응암동, 해태드림타운)",
+    "latitude":37.5990818237,
+    "longitude":126.916942094,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"엠에이치플러스_연신내점",
+    "address":"서울 은평구 연서로 278 상가 (불광동)",
+    "latitude":37.6207490667,
+    "longitude":126.925387894,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에스비트_녹번역점",
+    "address":"서울 은평구 은평로 240 상가 1층 318호 KT (응암동, 힐스테이트녹번역)",
+    "latitude":37.6006241017,
+    "longitude":126.93465182,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY연신내역점",
+    "address":"서울 은평구 연서로 228 상가주택 1층 (대조동)",
+    "latitude":37.6184980357,
+    "longitude":126.92068342,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY합정역3호점",
+    "address":"서울 마포구 양화로 45 B동 418호 (서교동, 메세나폴리스)",
+    "latitude":37.5507610967,
+    "longitude":126.914200617,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY홍제역2호점",
+    "address":"서울 서대문구 통일로 450 홍제역 12번 출구 사이 상가주택 (홍제동)",
+    "latitude":37.5889754077,
+    "longitude":126.944289787,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY연신내역2호점 ",
+    "address":"서울 은평구 연서로 217 1층 KT매장 (갈현동)",
+    "latitude":37.6181098857,
+    "longitude":126.919625012,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY홍제역점",
+    "address":"서울 서대문구 통일로 435-2 1층 (홍제동)",
+    "latitude":37.5878474657,
+    "longitude":126.944919789,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY합정역2호점",
+    "address":"서울 마포구 양화로 52 (서교동)",
+    "latitude":37.5496773607,
+    "longitude":126.914667781,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY불광역점",
+    "address":"서울 은평구 통일로 736 1층 불광역 8번출구 (불광동)",
+    "latitude":37.6112983847,
+    "longitude":126.92960795,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY서대문역점",
+    "address":"서울 서대문구 통일로 137 1층 (냉천동)",
+    "latitude":37.5666983777,
+    "longitude":126.965448955,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY불광역2호점",
+    "address":"서울 은평구 통일로 747 (대조동)",
+    "latitude":37.6118111867,
+    "longitude":126.928296918,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"HJY이대역점",
+    "address":"서울 서대문구 이화여대길 33 1층 KT (대현동)",
+    "latitude":37.5584436477,
+    "longitude":126.94562414,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)엠텔레콤_녹번점",
+    "address":"서울 은평구 진흥로 188 1층 KT (녹번동, 상일빌라)",
+    "latitude":37.6082774767,
+    "longitude":126.930390331,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)브로_신촌연세로점",
+    "address":"서울 서대문구 연세로 20 1층 KT매장 (창천동)",
+    "latitude":37.5574795227,
+    "longitude":126.93706872,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"햇빛모바일_신촌현대점 ",
+    "address":"서울 마포구 신촌로 90 1층 KT (노고산동, 원준빌딩)",
+    "latitude":37.5553118557,
+    "longitude":126.935539052,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"햇빛모바일_불광역점",
+    "address":"서울 은평구 불광로 27 1층 KT (대조동)",
+    "latitude":37.6107719607,
+    "longitude":126.928815095,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"모아폰_상암푸르지오시티점",
+    "address":"서울 마포구 월드컵북로54길 25 1층 106호 (상암동, 푸르지오센터)",
+    "latitude":37.5820721357,
+    "longitude":126.88896854,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)DRC 동묘역점",
+    "address":"서울 종로구 종로 336 (창신동)",
+    "latitude":37.5724710757,
+    "longitude":127.01506338,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)DRC 종로5가점",
+    "address":"서울 종로구 종로 213 상가 1층 (종로5가)",
+    "latitude":37.5712059407,
+    "longitude":127.00136902,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)거인통신_길음뉴타운점",
+    "address":"서울 성북구 길음로 33 상가 B동 지층 1호 올레매장 1층 (길음동, 길음뉴타운)",
+    "latitude":37.6082704357,
+    "longitude":127.019106521,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)거인통신_길음역점",
+    "address":"서울 성북구 길음로 11 128호 상가 (길음동, 길음역롯데캐슬트윈골드)",
+    "latitude":37.6037856857,
+    "longitude":127.023437511,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)유엔아이_명동점",
+    "address":"서울 중구 남대문로 66-1 1층 1호 (명동2가, 명덕빌딩)",
+    "latitude":37.5630171827,
+    "longitude":126.982183609,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)유엔아이_종각점",
+    "address":"서울 종로구 종로 72 (종로2가)",
+    "latitude":37.5699495417,
+    "longitude":126.985387885,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"코어링크 혜화글로벌점",
+    "address":"서울 종로구 대명길 46 (명륜2가)",
+    "latitude":37.5829899237,
+    "longitude":126.999030728,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"헤븐텔레콤_안암오거리점",
+    "address":"서울 동대문구 약령시로 2-1 (제기동)",
+    "latitude":37.5823774857,
+    "longitude":127.030116815,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"㈜공일공정보 보문점",
+    "address":"서울 성북구 보문로 115 1층 (보문동2가)",
+    "latitude":37.5853989477,
+    "longitude":127.019106271,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)일등통신_마포역점",
+    "address":"서울 마포구 마포대로 53 113호 (도화동, 마포트라팰리스)",
+    "latitude":37.5414318907,
+    "longitude":126.947054761,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"새암 성신여대역점",
+    "address":"서울 성북구 아리랑로 16 (동선동4가)",
+    "latitude":37.5942139117,
+    "longitude":127.016512847,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)브로_광화문 적선점",
+    "address":"서울 종로구 자하문로2길 4 1층 KT 올레 매장 (적선동, 경복빌딩)",
+    "latitude":37.5763673147,
+    "longitude":126.972843551,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"언슈머 서울시청역점",
+    "address":"서울 중구 무교로 14 (무교동)",
+    "latitude":37.5671421337,
+    "longitude":126.979377414,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올웨이_중곡점",
+    "address":"서울 광진구 천호대로 655 (중곡동, 덕수빌딩)",
+    "latitude":37.5525955017,
+    "longitude":127.089722615,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올웨이_아차산점",
+    "address":"서울 광진구 용마산로 60 1층 KT (중곡동)",
+    "latitude":37.5589196077,
+    "longitude":127.087899699,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올웨이_광나루역점",
+    "address":"서울 광진구 천호대로 808 (광장동, 광장12차현대홈타운)",
+    "latitude":37.5450760037,
+    "longitude":127.102807439,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올웨이_한양대점",
+    "address":"서울 성동구 마조로 30 한양대병원후문 1층 KT (행당동)",
+    "latitude":37.5603732887,
+    "longitude":127.041474895,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올웨이_중곡2호점",
+    "address":"서울 광진구 면목로 173 1층 KT (중곡동)",
+    "latitude":37.5686034467,
+    "longitude":127.082586502,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올웨이_상왕십리점",
+    "address":"서울 성동구 왕십리로 410 L동 B1층 107호 (하왕십리동, 센트라스)",
+    "latitude":37.5654043057,
+    "longitude":127.025280639,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"올웨이_군자점",
+    "address":"서울 광진구 천호대로111길 10 (중곡동)",
+    "latitude":37.5567938637,
+    "longitude":127.082284115,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)일등통신_수유점",
+    "address":"서울 강북구 도봉로 363 (수유동)",
+    "latitude":37.6399437108,
+    "longitude":127.027264324,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)일등통신_성수점",
+    "address":"서울 성동구 아차산로7길 2 태화약국 (성수동2가)",
+    "latitude":37.5454159677,
+    "longitude":127.054274487,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)일등통신_행당점",
+    "address":"서울 성동구 고산자로 207 무학산부인과 1층 KT (행당동)",
+    "latitude":37.5587076977,
+    "longitude":127.033731414,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"탑클래스 모바일_청량리점",
+    "address":"서울 동대문구 홍릉로 6-1 1층 KT (청량리동)",
+    "latitude":37.5809025637,
+    "longitude":127.04528261,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"탑클래스 모바일_구의역점",
+    "address":"서울 광진구 아차산로 380 (자양동, 세화빌딩)",
+    "latitude":37.5366165886,
+    "longitude":127.08500071,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"탑클래스 모바일 장한평역점",
+    "address":"서울 동대문구 장한로 3 1층 KT매장 (장안동, 승원빌딩)",
+    "latitude":37.5621380917,
+    "longitude":127.064576292,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"탑클래스 모바일_동대문역점",
+    "address":"서울 종로구 창신길 1 1층 (창신동, 영화빌딩)",
+    "latitude":37.5718307467,
+    "longitude":127.010202323,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)거성크루_건대역점",
+    "address":"서울 광진구 동일로20길 72 무궁화공예문화교실 (자양동)",
+    "latitude":37.5402157717,
+    "longitude":127.067508697,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)거성크루_한남오거리점",
+    "address":"서울 용산구 대사관로 76 (한남동, 거북빌딩)",
+    "latitude":37.5330707776,
+    "longitude":127.006503781,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)거성크루_경희대삼거리점",
+    "address":"서울 동대문구 경희대로 1 1층 (회기동)",
+    "latitude":37.5917485517,
+    "longitude":127.052104839,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)거성크루_세종대점",
+    "address":"서울 광진구 광나루로 366-1 (화양동)",
+    "latitude":37.5478276847,
+    "longitude":127.070514818,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)거성크루_건대랜드마크점",
+    "address":"서울 광진구 능동로 91 1층 (자양동)",
+    "latitude":37.5392608726,
+    "longitude":127.070039407,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)이지스컴_답십리점",
+    "address":"서울 동대문구 전농로 102 (답십리동)",
+    "latitude":37.5739267657,
+    "longitude":127.057830426,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)리테일앤컴퍼니_전농점",
+    "address":"서울 동대문구 사가정로 122 1층 102호 (전농동, 전농동하우스토리)",
+    "latitude":37.5772016877,
+    "longitude":127.058517319,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)리테일앤컴퍼니_신금호역점",
+    "address":"서울 성동구 금호로 150-1 1층 (금호동1가, 백상빌딩)",
+    "latitude":37.5544474167,
+    "longitude":127.020457813,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"뉴미닝_경희대점",
+    "address":"서울 동대문구 경희대로 18 1층 KT (회기동)",
+    "latitude":37.5929547807,
+    "longitude":127.052880971,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"뉴미닝_신설동역점",
+    "address":"서울 동대문구 한빛로 1 1층 101호 KT (신설동, 대학빌딩)",
+    "latitude":37.5762573987,
+    "longitude":127.023818024,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"제이엠커뮤니케이션_답십리점",
+    "address":"서울 성동구 용답중앙15길 12-1 (용답동)",
+    "latitude":37.5644167287,
+    "longitude":127.053864209,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"제이엠커뮤니케이션_금호역점",
+    "address":"서울 성동구 장터길 9 (금호동3가)",
+    "latitude":37.5485434517,
+    "longitude":127.016873377,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"제이엠커뮤니케이션_휘경점",
+    "address":"서울 동대문구 망우로 46 401동 1103호 KT 매장 (휘경동, 회기역하트리움)",
+    "latitude":37.5885906127,
+    "longitude":127.058253733,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"모바일라운지_구의역점",
+    "address":"서울 광진구 아차산로 401 1층 (구의동, 영창빌딩)",
+    "latitude":37.5376443296,
+    "longitude":127.087256789,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"모바일라운지_장안동사거리점",
+    "address":"서울 동대문구 장한로25길 2 1층 KT 매장 (장안동, 상미빌딩)",
+    "latitude":37.5719012177,
+    "longitude":127.071120502,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"모바일라운지_건대점",
+    "address":"서울 광진구 능동로 123 1층 일부 (화양동)",
+    "latitude":37.5420393047,
+    "longitude":127.071337848,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"모바일라운지_건대스타시티점",
+    "address":"서울 광진구 아차산로 272 104호, B1층 (자양동, 더샵스타시티)",
+    "latitude":37.5384131737,
+    "longitude":127.073194189,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"모바일라운지_화양점",
+    "address":"서울 광진구 군자로 76 (군자동)",
+    "latitude":37.5499563297,
+    "longitude":127.071085898,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 혜화점",
+    "address":"서울 종로구 대학로 65 kt 혜화지점 1층 kt 플라자 혜화점",
+    "latitude":37.5716267537,
+    "longitude":127.00580596,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 용산점",
+    "address":"서울 용산구 한강대로 297 우신빌딩 1층 kt플라자 용산점",
+    "latitude":37.5447786677,
+    "longitude":126.971683938,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 은평점",
+    "address":"서울 은평구 통일로71길 16 kt 은평지점 1층 kt 플라자 은평점",
+    "latitude":37.6134473607,
+    "longitude":126.926075762,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 신촌점",
+    "address":"서울시 마포구 양화로 175 마젤란21 오피스텔 1층",
+    "latitude":37.5577156137,
+    "longitude":126.924362236,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 답십리점",
+    "address":"서울시 동대문구 천호대로 281 동부시장건물 1층 kt플라자 답십리점",
+    "latitude":37.5675521907,
+    "longitude":127.052183169,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 중랑점",
+    "address":"서울 중랑구 봉우재로 59(면목동)",
+    "latitude":37.5913396697,
+    "longitude":127.079628759,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 노원점",
+    "address":"서울 노원구 노해로 502 kt 노원지점 1층 kt 플라자 노원점",
+    "latitude":37.6544508828,
+    "longitude":127.063745701,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 도봉점",
+    "address":"서울 도봉구 도봉로110길 25 kt 도봉지점 1층 kt 플라자 도봉점",
+    "latitude":37.6464070318,
+    "longitude":127.034893388,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 강북점",
+    "address":"서울 강북구 솔매로50길 43 kt 강북지점 1층 kt 플라자 강북점",
+    "latitude":37.6246595757,
+    "longitude":127.028501757,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 양재점",
+    "address":"서울 강남구 남부순환로 2653 kt 양재지점 1층 kt 플라자 양재점",
+    "latitude":37.4858550066,
+    "longitude":127.040325988,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 강남점",
+    "address":"서울 강남구 언주로 517 kt 강남지점 1층 kt 플라자 강남점",
+    "latitude":37.5042816176,
+    "longitude":127.041542425,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 서초점",
+    "address":"서울 서초구 효령로 174 ktds빌딩 1층 kt 플라자 서초점",
+    "latitude":37.4817791956,
+    "longitude":127.002955704,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 송파점",
+    "address":"서울 송파구 오금로 58 잠실아이스페이스 1층 101호 kt 플라자 송파점",
+    "latitude":37.5167297576,
+    "longitude":127.105468414,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 강동점",
+    "address":"서울 강동구 양재대로 1462, 남양빌딩 1~2층 kt 플라자 강동점",
+    "latitude":37.5362301496,
+    "longitude":127.139777149,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 강서점",
+    "address":"서울 강서구 강서로5길 64 kt 강서지점 1층 kt 플라자 강서점",
+    "latitude":37.5294197486,
+    "longitude":126.84847846,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 구로점",
+    "address":"서울 관악구 조원중앙로1길 26 kt 구로지점 1층 kt 플라자 구로점",
+    "latitude":37.4808345986,
+    "longitude":126.903634092,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 개봉점",
+    "address":"서울 구로구 개봉로6길 12-5 kt 개봉지점 1층 kt 플라자 개봉점",
+    "latitude":37.4869964066,
+    "longitude":126.857933988,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"olleh plaza 관악점",
+    "address":"서울 관악구 청룡1길 34 kt 관악지점 1층 kt 플라자 관악점",
+    "latitude":37.4806842996,
+    "longitude":126.94838485,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"KT플라자 사당점",
+    "address":"서울 서초구 동작대로 22 1층 (방배동, 삼미빌딩)",
+    "latitude":37.4784606176,
+    "longitude":126.982111348,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S성내직영점",
+    "address":"서울 강동구 양재대로 1339 (성내동)",
+    "latitude":37.5259521906,
+    "longitude":127.135009666,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S역삼직영점",
+    "address":"서울 강남구 테헤란로 139-1 1층 (역삼동)",
+    "latitude":37.5004394656,
+    "longitude":127.034471419,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S강남대로직영점",
+    "address":"서울 서초구 강남대로 359 1층 101호 (서초동, 대우도씨에빛2)",
+    "latitude":37.4948401816,
+    "longitude":127.028591115,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S교대역직영점",
+    "address":"서울 서초구 서초대로 286 1층 103호 (서초동, 서초프라자)",
+    "latitude":37.4931840036,
+    "longitude":127.013048518,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S가로수길직영점",
+    "address":"서울 강남구 도산대로 127 1층 (신사동, 경서빌딩)",
+    "latitude":37.5176667536,
+    "longitude":127.022358351,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S천호직영점",
+    "address":"서울 강동구 올림픽로 660 1층 (천호동, 천호엘크루주상복합)",
+    "latitude":37.5401773387,
+    "longitude":127.124560615,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신논현직영점",
+    "address":"서울 서초구 강남대로 495 (반포동, 동일빌딩)",
+    "latitude":37.5063026826,
+    "longitude":127.023194589,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S양재시민의숲직영점",
+    "address":"서울 서초구 마방로2길 94 1층 (양재동, OSL빌딩)",
+    "latitude":37.4694673806,
+    "longitude":127.039820223,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S선릉사거리애드샵직영점",
+    "address":"서울 강남구 선릉로 515 1층 (역삼동, 동인빌딩)",
+    "latitude":37.5054393626,
+    "longitude":127.048239106,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S길동사거리직영점",
+    "address":"서울 강동구 천호대로 1128 (성내동)",
+    "latitude":37.5341729346,
+    "longitude":127.136531735,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S강남역직영점",
+    "address":"서울 강남구 테헤란로 120 강남역 1번출구 국기원사거리 (역삼동, 상경빌딩)",
+    "latitude":37.4985904826,
+    "longitude":127.030856445,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S선릉직영점",
+    "address":"서울 강남구 선릉로 424 해창 상가 1층 2호 선릉역 2번출구 진선여고 사거리 (대치동)",
+    "latitude":37.5029006006,
+    "longitude":127.050062207,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신천역직영점",
+    "address":"서울 송파구 올림픽로 124 (잠실동)",
+    "latitude":37.5114094956,
+    "longitude":127.08441382,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S삼전직영점",
+    "address":"서울 송파구 백제고분로 204 (삼전동)",
+    "latitude":37.5037441126,
+    "longitude":127.089237881,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"KT플라자 선릉역점",
+    "address":"서울 강남구 테헤란로 421 1층 101호 (삼성동, 암천빌딩)",
+    "latitude":37.5060047156,
+    "longitude":127.052535139,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S건대입구역직영점",
+    "address":"서울 광진구 능동로 109 1층 (화양동)",
+    "latitude":37.5408820466,
+    "longitude":127.070779976,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S삼양로직영점",
+    "address":"서울 강북구 솔샘로 260 상가 (미아동)",
+    "latitude":37.6192009067,
+    "longitude":127.021431396,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S면목역직영점",
+    "address":"서울 중랑구 면목로 422 1층 KT매장 (면목동)",
+    "latitude":37.5895783567,
+    "longitude":127.087573666,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S중계아울렛직영점",
+    "address":"서울 노원구 동일로204가길 34 1층 (중계동, 씨앤미복합빌딩)",
+    "latitude":37.6407498288,
+    "longitude":127.068172131,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S정릉직영점",
+    "address":"서울 성북구 보국문로 43 (정릉동, 야원빌딩)",
+    "latitude":37.6081676067,
+    "longitude":127.00988449,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신용산역직영점",
+    "address":"서울 용산구 한강대로 95 105호 (한강로2가, 래미안용산)",
+    "latitude":37.5288489846,
+    "longitude":126.966628623,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S노원역직영점",
+    "address":"서울 노원구 동일로 1382 1층 KT매장 (상계동, 올림피아빌딩)",
+    "latitude":37.6519896638,
+    "longitude":127.061556116,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S연신내역직영점",
+    "address":"서울 은평구 통일로 842 1층 KT프라자 (불광동, 뱅뱅옆)",
+    "latitude":37.6186969037,
+    "longitude":126.922059551,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S상봉역직영점",
+    "address":"서울 중랑구 망우로 306 1층 (상봉동)",
+    "latitude":37.5963494227,
+    "longitude":127.08644633,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S먹골역직영점",
+    "address":"서울 중랑구 동일로 890 1층 103호 KT 엠엔에스 (묵동)",
+    "latitude":37.6099156597,
+    "longitude":127.078189077,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S구파발직영점",
+    "address":"서울 은평구 진관2로 19 1층 103호 (진관동, 휴먼프라자I)",
+    "latitude":37.6348425788,
+    "longitude":126.919608479,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S홍대애드샵플러스직영점",
+    "address":"서울 마포구 양화로18길 3 (동교동)",
+    "latitude":37.5570312867,
+    "longitude":126.924570264,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S상암애드샵직영점",
+    "address":"서울 마포구 월드컵북로 396 1층 104호 (상암동, 누리꿈스퀘어)",
+    "latitude":37.5794288857,
+    "longitude":126.889782088,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신촌연세대직영점",
+    "address":"서울 서대문구 연세로 29 1층 KT (창천동, 혜인빌딩)",
+    "latitude":37.5582321187,
+    "longitude":126.936707394,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S광화문본점직영점",
+    "address":"서울 종로구 종로 19 104호 (종로1가, 르메이에르종로타운)",
+    "latitude":37.5708463277,
+    "longitude":126.97992357,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S광화문중앙직영점",
+    "address":"서울 종로구 새문안로9길 25 1층 KT 매장 (당주동)",
+    "latitude":37.5713521067,
+    "longitude":126.9754818,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S독립문역직영점",
+    "address":"서울 종로구 송월길 99 상가동 1층 2128호 (홍파동, 경희궁자이2단지)",
+    "latitude":37.5692070107,
+    "longitude":126.964152857,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S수유직영점",
+    "address":"서울 강북구 도봉로 342 1층 KT (번동)",
+    "latitude":37.6380267388,
+    "longitude":127.026119121,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신당직영점",
+    "address":"서울 중구 퇴계로 434 몽마 1층 (신당동)",
+    "latitude":37.5654913067,
+    "longitude":127.01976232,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S을지로명동본점직영점",
+    "address":"서울 중구 명동7길 25 KT매장 (을지로2가)",
+    "latitude":37.5649142397,
+    "longitude":126.984192064,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신촌역직영점",
+    "address":"서울 마포구 백범로 3 신촌역 6번출구 서강대방향 M 30 (노고산동)",
+    "latitude":37.5544027967,
+    "longitude":126.937204846,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S응암역직영점",
+    "address":"서울 은평구 은평로 63 KT프라자 응암역점 (역촌동, 비앤케이빌딩)",
+    "latitude":37.5990903327,
+    "longitude":126.914835876,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S자양번영로직영점",
+    "address":"서울 광진구 뚝섬로 590 1층 KT (자양동, 아주빌딩)",
+    "latitude":37.5331352576,
+    "longitude":127.075293531,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S명지대사거리직영점",
+    "address":"서울 서대문구 증가로 144 1층 (남가좌동)",
+    "latitude":37.5777579477,
+    "longitude":126.921608966,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S금호동직영점",
+    "address":"서울 성동구 독서당로 302 1층 KT (금호동4가, 대도프라자)",
+    "latitude":37.5475712277,
+    "longitude":127.02270209,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S종로본점직영점",
+    "address":"서울 종로구 삼일대로 393 (관철동, 규당빌딩)",
+    "latitude":37.5696643647,
+    "longitude":126.987386969,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S상계역직영점",
+    "address":"서울 노원구 한글비석로20길 23-16 (중계동)",
+    "latitude":37.6604928378,
+    "longitude":127.073726327,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S대학로본점직영점",
+    "address":"서울 종로구 대명길 6 (명륜2가)",
+    "latitude":37.5837609217,
+    "longitude":127.001074886,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S성신여대직영점",
+    "address":"서울 성북구 동소문로 98 1층 (동소문동5가)",
+    "latitude":37.5922520987,
+    "longitude":127.016172503,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S외대역직영점",
+    "address":"서울 동대문구 휘경로 7 1층 (이문동)",
+    "latitude":37.5964025007,
+    "longitude":127.061117492,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S한성대직영점",
+    "address":"서울 성북구 동소문로 16 1층 KT (동소문동2가, 일신빌딩)",
+    "latitude":37.5890158607,
+    "longitude":127.007978933,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신길직영점",
+    "address":"서울 영등포구 도신로60길 2 (신길동, 미주메디컬빌딩)",
+    "latitude":37.5117900516,
+    "longitude":126.916814165,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S영등포구청역직영점",
+    "address":"서울 영등포구 당산로 132 영등포구청 역 (당산동3가)",
+    "latitude":37.5262784896,
+    "longitude":126.897000082,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S이수역직영점",
+    "address":"서울 동작구 동작대로 127 1층 KT매장 (사당동)",
+    "latitude":37.4879683076,
+    "longitude":126.981943656,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S까치산역직영점",
+    "address":"서울 강서구 강서로 47 (화곡동)",
+    "latitude":37.5319056716,
+    "longitude":126.846268244,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신정네거리역직영점",
+    "address":"서울 양천구 중앙로 274 (신정동)",
+    "latitude":37.5207599846,
+    "longitude":126.853110247,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S가양역직영점",
+    "address":"서울 강서구 양천로 460 (등촌동)",
+    "latitude":37.5625477107,
+    "longitude":126.851727505,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S우장산역직영점",
+    "address":"서울 강서구 강서로 251 1층 (내발산동, 세란빌딩)",
+    "latitude":37.5481247177,
+    "longitude":126.836019187,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S대림역직영점",
+    "address":"서울 영등포구 도림로 135 (대림동)",
+    "latitude":37.4932362776,
+    "longitude":126.896896353,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S마곡나루역직영점",
+    "address":"서울 강서구 마곡중앙5로1길 20 107호 108호 (마곡동, 마곡나루역보타닉비즈타워)",
+    "latitude":37.5687316027,
+    "longitude":126.826720012,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S관악구청직영점",
+    "address":"서울 관악구 쑥고개로 139 (봉천동, 승원빌딩)",
+    "latitude":37.4788754716,
+    "longitude":126.952023646,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S당산직영점",
+    "address":"서울 영등포구 양평로 52 당산역 (당산동6가)",
+    "latitude":37.5346553286,
+    "longitude":126.900875295,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S목동역직영점",
+    "address":"서울 양천구 목동로 201 1층 KT매장 (신정동)",
+    "latitude":37.5264299446,
+    "longitude":126.863927801,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S오목교직영점",
+    "address":"서울 양천구 목동동로 293 (목동, 현대41타워)",
+    "latitude":37.5281705726,
+    "longitude":126.87575425,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S서울대직영점",
+    "address":"서울 관악구 관악로 198 1층 KT매장 (봉천동)",
+    "latitude":37.4825500366,
+    "longitude":126.95397818,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S노량진직영점",
+    "address":"서울 동작구 노량진로 162 1층 KT (노량진동)",
+    "latitude":37.5133925726,
+    "longitude":126.943958191,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S화곡역직영점",
+    "address":"서울 강서구 화곡로 164 1층 KT매장 (화곡동, 화곡빌딩)",
+    "latitude":37.5412530367,
+    "longitude":126.839887787,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S여의도역직영점",
+    "address":"서울 영등포구 국제금융로2길 37 101호 여의도역 (여의도동, 에스트레뉴빌딩)",
+    "latitude":37.5229451936,
+    "longitude":126.924285592,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S신림직영점",
+    "address":"서울 관악구 신림로 360-1 1층 KT매장 (신림동)",
+    "latitude":37.4864928936,
+    "longitude":126.929457364,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S발산역직영점 ",
+    "address":"서울 강서구 강서로 391 문영비즈웍스제1층 제105호 (마곡동)",
+    "latitude":37.5605470847,
+    "longitude":126.838427181,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S당곡역직영점",
+    "address":"서울 관악구 봉천로 212 (신림동, 희성빌딩)",
+    "latitude":37.4896304996,
+    "longitude":126.925077307,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"KT플라자 신길뉴타운점",
+    "address":"서울 영등포구 신길로 28길 9, 20호",
+    "latitude":37.5033191646,
+    "longitude":126.910985938,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"(주)에이치커넥션 노원역점",
+    "address":"서울특별시 노원구 동일로 1390 (상계동, 상계주공6단지아파트) 1층 KT",
+    "latitude":37.6527180998,
+    "longitude":127.061519955,
+    "operating_hours":"24시간",
+    "source":"climate_shelter"
+  },
+  {
+    "name":"M&S구로디지털직영점",
+    "address":"서울특별시 구로구 디지털로34길 55 (구로동) 코오롱싸이언스밸리 112호",
+    "latitude":37.4843459436,
+    "longitude":126.899285087,
+    "operating_hours":"09~19시",
+    "source":"climate_shelter"
+  }
+]
