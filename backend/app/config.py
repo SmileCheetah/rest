@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     kma_asos_api_base_url: str = (
         "https://apis.data.go.kr/1360000/AsosHourlyInfoService"
     )
+    kma_asos_station_id: int = 108
     kma_impact_api_base_url: str = (
         "https://apis.data.go.kr/1360000/ImpactInfoServiceV2"
     )

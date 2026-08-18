@@ -18,7 +18,14 @@ from app.schemas.route import (
 from app.schemas.cooling_spot import CoolingSpotResponse
 from app.schemas.risk_analysis import RiskEvaluateRequest, RiskEvaluateResponse
 from app.schemas.weather import ForecastWeatherResponse
+from app.services.asos import (
+    AsosConfigurationError,
+    AsosDataNotFoundError,
+    AsosProviderError,
+    get_asos_hourly,
+)
 from app.services.tmap import PedestrianRoute, get_pedestrian_route
+from app.config import settings
 from app.services.risk_analysis import evaluate_risk
 from app.services.weather import (
     WeatherForecastNotFoundError,
@@ -65,6 +72,7 @@ async def recommend_route(
             normal_route.destination.latitude,
             normal_route.destination.longitude,
         )
+    model_weather = await _get_model_weather(normal_route.departure_time)
     expected_exposure = current_continuous_exposure_minutes + normal_route.walking_minutes
     risk = evaluate_risk(
         RiskEvaluateRequest(
@@ -75,6 +83,9 @@ async def recommend_route(
             walking_minutes=normal_route.walking_minutes,
             current_continuous_exposure_minutes=current_continuous_exposure_minutes,
             expected_continuous_exposure_minutes=expected_exposure,
+            wind_speed=model_weather["wind_speed"],
+            solar_radiation=model_weather["solar_radiation"],
+            surface_pressure=model_weather["surface_pressure"],
         )
     )
     if risk.risk_level == "MOVE_POSSIBLE":
@@ -90,6 +101,44 @@ async def recommend_route(
     except SafeRouteNotFoundError as exc:
         return risk, normal_route, None, str(exc)
     return risk, normal_route, safe_route, None
+
+
+async def _get_model_weather(departure_time: datetime) -> dict[str, float | None]:
+    """Load optional ASOS features required by the trained risk artifact.
+
+    Forecast/current weather remains the source for the displayed route weather.
+    ASOS is only an enrichment step for wind, solar radiation, and pressure; if
+    it is unavailable, risk analysis safely falls back to the existing rules.
+    """
+    empty = {
+        "wind_speed": None,
+        "solar_radiation": None,
+        "surface_pressure": None,
+    }
+    try:
+        response = await get_asos_hourly(
+            settings.kma_asos_station_id,
+            departure_time,
+            departure_time,
+        )
+    except (
+        AsosConfigurationError,
+        AsosDataNotFoundError,
+        AsosProviderError,
+        ValueError,
+    ):
+        return empty
+    if not response.observations:
+        return empty
+    observation = min(
+        response.observations,
+        key=lambda item: abs((item.observed_at - departure_time).total_seconds()),
+    )
+    return {
+        "wind_speed": observation.wind_speed,
+        "solar_radiation": observation.solar_radiation,
+        "surface_pressure": observation.surface_pressure,
+    }
 
 
 async def calculate_normal_route(
