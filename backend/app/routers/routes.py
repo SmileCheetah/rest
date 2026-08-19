@@ -101,6 +101,7 @@ async def route_recommendation(
                 current_continuous_exposure_minutes=request.currentContinuousExposureMinutes,
                 current_total_walking_minutes=request.currentTotalWalkingMinutes,
                 minutes_since_last_rest=request.minutesSinceLastRest,
+                rest_required_before_next_visit=request.restRequiredBeforeNextVisit,
                 planned_rest_minutes=request.plannedRestMinutes,
                 max_additional_minutes=request.maxAdditionalMinutes,
             )
