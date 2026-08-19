@@ -112,6 +112,8 @@ class RouteRecommendationRequest(BaseModel):
 
     routeSegmentId: int = Field(gt=0)
     currentContinuousExposureMinutes: int = Field(default=0, ge=0, le=600)
+    currentTotalWalkingMinutes: int | None = Field(default=None, ge=0, le=1_440)
+    minutesSinceLastRest: int | None = Field(default=None, ge=0, le=1_440)
     plannedRestMinutes: int = Field(default=10, ge=5, le=60)
     maxAdditionalMinutes: int = Field(default=5, ge=0, le=20)
 

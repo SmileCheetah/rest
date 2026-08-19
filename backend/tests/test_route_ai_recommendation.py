@@ -44,6 +44,37 @@ def _weather() -> ForecastWeatherResponse:
 
 
 class RouteAiRecommendationTest(unittest.IsolatedAsyncioTestCase):
+    async def test_route_ai_receives_full_accumulated_exposure_context(self):
+        captured = {}
+
+        async def resolve(request):
+            return RestWeatherResult(request=request, source="REQUEST_FALLBACK", wbgt=28)
+
+        def predict(_service, request, _wbgt):
+            captured["request"] = request
+            return {"probabilities": {}, "decision": "REST_BEFORE_NEXT_VISIT"}
+
+        with (
+            patch("app.services.routes.resolve_rest_weather", new=resolve),
+            patch(
+                "app.services.routes.RestDecisionService.predict_model_status",
+                new=predict,
+            ),
+        ):
+            result = await _should_recommend_safe_route(
+                normal_route=_normal_route(),
+                weather=_weather(),
+                model_weather={"wind_speed": 1.0, "solar_radiation": None, "surface_pressure": None},
+                current_continuous_exposure_minutes=0,
+                current_total_walking_minutes=30,
+                minutes_since_last_rest=110,
+                nearest_cooling_spot_distance_meters=180,
+            )
+
+        self.assertTrue(result)
+        self.assertEqual(captured["request"].total_walking_minutes, 45)
+        self.assertEqual(captured["request"].minutes_since_last_rest, 110)
+
     async def test_shortest_actual_walking_route_wins_over_nearest_origin_spot(self):
         origin = Coordinate(latitude=37.5739, longitude=127.0105, name="현재 위치")
         destination = Coordinate(latitude=37.5736, longitude=127.0099, name="방문지")

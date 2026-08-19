@@ -99,6 +99,8 @@ async def route_recommendation(
                 session,
                 route_segment_id=request.routeSegmentId,
                 current_continuous_exposure_minutes=request.currentContinuousExposureMinutes,
+                current_total_walking_minutes=request.currentTotalWalkingMinutes,
+                minutes_since_last_rest=request.minutesSinceLastRest,
                 planned_rest_minutes=request.plannedRestMinutes,
                 max_additional_minutes=request.maxAdditionalMinutes,
             )

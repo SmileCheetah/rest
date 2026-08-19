@@ -30,7 +30,9 @@ STATUS_LABELS = (
     "REST_BEFORE_NEXT_VISIT",
 )
 STATUS_MAX = {
-    "MOVABLE": 39,
+    # 짧은 첫 이동은 높은 WBGT만으로 곧바로 휴식 권유가 되지 않도록
+    # 초기 이동 가능 범위를 넓힌 MVP 운영 기준입니다.
+    "MOVABLE": 59,
     "REST_RECOMMENDED": 69,
 }
 
@@ -101,7 +103,7 @@ def train_rest_status_classifier(
         },
         "trained_at": datetime.now(UTC).isoformat(),
         "mvp_label_note": (
-            "The 50/25/10/10/5 score weights and 0-39/40-69/70-100 thresholds "
+            "The 50/25/10/10/5 score weights and 0-59/60-69/70-100 thresholds "
             "are synthetic MVP policy values, not official NIOSH/OSHA outputs."
         ),
     }
@@ -166,5 +168,8 @@ def predict_rest_status(
         label: round(float(raw_probabilities[index]), 4)
         for index, label in enumerate(STATUS_LABELS)
     }
-    prediction = max(probability_map, key=probability_map.get)
+    # 표시용 반올림 값이 아니라 모델의 원본 확률로 최종 클래스를 고릅니다.
+    # 경계에 아주 가까운 두 확률이 같은 값으로 반올림되는 경우에도 결과가
+    # 클래스 선언 순서에 의해 바뀌지 않게 합니다.
+    prediction = STATUS_LABELS[int(np.argmax(raw_probabilities))]
     return {"probabilities": probability_map, "decision": prediction}

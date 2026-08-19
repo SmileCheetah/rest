@@ -64,6 +64,8 @@ async def recommend_route(
     *,
     route_segment_id: int,
     current_continuous_exposure_minutes: int,
+    current_total_walking_minutes: int | None,
+    minutes_since_last_rest: int | None,
     planned_rest_minutes: int,
     max_additional_minutes: int,
 ) -> tuple[RiskEvaluateResponse, RouteSegmentResponse, SafeRouteResponse | None, str | None]:
@@ -120,6 +122,8 @@ async def recommend_route(
         weather=weather,
         model_weather=model_weather,
         current_continuous_exposure_minutes=current_continuous_exposure_minutes,
+        current_total_walking_minutes=current_total_walking_minutes,
+        minutes_since_last_rest=minutes_since_last_rest,
         nearest_cooling_spot_distance_meters=nearest_distance,
     )
     if not should_recommend_safe_route:
@@ -144,6 +148,8 @@ async def _should_recommend_safe_route(
     model_weather: dict[str, float | None],
     current_continuous_exposure_minutes: int,
     nearest_cooling_spot_distance_meters: int | None,
+    current_total_walking_minutes: int | None = None,
+    minutes_since_last_rest: int | None = None,
 ) -> bool:
     """동일한 XGBoost 휴식 판단으로 안전경로 생성 여부를 결정합니다."""
     observed_at = (
@@ -154,9 +160,16 @@ async def _should_recommend_safe_route(
     request = RestDecisionRequest(
         continuousWalkingMinutes=current_continuous_exposure_minutes,
         totalWalkingMinutes=(
-            current_continuous_exposure_minutes + normal_route.walking_minutes
+            (current_total_walking_minutes
+             if current_total_walking_minutes is not None
+             else current_continuous_exposure_minutes)
+            + normal_route.walking_minutes
         ),
-        minutesSinceLastRest=current_continuous_exposure_minutes,
+        minutesSinceLastRest=(
+            minutes_since_last_rest
+            if minutes_since_last_rest is not None
+            else current_continuous_exposure_minutes
+        ),
         recentRestMinutes=0,
         stationId=settings.kma_asos_station_id,
         temperature=weather.temperature,

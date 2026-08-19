@@ -2,6 +2,7 @@ import type {
   CreateScheduleRequest,
   CreateRouteSegmentRequest,
   CurrentWeather,
+  HourlyWeather,
   CoolingSpot,
   HeatwaveImpact,
   LivingWeatherIndex,
@@ -140,6 +141,19 @@ export function getCurrentWeather(
   return apiRequest(`/weather/current?${params}`);
 }
 
+export function getHourlyWeather(
+  latitude: number,
+  longitude: number,
+  date: string,
+): Promise<HourlyWeather> {
+  const params = new URLSearchParams({
+    latitude: String(latitude),
+    longitude: String(longitude),
+    date,
+  });
+  return apiRequest(`/weather/hourly?${params}`);
+}
+
 export function getCurrentHeatwave(): Promise<HeatwaveImpact> {
   return apiRequest("/heatwave/current");
 }
@@ -163,12 +177,16 @@ export function createRouteSegment(
 export function recommendRoute(
   routeSegmentId: number,
   currentContinuousExposureMinutes = 0,
+  currentTotalWalkingMinutes = currentContinuousExposureMinutes,
+  minutesSinceLastRest = currentContinuousExposureMinutes,
 ): Promise<RouteRecommendation> {
   return apiRequest("/routes/recommendation", {
     method: "POST",
     body: JSON.stringify({
       routeSegmentId,
       currentContinuousExposureMinutes,
+      currentTotalWalkingMinutes,
+      minutesSinceLastRest,
       plannedRestMinutes: 10,
       maxAdditionalMinutes: 5,
     }),
