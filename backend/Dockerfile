@@ -13,9 +13,10 @@ RUN apt-get update \
 
 COPY app ./app
 COPY artifacts ./artifacts
+COPY scripts ./scripts
 COPY migrations ./migrations
 COPY alembic.ini ./alembic.ini
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "alembic upgrade head && python -m scripts.seed && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

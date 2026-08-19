@@ -396,13 +396,16 @@ export default function Home() {
   );
 
   const loadDashboard = useCallback(async () => {
-    try {
-      const [schedules, targets, spots] = await Promise.all([
-        getTodaySchedules(),
-        getVisitTargets(),
-        // 지도에는 현재 위치 기준 반경 2km 이내 쉼터만 표시한다.
-        getCoolingSpots(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude, 2_000),
-      ]);
+    const [schedulesResult, targetsResult, spotsResult] = await Promise.allSettled([
+      getTodaySchedules(),
+      getVisitTargets(),
+      // 지도에는 현재 위치 기준 반경 2km 이내 쉼터만 표시한다.
+      getCoolingSpots(DEFAULT_LOCATION.latitude, DEFAULT_LOCATION.longitude, 2_000),
+    ]);
+
+    if (schedulesResult.status === "fulfilled") {
+      const schedules = schedulesResult.value;
+      const spots = spotsResult.status === "fulfilled" ? spotsResult.value : [];
       const cards = toVisitCards(schedules);
       setVisits(cards);
       // 일정 카드는 먼저 표시하고, XGBoost 휴식 판단 결과가 도착하면
@@ -415,24 +418,42 @@ export default function Home() {
           .filter((schedule) => schedule.status === "COMPLETED")
           .map((schedule) => schedule.scheduleId),
       );
-      setVisitTargets(targets);
-      setCoolingSpots(spots);
-      setSelectedTargetId((current) => current ?? targets[0]?.visitTargetId ?? null);
-      try {
-        setWorkSession(await getCurrentWorkSession());
-      } catch (error) {
-        if (error instanceof ApiError && error.status === 404) {
-          setWorkSession(null);
-        } else {
-          throw error;
-        }
-      }
-      setApiMessage(null);
-    } catch {
-      setApiMessage("Backend 연결을 확인해주세요. 현재 화면은 mock 데이터입니다.");
-    } finally {
-      setIsBusy(false);
     }
+
+    if (targetsResult.status === "fulfilled") {
+      const targets = targetsResult.value;
+      setVisitTargets(targets);
+      setSelectedTargetId((current) =>
+        targets.some((target) => target.visitTargetId === current)
+          ? current
+          : targets[0]?.visitTargetId ?? null,
+      );
+    }
+
+    if (spotsResult.status === "fulfilled") {
+      setCoolingSpots(spotsResult.value);
+    }
+
+    try {
+      setWorkSession(await getCurrentWorkSession());
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        setWorkSession(null);
+      }
+    }
+
+    const failedSections = [
+      schedulesResult.status === "rejected" ? "일정" : null,
+      targetsResult.status === "rejected" ? "방문대상자" : null,
+      spotsResult.status === "rejected" ? "쿨링스팟" : null,
+    ].filter((section): section is string => section !== null);
+
+    if (failedSections.length === 0) {
+      setApiMessage(null);
+    } else {
+      setApiMessage(`${failedSections.join(", ")} 정보를 불러오지 못했습니다. 다시 눌러주세요.`);
+    }
+    setIsBusy(false);
   }, []);
 
   const loadWeather = useCallback(async () => {
