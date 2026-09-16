@@ -1,5 +1,6 @@
 <img width="1182" height="592" alt="image" src="https://github.com/user-attachments/assets/8d9d206b-8f2f-40e1-9f49-30676c10cb87" />
-# 쉼표
+
+## 쉼표
 
 ## 폭염 이동 안전 지원 서비스
 
