@@ -1,14 +1,12 @@
-<img width="239" height="544" alt="스크린샷 2026-09-16 오후 8 56 58" src="https://github.com/user-attachments/assets/2bff649d-3fda-478e-8560-a1c3530f81b9" /># 쉼표
+<img width="1182" height="592" alt="image" src="https://github.com/user-attachments/assets/8d9d206b-8f2f-40e1-9f49-30676c10cb87" />
+# 쉼표
 
 ## 폭염 이동 안전 지원 서비스
 
 > 폭염 속 생활지원사의 방문 일정과 이동 경로를 분석해
 > 필요한 휴식과 안전한 이동 경로를 안내하는 AI 기반 서비스입니다.
 
-[![GitHub]([https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/SmileCheetah/rest](https://github.com/SmileCheetah/rest))
-[![Demo]([https://img.shields.io/badge/Demo-Live%20Service-00C853)](https://rest-brown-iota.vercel.app](https://rest-brown-iota.vercel.app/))
-
----
+https://rest-brown-iota.vercel.app/
 
 ## 프로젝트 소개
 
@@ -136,7 +134,9 @@ AI 기반 안전 동행 서비스 아이디어를 기획했습니다.
 
 ---
 
-## 담당 역할
+## 개발 담당 역할
+
+이채현
 
 김상호
 
